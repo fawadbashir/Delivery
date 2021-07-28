@@ -6,7 +6,11 @@ import Colors from '../constants/colors'
 
 const AuthButton = (props) => {
   return (
-    <TouchableOpacity onPress={props.onPress} activeOpacity={0.6}>
+    <TouchableOpacity
+      style={props.style}
+      onPress={props.onPress}
+      activeOpacity={0.6}
+      disabled={props.disabled}>
       <LinearGradient
         colors={[Colors.primary, '#192f6a']}
         style={{...styles.authButton, ...props.authButton}}>
@@ -21,16 +25,17 @@ const AuthButton = (props) => {
 const styles = StyleSheet.create({
   authButton: {
     padding: 10,
-    width: '60%',
+    // width: '70%',
     alignSelf: 'center',
-    borderRadius: 30,
+    borderRadius: 50,
     alignItems: 'center',
     marginTop: 20,
   },
   authButtonText: {
-    fontFamily: 'Poppins-Regular',
+    fontFamily: 'Poppins-SemiBold',
     color: 'white',
     fontSize: 18,
+
     // backgroundColor: 'transparent',
   },
 })
