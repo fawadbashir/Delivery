@@ -8,12 +8,17 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native'
 import {useForm} from 'react-hook-form'
 import {Checkbox} from 'react-native-paper'
 
 import AuthButton from '../../components/AuthButton'
 import Input from '../../components/Input'
+
+import {useHttpClient} from '../../hooks/http-hook'
+
 import Colors from '../../constants/colors'
 
 const SignUp = (props) => {
@@ -23,12 +28,14 @@ const SignUp = (props) => {
   const passwordRef = useRef()
   const phoneNumberRef = useRef()
   const confirmPasswordRef = useRef()
+  const {sendRequest, clearError, error, isLoading} = useHttpClient()
+
   const {
     control,
     handleSubmit,
     register,
 
-    formState: {errors, isValid},
+    formState: {errors},
   } = useForm({mode: 'onSubmit'})
   const fullName = register('fullName', {minLength: 8})
   const email = register('email')
@@ -46,6 +53,29 @@ const SignUp = (props) => {
 
   const onSubmit = (data) => {
     console.log(data)
+    const [firstName, lastName] = data.fullName.split(' ')
+
+    const userData = {
+      firstName,
+      lastName,
+      phone: data.phoneNumber,
+      email: data.email,
+      password: data.password,
+    }
+
+    sendRequest(
+      'https://deliverypay.in/api/registerUser',
+      'POST',
+      JSON.stringify(userData),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    ).then((response) => console.log(response))
+  }
+
+  if (error) {
+    Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
   }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -60,6 +90,7 @@ const SignUp = (props) => {
             control={control}
             rules={{
               required: true,
+              pattern: /^([\w]{3,})+\s+([\w\s]{3,})+$/i,
             }}
             placeholder="Full Name"
             ref={(e) => {
@@ -175,7 +206,7 @@ const SignUp = (props) => {
           <Checkbox
             status={checked ? 'checked' : 'unchecked'}
             onPress={() => {
-              setChecked(!checked)
+              setChecked((prev) => !prev)
             }}
             color={'#53aefc'}
             uncheckedColor={'#53aefc'}
@@ -186,14 +217,22 @@ const SignUp = (props) => {
               style={styles.agreeText}>{`conditions & privacy policy`}</Text>
           </View>
         </View>
-        <AuthButton
-          style={{width: '70%', alignSelf: 'center'}}
-          authButton={styles.authButton}
-          authButtonText={{fontSize: 16}}
-          onPress={handleSubmit(onSubmit)}
-          disabled={!isValid || !checked}>
-          Register
-        </AuthButton>
+        {!isLoading ? (
+          <AuthButton
+            style={{width: '70%', alignSelf: 'center'}}
+            authButton={styles.authButton}
+            authButtonText={{fontSize: 16}}
+            onPress={handleSubmit(onSubmit)}
+            disabled={!checked}>
+            Register
+          </AuthButton>
+        ) : (
+          <ActivityIndicator
+            size="large"
+            color={Colors.primary}
+            style={{marginTop: 35}}
+          />
+        )}
         <View style={styles.loginSection}>
           <Text style={styles.alreadyAccountText}>
             Already have an account?

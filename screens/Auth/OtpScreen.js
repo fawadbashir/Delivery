@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect, useContext, useCallback} from 'react'
 import {
   View,
   Text,
@@ -8,12 +8,71 @@ import {
 } from 'react-native'
 import colors from '../../constants/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import fetch from 'node-fetch'
 
-const OtpScreen = () => {
+import {AuthContext} from '../../context/auth'
+
+import {sendRequest} from '../../hooks/http-hook'
+
+const OtpScreen = (props) => {
+  const [otp, setOtp] = useState([])
+  const {user} = useContext(AuthContext)
+
+  const addToOtp = (value) => {
+    setOtp((prevOtp) => [...prevOtp, value])
+  }
+
+  const clearOtpValue = () => {
+    const lastValue = otp.pop()
+
+    setOtp((prevOtp) => prevOtp.filter((item) => item !== lastValue))
+  }
+
+  const submitUserOtp = () => {
+    sendRequest(
+      'https://deliverypay.in/api/submitUserOTP',
+      'POST',
+      JSON.stringify({code: otp.join(','), phone: user.userPhone}),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    ).then((response) => console.log(response))
+  }
+
+  const fetchOtp = useCallback(async () => {
+    try {
+      const response = await fetch(
+        'https://deliverypay.in/api/sendUserOTP',
+        {
+          method: 'POST',
+          body: JSON.stringify({phone: user.userPhone}),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        },
+        [user.userPhone],
+      )
+      console.log(response)
+      const resData = await response.json()
+      console.log(resData)
+    } catch (e) {
+      console.log(e)
+    }
+  }, [user.userPhone])
+
+  useEffect(() => {
+    fetchOtp()
+    console.log(user)
+  }, [fetchOtp])
+
   return (
     <ScrollView contentContainerStyle={styles.screen}>
       <View style={styles.topView}>
-        <TouchableOpacity activeOpacity={0.1}>
+        <TouchableOpacity
+          activeOpacity={0.1}
+          onPress={() => props.navigation.navigate('login')}>
           <Icon name="arrow-back" size={30} />
         </TouchableOpacity>
         <Text style={styles.loginText}>Login</Text>
@@ -25,12 +84,12 @@ const OtpScreen = () => {
         </Text>
         <Text style={styles.infoText}>with six digit verification code</Text>
         <View style={styles.otpNumbersView}>
-          <Text style={styles.otpNumberText}>____</Text>
-          <Text style={styles.otpNumberText}>____</Text>
-          <Text style={styles.otpNumberText}>____</Text>
-          <Text style={styles.otpNumberText}>____</Text>
-          <Text style={styles.otpNumberText}>____</Text>
-          <Text style={styles.otpNumberText}>____</Text>
+          <Text style={styles.otpNumberText}>{otp[0] ? otp[0] : '____'}</Text>
+          <Text style={styles.otpNumberText}>{otp[1] ? otp[1] : '____'}</Text>
+          <Text style={styles.otpNumberText}>{otp[2] ? otp[2] : '____'}</Text>
+          <Text style={styles.otpNumberText}>{otp[3] ? otp[3] : '____'}</Text>
+          <Text style={styles.otpNumberText}>{otp[4] ? otp[4] : '____'}</Text>
+          <Text style={styles.otpNumberText}>{otp[5] ? otp[5] : '____'}</Text>
         </View>
         <TouchableOpacity onPress={() => {}} activeOpacity={0.6}>
           <Text style={styles.mainHeading}>Re-send Otp</Text>
@@ -39,70 +98,94 @@ const OtpScreen = () => {
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 1)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>1</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 2)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>2</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 3)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>3</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 4)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>4</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 5)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>5</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 6)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>6</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 7)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>7</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 8)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>8</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 9)}
+              disabled={otp.length === 6}>
               <Text style={styles.buttonText}>9</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={clearOtpValue}
+              disabled={otp.length === 0}>
               {/* <Text style={styles.buttonText}>1</Text> */}
               <Icon name="close" size={20} style={styles.iconText} />
               {/* <Icon */}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              onPress={addToOtp.bind(this, 0)}
+              disabled={otp.length === 7}>
               <Text style={styles.buttonText}>0</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
-              activeOpacity={0.6}>
+              activeOpacity={0.6}
+              disabled={otp.length < 7}
+              onPress={submitUserOtp}>
               <Icon name="done" size={20} style={styles.iconText} />
             </TouchableOpacity>
           </View>
@@ -172,6 +255,8 @@ const styles = StyleSheet.create({
   otpNumberText: {
     marginHorizontal: 10,
     width: 30,
+    fontSize: 16,
+    // fontFamily: 'Poppins-Regular',
   },
   buttonsView: {
     paddingHorizontal: 40,

@@ -1,5 +1,6 @@
-import React, {useRef} from 'react'
+import React, {useRef, useContext} from 'react'
 import {useForm} from 'react-hook-form'
+import fetch from 'node-fetch'
 import {
   View,
   StyleSheet,
@@ -9,18 +10,27 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   ImageBackground,
+  Alert,
+  ActivityIndicator,
 } from 'react-native'
 
 import {Card} from 'react-native-paper'
-import AuthButton from '../../components/AuthButton'
 
+import AuthButton from '../../components/AuthButton'
 import Input from '../../components/Input'
+import {useHttpClient} from '../../hooks/http-hook'
+import {AuthContext} from '../../context/auth'
+
 import Colors from '../../constants/colors'
 
 const Login = (props) => {
   const emailRef = useRef()
   const passwordRef = useRef()
   const window = useWindowDimensions()
+
+  const {login} = useContext(AuthContext)
+
+  const {sendRequest, clearError, error, isLoading} = useHttpClient()
 
   const {
     control,
@@ -33,7 +43,51 @@ const Login = (props) => {
   const password = register('password')
 
   const onSubmit = (data) => {
-    console.log(data)
+    const {email, password} = data
+
+    sendRequest(
+      'https://deliverypay.in/api/userLogin',
+      'POST',
+      JSON.stringify({username: email, password}),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    ).then((response) => {
+      login(response.user.userId, response.user.phone)
+
+      props.navigation.navigate('otp')
+    })
+
+    // console.log(data)
+    // const fetchData = async () => {
+    //   setIsLoading(true)
+    //   try {
+    //     const response = await fetch('https://deliverypay.in/api/userLogin', {
+    //       method: 'POST',
+    //       body: JSON.stringify({
+    //         username: email,
+    //         password,
+    //       }),
+    //       headers: {
+    //         Accept: 'application/json',
+    //         'Content-Type': 'application/json'
+    //       },
+    //     })
+
+    //     const resData = await response.json()
+    //     console.log(resData)
+    //   } catch (e) {
+    //     console.log(e)
+    //     setError(e)
+    //   }
+    //   setIsLoading(false)
+    // }
+    // fetchData()
+  }
+
+  if (error) {
+    Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
   }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -105,12 +159,20 @@ const Login = (props) => {
               <Text style={styles.forgetPassword}>Forget Password ?</Text>
             </TouchableOpacity>
 
-            <AuthButton
-              style={{alignSelf: 'center'}}
-              authButton={{width: 180}}
-              onPress={handleSubmit(onSubmit)}>
-              Log in
-            </AuthButton>
+            {isLoading ? (
+              <ActivityIndicator
+                size="large"
+                color={Colors.primary}
+                style={{marginTop: 35}}
+              />
+            ) : (
+              <AuthButton
+                style={{alignSelf: 'center'}}
+                authButton={{width: 180}}
+                onPress={handleSubmit(onSubmit)}>
+                Log in
+              </AuthButton>
+            )}
           </Card>
 
           <View

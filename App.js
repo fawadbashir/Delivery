@@ -10,7 +10,7 @@ import React from 'react'
 
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper'
 import NavigationContainer from './Navigation/NavigationContainer'
-import OtpScreen from './screens/Auth/OtpScreen'
+import {AuthProvider} from './context/auth'
 
 const theme = {
   ...DefaultTheme,
@@ -24,10 +24,9 @@ const theme = {
 
 const App = () => {
   return (
-    <PaperProvider theme={theme}>
-      {/* <NavigationContainer /> */}
-      <OtpScreen />
-    </PaperProvider>
+    <AuthProvider>
+      <NavigationContainer />
+    </AuthProvider>
   )
 }
 
