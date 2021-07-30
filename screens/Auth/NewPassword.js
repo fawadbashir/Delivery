@@ -24,10 +24,11 @@ import {AuthContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
-const Login = (props) => {
+const NewPassword = (props) => {
   const emailRef = useRef()
   const passwordRef = useRef()
-  // const window = useWindowDimensions()
+  //   const otpRef = useRef()
+  const window = useWindowDimensions()
 
   const {login} = useContext(AuthContext)
 
@@ -42,15 +43,16 @@ const Login = (props) => {
 
   const email = register('email')
   const password = register('password')
+  //   const otp = register('otp')
 
   const onSubmit = async (data) => {
-    const {email, password} = data
+    const {email, password, otp} = data
 
     try {
       const responseData = await sendRequest(
-        'https://deliverypay.in/api/userLogin',
+        'https://deliverypay.in/api/userResetPass',
         'POST',
-        JSON.stringify({username: email, password}),
+        JSON.stringify({phone: email, newPass: password, code: otp}),
         {
           Accept: 'application/json',
           'Content-Type': 'application/json',
@@ -58,7 +60,6 @@ const Login = (props) => {
       )
 
       login(responseData.user.userId, responseData.user.phone)
-      props.navigation.navigate('otp')
       // eslint-disable-next-line no-empty
     } catch (e) {}
     if (error) {
@@ -66,42 +67,6 @@ const Login = (props) => {
     }
   }
 
-  // .then((response) => {
-  //   login(response.user.userId, response.user.phone)
-
-  //   props.navigation.navigate('otp')
-  // })
-
-  // console.log(data)
-  // const fetchData = async () => {
-  //   setIsLoading(true)
-  //   try {
-  //     const response = await fetch('https://deliverypay.in/api/userLogin', {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         username: email,
-  //         password,
-  //       }),
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json'
-  //       },
-  //     })
-
-  //     const resData = await response.json()
-  //     console.log(resData)
-  //   } catch (e) {
-  //     console.log(e)
-  //     setError(e)
-  //   }
-  //   setIsLoading(false)
-  // }
-  // fetchData()
-
-  // if (error) {
-
-  //   console.log(error)
-  // }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView contentContainerStyle={styles.screen}>
@@ -112,11 +77,12 @@ const Login = (props) => {
             <Text style={styles.mainHeading}>Ensure the best and</Text>
             <Text style={styles.mainHeading}>secure transaction</Text>
             <Text style={styles.subHeading}>
-              We ensure buyer and seller happiness
+              {/* We ensure buyer and seller happiness */}
             </Text>
           </View>
-          <Card style={[styles.card, {top: '25%'}]}>
-            <Text style={styles.loginHeading}>Login Account</Text>
+          <Card
+            style={[styles.card, {top: window.height < 700 ? '25%' : '28%'}]}>
+            <Text style={styles.loginHeading}>Reset Password</Text>
             <View
               style={[styles.inputContainer, errors.email && styles.redBorder]}>
               <Input
@@ -146,6 +112,32 @@ const Login = (props) => {
                 placeholderTextColor={errors.email ? '#b55151' : '#53aefc'}
               />
             </View>
+            {/* <View
+              style={[
+                styles.inputContainer,
+                errors.password && styles.redBorder,
+              ]}>
+              <Input
+                name="otp"
+                control={control}
+                rules={{
+                  required: true,
+                  // pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                }}
+                placeholder="OTP Code"
+                ref={(e) => {
+                  otp.ref(e)
+                  otpRef.current = e
+                }}
+                onSubmitEditing={() => {
+                  otpRef.current.blur()
+                  // Keyboard.dismiss()
+                }}
+                blurOnSubmit={false}
+                returnKeyType="go"
+                placeholderTextColor={errors.password ? '#b55151' : '#53aefc'}
+              />
+            </View> */}
             <View
               style={[
                 styles.inputContainer,
@@ -159,7 +151,7 @@ const Login = (props) => {
                   // pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                 }}
                 secureTextEntry={true}
-                placeholder="Password"
+                placeholder="New Password"
                 ref={(e) => {
                   password.ref(e)
                   passwordRef.current = e
@@ -173,13 +165,14 @@ const Login = (props) => {
                 placeholderTextColor={errors.password ? '#b55151' : '#53aefc'}
               />
             </View>
-            <TouchableOpacity
+
+            {/* <TouchableOpacity
               onPress={() => {
                 props.navigation.navigate('forgotPassword')
               }}
               activeOpacity={0.6}>
               <Text style={styles.forgetPassword}>Forget Password ?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {isLoading ? (
               <ActivityIndicator
@@ -190,9 +183,9 @@ const Login = (props) => {
             ) : (
               <AuthButton
                 style={{alignSelf: 'center'}}
-                authButton={{width: 180}}
+                authButton={{width: 200}}
                 onPress={handleSubmit(onSubmit)}>
-                Log in
+                Reset Password
               </AuthButton>
             )}
           </Card>
@@ -292,4 +285,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Login
+export default NewPassword

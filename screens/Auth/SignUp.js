@@ -71,12 +71,12 @@ const SignUp = (props) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-    ).then((response) => console.log(response))
+    ).then((response) => console.log(response, 'response'))
+    if (error) {
+      Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
+    }
   }
 
-  if (error) {
-    Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
-  }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView style={styles.screen}>
@@ -138,6 +138,7 @@ const SignUp = (props) => {
             control={control}
             rules={{
               required: true,
+              pattern: /^[789]\d{9,9}$/g,
             }}
             placeholder="Phone No."
             ref={(e) => {

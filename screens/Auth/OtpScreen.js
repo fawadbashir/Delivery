@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native'
 import colors from '../../constants/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -12,32 +13,63 @@ import fetch from 'node-fetch'
 
 import {AuthContext} from '../../context/auth'
 
-import {sendRequest} from '../../hooks/http-hook'
+import {useHttpClient} from '../../hooks/http-hook'
 
 const OtpScreen = (props) => {
-  const [otp, setOtp] = useState([])
-  const {user} = useContext(AuthContext)
+  // const [otp, setOtp] = useState([])
+  const {user, isForgotPassword, otp, addToOtp, clearOtpValue} =
+    useContext(AuthContext)
 
-  const addToOtp = (value) => {
-    setOtp((prevOtp) => [...prevOtp, value])
-  }
+  const {sendRequest, error, clearError} = useHttpClient()
 
-  const clearOtpValue = () => {
-    const lastValue = otp.pop()
-
-    setOtp((prevOtp) => prevOtp.filter((item) => item !== lastValue))
-  }
+  // const addToOtp = (value) => {
+  //   setOtp((prevOtp) => [...prevOtp, value])
+  // }
 
   const submitUserOtp = () => {
-    sendRequest(
-      'https://deliverypay.in/api/submitUserOTP',
-      'POST',
-      JSON.stringify({code: otp.join(','), phone: user.userPhone}),
-      {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    ).then((response) => console.log(response))
+    if (isForgotPassword) {
+      try {
+        const responseData = sendRequest(
+          'https://deliverypay.in/api/submitUserForgotPassOTP',
+          'POST',
+          JSON.stringify({code: otp.join(','), phone: user.userPhone}),
+          {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        )
+        if (responseData) {
+          props.navigation.navigate('newPassword')
+        }
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
+      if (error) {
+        Alert.alert('Error', error, [
+          {text: 'Okay', style: 'cancel', onPress: () => clearError()},
+        ])
+      }
+    } else {
+      try {
+        const responseData = sendRequest(
+          'https://deliverypay.in/api/submitUserOTP',
+          'POST',
+          JSON.stringify({code: otp.join(','), phone: user.userPhone}),
+          {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        )
+        if (responseData) {
+          props.navigation.navigate('newPassword')
+        }
+        // eslint-disable-next-line no-empty
+      } catch (e) {}
+      if (error) {
+        Alert.alert('Error', error, [
+          {text: 'Okay', style: 'cancel', onPress: () => clearError()},
+        ])
+      }
+    }
   }
 
   const fetchOtp = useCallback(async () => {
@@ -57,15 +89,20 @@ const OtpScreen = (props) => {
       console.log(response)
       const resData = await response.json()
       console.log(resData)
+      if (!response.ok) {
+        Alert.alert('Error', resData.message)
+      }
     } catch (e) {
       console.log(e)
     }
   }, [user.userPhone])
 
   useEffect(() => {
-    fetchOtp()
+    if (!isForgotPassword) {
+      fetchOtp()
+    }
     console.log(user)
-  }, [fetchOtp])
+  }, [fetchOtp, isForgotPassword, user])
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
@@ -99,21 +136,21 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 1)}
+              onPress={() => addToOtp(1)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>1</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 2)}
+              onPress={() => addToOtp(2)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>2</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 3)}
+              onPress={() => addToOtp(3)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>3</Text>
             </TouchableOpacity>
@@ -122,21 +159,21 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 4)}
+              onPress={() => addToOtp(4)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>4</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 5)}
+              onPress={() => addToOtp(5)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>5</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 6)}
+              onPress={() => addToOtp(6)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>6</Text>
             </TouchableOpacity>
@@ -145,21 +182,21 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 7)}
+              onPress={() => addToOtp(7)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>7</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 8)}
+              onPress={() => addToOtp(8)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>8</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 9)}
+              onPress={() => addToOtp(9)}
               disabled={otp.length === 6}>
               <Text style={styles.buttonText}>9</Text>
             </TouchableOpacity>
@@ -177,7 +214,7 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={addToOtp.bind(this, 0)}
+              onPress={() => addToOtp(0)}
               disabled={otp.length === 7}>
               <Text style={styles.buttonText}>0</Text>
             </TouchableOpacity>

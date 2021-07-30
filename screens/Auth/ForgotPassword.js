@@ -24,12 +24,12 @@ import {AuthContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
-const Login = (props) => {
+const ForgotPassword = (props) => {
   const emailRef = useRef()
-  const passwordRef = useRef()
+
   // const window = useWindowDimensions()
 
-  const {login} = useContext(AuthContext)
+  const {login, userForgotPassword} = useContext(AuthContext)
 
   const {sendRequest, clearError, error, isLoading} = useHttpClient()
 
@@ -41,24 +41,26 @@ const Login = (props) => {
   } = useForm({mode: 'onSubmit'})
 
   const email = register('email')
-  const password = register('password')
 
   const onSubmit = async (data) => {
-    const {email, password} = data
+    const {email} = data
 
     try {
       const responseData = await sendRequest(
-        'https://deliverypay.in/api/userLogin',
+        'https://deliverypay.in/api/sendUserForgotPassOTP',
         'POST',
-        JSON.stringify({username: email, password}),
+        JSON.stringify({phone: email}),
         {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
       )
-
-      login(responseData.user.userId, responseData.user.phone)
-      props.navigation.navigate('otp')
+      console.log(responseData)
+      login(null, email)
+      if (responseData) {
+        userForgotPassword()
+        props.navigation.navigate('otp')
+      }
       // eslint-disable-next-line no-empty
     } catch (e) {}
     if (error) {
@@ -66,42 +68,6 @@ const Login = (props) => {
     }
   }
 
-  // .then((response) => {
-  //   login(response.user.userId, response.user.phone)
-
-  //   props.navigation.navigate('otp')
-  // })
-
-  // console.log(data)
-  // const fetchData = async () => {
-  //   setIsLoading(true)
-  //   try {
-  //     const response = await fetch('https://deliverypay.in/api/userLogin', {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         username: email,
-  //         password,
-  //       }),
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json'
-  //       },
-  //     })
-
-  //     const resData = await response.json()
-  //     console.log(resData)
-  //   } catch (e) {
-  //     console.log(e)
-  //     setError(e)
-  //   }
-  //   setIsLoading(false)
-  // }
-  // fetchData()
-
-  // if (error) {
-
-  //   console.log(error)
-  // }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <ScrollView contentContainerStyle={styles.screen}>
@@ -115,7 +81,7 @@ const Login = (props) => {
               We ensure buyer and seller happiness
             </Text>
           </View>
-          <Card style={[styles.card, {top: '25%'}]}>
+          <Card style={[styles.card, {marginTop: '55%'}]}>
             <Text style={styles.loginHeading}>Login Account</Text>
             <View
               style={[styles.inputContainer, errors.email && styles.redBorder]}>
@@ -139,14 +105,14 @@ const Login = (props) => {
                   emailRef.current = e
                 }}
                 onSubmitEditing={() => {
-                  passwordRef.current.focus()
+                  emailRef.current.dismiss()
                 }}
                 blurOnSubmit={false}
                 returnKeyType="next"
                 placeholderTextColor={errors.email ? '#b55151' : '#53aefc'}
               />
             </View>
-            <View
+            {/* <View
               style={[
                 styles.inputContainer,
                 errors.password && styles.redBorder,
@@ -172,14 +138,10 @@ const Login = (props) => {
                 returnKeyType="go"
                 placeholderTextColor={errors.password ? '#b55151' : '#53aefc'}
               />
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate('forgotPassword')
-              }}
-              activeOpacity={0.6}>
+            </View> */}
+            {/* <TouchableOpacity onPress={() => {}} activeOpacity={0.6}>
               <Text style={styles.forgetPassword}>Forget Password ?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {isLoading ? (
               <ActivityIndicator
@@ -190,9 +152,9 @@ const Login = (props) => {
             ) : (
               <AuthButton
                 style={{alignSelf: 'center'}}
-                authButton={{width: 180}}
+                authButton={{width: 200, marginTop: 30}}
                 onPress={handleSubmit(onSubmit)}>
-                Log in
+                Send Password
               </AuthButton>
             )}
           </Card>
@@ -201,14 +163,14 @@ const Login = (props) => {
             <Text
               style={[
                 styles.loginHeading,
-                {fontFamily: 'Poppins-Regular'},
-              ]}>{`Don't Have an account?`}</Text>
+                {fontFamily: 'Poppins-Regular', marginTop: 30},
+              ]}>{`Already have an account?`}</Text>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.navigate('signup')
+                props.navigation.navigate('login')
               }}
               activeOpacity={0.6}>
-              <Text style={styles.registerText}>Register</Text>
+              <Text style={styles.registerText}>Login</Text>
             </TouchableOpacity>
           </View>
         </ImageBackground>
@@ -248,8 +210,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // top: window.height <= 700 ?  ,
     borderRadius: 35,
-    paddingTop: 25,
-    paddingBottom: 40,
+    paddingTop: 40,
+    // paddingBottom: 40,
     // alignItems: 'center',
   },
   loginHeading: {
@@ -281,7 +243,8 @@ const styles = StyleSheet.create({
   whiteBackground: {
     width: '100%',
     height: '35%',
-    justifyContent: 'center',
+    flexGrow: 1,
+    // justifyContent: 'center',
     // backgroundColor: '#ffff',
     alignItems: 'center',
   },
@@ -292,4 +255,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Login
+export default ForgotPassword

@@ -26,8 +26,8 @@ export const useHttpClient = () => {
           (reqCtrl) => reqCtrl !== httpAbortCntrl,
         )
         if (!response.ok) {
-          console.log(response)
-          // throw new Error('Cant process Request')
+          // console.log(response)
+          throw new Error(responseData.message)
         }
         // console.log(response)
         setIsLoading(false)
