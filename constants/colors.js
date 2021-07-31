@@ -3,4 +3,5 @@ export default {
   accent: '#2020d5',
   lightBlue: '#bce0fd',
   errorColor: '#b55151',
+  commonBackgroundColor: '#f8faff',
 }
