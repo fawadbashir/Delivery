@@ -6,6 +6,7 @@ export const AuthProvider = (props) => {
   const [user, setUser] = useState({userId: '', userPhone: ''})
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [otp, setOtp] = useState([])
+  const [userType, setUserType] = useState('')
 
   const addToOtp = (value) => {
     setOtp((prevOtp) => [...prevOtp, value])
@@ -21,6 +22,10 @@ export const AuthProvider = (props) => {
     setUser({userId: id, userPhone: phone})
   }
 
+  const changeUserType = (user) => {
+    setUserType(user)
+  }
+
   const userForgotPassword = () => setIsForgotPassword(true)
 
   return (
@@ -33,6 +38,8 @@ export const AuthProvider = (props) => {
         addToOtp,
         otp,
         clearOtpValue,
+        changeUserType,
+        userType,
       }}>
       {props.children}
     </AuthContext.Provider>
