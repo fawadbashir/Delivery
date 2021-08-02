@@ -25,35 +25,45 @@ const UserCategory = () => {
         </Text>
         <View style={styles.imageView}>
           <Image source={require('../assets/buyer.png')} style={styles.image} />
-          <View style={styles.customerTypeOption}>
+          <TouchableOpacity
+            style={styles.customerTypeOption}
+            activeOpacity={0.7}
+            onPress={() => setUserType('buyer')}>
             <Text style={styles.userText}>I am a Buyer</Text>
             <RadioButton
               value="buyer"
               status={userType === 'buyer' ? 'checked' : 'unchecked'}
               onPress={() => setUserType('buyer')}
+              color="#2699fb"
             />
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.imageView}>
           <Image
             source={require('../assets/seller.png')}
             style={styles.image}
           />
-          <View style={styles.customerTypeOption}>
+          <TouchableOpacity
+            style={styles.customerTypeOption}
+            activeOpacity={0.7}
+            onPress={() => setUserType('seller')}>
+            {/* <View > */}
             <Text style={styles.userText}>I am a Seller</Text>
             <RadioButton
               value="seller"
               status={userType === 'seller' ? 'checked' : 'unchecked'}
               onPress={() => setUserType('seller')}
+              color="#2699fb"
             />
-          </View>
+            {/* </View> */}
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           style={{width: 171, marginVertical: 20}}
           activeOpacity={0.6}>
           <LinearGradient
-            start={{x: 0.6, y: 1}}
-            end={{x: 0.9, y: -1}}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
             colors={['#336CF9', '#1BE6D6']}
             style={{
               borderRadius: 20,

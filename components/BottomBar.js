@@ -1,35 +1,57 @@
 import React from 'react'
-import {Image, TouchableOpacity, Text, View, StyleSheet} from 'react-native'
+import {
+  Image,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native'
 
 const BottomBar = () => {
+  const window = useWindowDimensions()
+  const buttonOnHeight = {
+    width: window.height < 700 ? 37 : 47,
+    height: window.height < 700 ? 33 : 44,
+  }
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {height: window.height < 700 ? 80 : 100}]}>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.personButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.personButton, buttonOnHeight]}
+          activeOpacity={0.7}>
           <Image source={require('../assets/homeIcon.png')} />
         </TouchableOpacity>
         <Text style={styles.iconText}>Home</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.personButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.personButton, buttonOnHeight]}
+          activeOpacity={0.7}>
           <Image source={require('../assets/sendIcon.png')} />
         </TouchableOpacity>
         <Text style={styles.iconText}>Deals</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.personButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.personButton, buttonOnHeight]}
+          activeOpacity={0.7}>
           <Image source={require('../assets/walletIcon.png')} />
         </TouchableOpacity>
         <Text style={styles.iconText}>Wallet</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.personButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.personButton, buttonOnHeight]}
+          activeOpacity={0.7}>
           <Image source={require('../assets/transactionIcon.png')} />
         </TouchableOpacity>
         <Text style={styles.iconText}>Transaction</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.personButton} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[styles.personButton, buttonOnHeight]}
+          activeOpacity={0.7}>
           <Image source={require('../assets/holdIcon.png')} />
         </TouchableOpacity>
         <Text style={styles.iconText}>Hold</Text>

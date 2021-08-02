@@ -1,4 +1,4 @@
-import React, {useRef, useContext} from 'react'
+import React, {useRef, useContext, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
 import fetch from 'node-fetch'
 import {
@@ -62,10 +62,13 @@ const NewPassword = (props) => {
       login(responseData.user.userId, responseData.user.phone)
       // eslint-disable-next-line no-empty
     } catch (e) {}
+  }
+
+  useEffect(() => {
     if (error) {
       Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
     }
-  }
+  }, [error])
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import {
   View,
   StyleSheet,
@@ -71,11 +71,19 @@ const SignUp = (props) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-    ).then((response) => console.log(response, 'response'))
+    )
+      .then((response) => {
+        console.log(response, 'response')
+        props.navigation.navigate('otp')
+      })
+      .catch((e) => {})
+  }
+
+  useEffect(() => {
     if (error) {
       Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
     }
-  }
+  }, [error])
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

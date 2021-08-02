@@ -1,9 +1,8 @@
 import {useState, useCallback, useEffect, useRef} from 'react'
-const fetch = require('node-fetch')
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState()
 
   const activeHttpRequests = useRef([])
 
@@ -26,7 +25,7 @@ export const useHttpClient = () => {
           (reqCtrl) => reqCtrl !== httpAbortCntrl,
         )
         if (!response.ok) {
-          // console.log(response)
+          // console.log(responseData.message)
           throw new Error(responseData.message)
         }
         // console.log(response)
@@ -36,12 +35,13 @@ export const useHttpClient = () => {
         console.log(e.message)
         setError(e.message)
         setIsLoading(false)
+        throw e
       }
     },
     [],
   )
   const clearError = () => {
-    setError('')
+    setError(null)
   }
 
   useEffect(() => {

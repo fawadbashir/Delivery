@@ -35,7 +35,7 @@ const Header = () => {
         </View>
       </View>
       <View style={styles.actionsContainer}>
-        <View style={styles.inputContainer}>
+        {/* <View style={styles.inputContainer}>
           <TextInput
             placeholder="Search"
             placeholderTextColor="black"
@@ -44,7 +44,7 @@ const Header = () => {
           <TouchableOpacity activeOpacity={0.5}>
             <Icon name="settings-voice" color="#707070" size={25} />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <TouchableOpacity style={styles.actionButton} activeOpacity={0.6}>
           <Image
             source={require('../assets/settingsIcon2.png')}
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
 
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   inputContainer: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   actionButton: {
     backgroundColor: '#fff',
     padding: 5,
-    // paddingBottom: 10,
+
     borderRadius: 50,
     shadowColor: 'black',
     shadowOpacity: 0.26,
@@ -144,7 +144,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     alignItems: 'center',
-    // justifyContent: 'center',
+
+    marginHorizontal: 5,
   },
 })
 

@@ -1,6 +1,6 @@
-import React, {useRef, useContext} from 'react'
+import React, {useRef, useContext, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import fetch from 'node-fetch'
+
 import {
   View,
   StyleSheet,
@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  useWindowDimensions,
   ImageBackground,
   Alert,
   ActivityIndicator,
@@ -63,10 +62,15 @@ const ForgotPassword = (props) => {
       }
       // eslint-disable-next-line no-empty
     } catch (e) {}
+    // if (error) {
+    //   Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
+    // }
+  }
+  useEffect(() => {
     if (error) {
       Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
     }
-  }
+  }, [error])
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

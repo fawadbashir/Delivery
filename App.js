@@ -9,10 +9,10 @@ import 'react-native-gesture-handler'
 import React from 'react'
 
 // import {DefaultTheme} from 'react-native-paper'
-// import NavigationContainer from './Navigation/NavigationContainer'
+import NavigationContainer from './Navigation/NavigationContainer'
 import {AuthProvider} from './context/auth'
-import StartTransaction from './screens/Seller/StartTransaction'
-
+// import StartTransaction from './screens/Seller/StartTransaction'
+// import UserCategory from './screens/UserCategory'
 // const theme = {
 //   ...DefaultTheme,
 //   colors: {
@@ -26,8 +26,9 @@ import StartTransaction from './screens/Seller/StartTransaction'
 const App = () => {
   return (
     <AuthProvider>
-      {/* <NavigationContainer /> */}
-      <StartTransaction />
+      <NavigationContainer />
+      {/* <StartTransaction /> */}
+      {/* <UserCategory /> */}
     </AuthProvider>
   )
 }

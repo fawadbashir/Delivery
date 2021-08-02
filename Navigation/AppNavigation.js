@@ -8,42 +8,23 @@ import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
 
 const AuthStack = createStackNavigator()
+const MainStack = createStackNavigator()
 
 export const AuthNavigator = () => {
   return (
     <AuthStack.Navigator
       headerMode={'none'}
       initialRouteName="customerCategory">
-      <AuthStack.Screen
-        name="login"
-        component={Login}
-        options={{headerShown: false}}
-      />
-      <AuthStack.Screen
-        name="signup"
-        component={SignUp}
-        options={{headerShown: false}}
-      />
-      <AuthStack.Screen
-        name="otp"
-        component={OtpScreen}
-        options={{headerShown: false}}
-      />
-      <AuthStack.Screen
-        name="customerCategory"
-        component={CustomerCategory}
-        options={{headerShown: false}}
-      />
-      <AuthStack.Screen
-        name="forgotPassword"
-        component={ForgotPassword}
-        options={{headerShown: false}}
-      />
-      <AuthStack.Screen
-        name="newPassword"
-        component={NewPassword}
-        options={{headerShown: false}}
-      />
+      <AuthStack.Screen name="login" component={Login} />
+      <AuthStack.Screen name="signup" component={SignUp} />
+      <AuthStack.Screen name="otp" component={OtpScreen} />
+      <AuthStack.Screen name="customerCategory" component={CustomerCategory} />
+      <AuthStack.Screen name="forgotPassword" component={ForgotPassword} />
+      <AuthStack.Screen name="newPassword" component={NewPassword} />
     </AuthStack.Navigator>
   )
+}
+
+export const MainNavigator = () => {
+  return <MainStack.Navigator></MainStack.Navigator>
 }
