@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import {useHttpClient} from '../../hooks/http-hook'
 import UserSearchItem from '../../components/UserSearchItem'
+import CommonSearch from '../../components/CommonSearch'
 
 const StartTransaction = () => {
   const {sendRequest} = useHttpClient()
@@ -58,7 +59,7 @@ const StartTransaction = () => {
           <Text style={styles.thirdHeading}>
             Start selling with Delivery Pay
           </Text>
-          <View style={styles.inputContainer}>
+          {/* <View style={styles.inputContainer}>
             <Icon name="search" color="#707070" size={25} />
             <TextInput
               placeholder="Search with Delivery Pay ID or Phone Number"
@@ -66,7 +67,11 @@ const StartTransaction = () => {
               placeholderTextColor="#707070"
               onChangeText={fetchUsers}
             />
-          </View>
+          </View> */}
+          <CommonSearch
+            placeholder="Search with Delivery Pay ID or Phone Number"
+            onChangeText={fetchUsers}
+          />
           {/* </KeyboardAvoidingView> */}
           <View
             style={{
