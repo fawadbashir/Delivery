@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useContext} from 'react'
 import {
   View,
   StyleSheet,
@@ -11,9 +11,14 @@ import {RadioButton} from 'react-native-paper'
 import Header from '../components/Header'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
+import {AuthContext} from '../context/auth'
 
-const UserCategory = () => {
-  const [userType, setUserType] = useState('')
+const UserCategory = (props) => {
+  const {changeUserType, userType} = useContext(AuthContext)
+
+  const changeToSeller = () => changeUserType('seller')
+  const changeToBuyer = () => changeUserType('buyer')
+
   return (
     <>
       <Header />
@@ -28,12 +33,12 @@ const UserCategory = () => {
           <TouchableOpacity
             style={styles.customerTypeOption}
             activeOpacity={0.7}
-            onPress={() => setUserType('buyer')}>
+            onPress={changeToBuyer}>
             <Text style={styles.userText}>I am a Buyer</Text>
             <RadioButton
               value="buyer"
               status={userType === 'buyer' ? 'checked' : 'unchecked'}
-              onPress={() => setUserType('buyer')}
+              onPress={changeToBuyer}
               color="#2699fb"
             />
           </TouchableOpacity>
@@ -46,21 +51,24 @@ const UserCategory = () => {
           <TouchableOpacity
             style={styles.customerTypeOption}
             activeOpacity={0.7}
-            onPress={() => setUserType('seller')}>
-            {/* <View > */}
+            onPress={changeToSeller}>
             <Text style={styles.userText}>I am a Seller</Text>
             <RadioButton
               value="seller"
               status={userType === 'seller' ? 'checked' : 'unchecked'}
-              onPress={() => setUserType('seller')}
+              onPress={changeToSeller}
               color="#2699fb"
             />
-            {/* </View> */}
           </TouchableOpacity>
         </View>
         <TouchableOpacity
           style={{width: 171, marginVertical: 20}}
-          activeOpacity={0.6}>
+          activeOpacity={0.6}
+          onPress={() =>
+            props.navigation.navigate(
+              userType === 'buyer' ? 'buying' : 'selling',
+            )
+          }>
           <LinearGradient
             start={{x: 0, y: 0}}
             end={{x: 1, y: 0}}
