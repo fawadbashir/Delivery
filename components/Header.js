@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Image,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native'
+import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const Header = () => {
