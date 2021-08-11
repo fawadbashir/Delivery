@@ -23,6 +23,13 @@ const Data = [
     transactionId: '9598464165',
     product: 'Mobile',
     status: 'Released',
+    amount: '2000/-',
+    holdDate: '31-3-21',
+    holdTime: '10.30 P.M.',
+    releasedDate: '01-4-21',
+    releasedTime: '10.30 A.M.',
+    releasedToSeller: 'Seller',
+    verificationMethod: 'Smooth',
   },
 
   {
@@ -33,6 +40,13 @@ const Data = [
     transactionId: '9598464165',
     product: 'Mobile',
     status: 'Released',
+    amount: '2000/-',
+    holdDate: '31-3-21',
+    holdTime: '10.30 P.M.',
+    releasedDate: '01-4-21',
+    releasedTime: '10.30 A.M.',
+    releasedToSeller: 'Seller',
+    verificationMethod: 'Smooth',
   },
   {
     id: '3',
@@ -42,6 +56,13 @@ const Data = [
     transactionId: '9598464165',
     product: 'Mobile',
     status: 'Manual Verification',
+    amount: '2000/-',
+    holdDate: '31-3-21',
+    holdTime: '10.30 P.M.',
+    releasedDate: '01-4-21',
+    releasedTime: '10.30 A.M.',
+    releasedToSeller: 'Seller',
+    verificationMethod: 'Smooth',
   },
   {
     id: '4',
@@ -51,6 +72,13 @@ const Data = [
     transactionId: '9598464165',
     product: 'Seller',
     status: 'Hold',
+    amount: '2000/-',
+    holdDate: '31-3-21',
+    holdTime: '10.30 P.M.',
+    releasedDate: '01-4-21',
+    releasedTime: '10.30 A.M.',
+    releasedToSeller: 'Seller',
+    verificationMethod: 'Smooth',
   },
   {
     id: '5',
@@ -60,10 +88,17 @@ const Data = [
     transactionId: '9598464165',
     product: 'Mobile',
     status: 'Hold',
+    amount: '2000/-',
+    holdDate: '31-3-21',
+    holdTime: '10.30 P.M.',
+    releasedDate: '01-4-21',
+    releasedTime: '10.30 A.M.',
+    releasedToSeller: 'Seller',
+    verificationMethod: 'Smooth',
   },
 ]
-const Hold = () => {
-  const window = useWindowDimensions()
+
+const HoleTransaction = () => {
   return (
     <>
       <Header />
@@ -76,20 +111,27 @@ const Hold = () => {
             All payments and transactions come here
           </Text>
         </View>
-        <View style={styles.listHeading}>
-          <Text style={styles.headingText}>Name</Text>
-          <Text style={styles.headingText}>Role</Text>
-          <Text style={styles.headingText}>TransactionId</Text>
-          <Text style={styles.headingText}>Product</Text>
-          <Text style={styles.headingText}>Status</Text>
-        </View>
         <View style={styles.list}>
           <FlatList
             data={Data}
             keyExtractor={(item, index) => item.id}
             renderItem={({item}) => {
               return (
-                <View>
+                <View
+                  style={[
+                    styles.listItem,
+                    {
+                      backgroundColor:
+                        item.role === 'Buyer' ? '#F9EAF4' : '#BCE0FD',
+                    },
+                  ]}>
+                  <View style={styles.listHeading}>
+                    <Text style={styles.headingText}>Name</Text>
+                    <Text style={styles.headingText}>Role</Text>
+                    <Text style={styles.headingText}>Transaction Id</Text>
+                    <Text style={styles.headingText}>Product</Text>
+                    <Text style={styles.headingText}>Status</Text>
+                  </View>
                   <View style={styles.innerList}>
                     <View style={styles.nameView}>
                       <Image style={styles.image} source={item.image} />
@@ -107,12 +149,11 @@ const Hold = () => {
                       <Text style={styles.product}>{item.product}</Text>
                     </View>
                     <TouchableOpacity>
-                      {/* <View style={styles.statusView}> */}
                       <LinearGradient
                         colors={
                           item.status == 'Hold'
                             ? ['#336CF9', '#1BE6D6']
-                            : ['#1BE6D6', '#013B67']
+                            : ['#1BE6D6', '#10877D', '#0E736B']
                         }
                         start={{x: 0, y: 0}}
                         end={{x: 1, y: 0}}
@@ -121,63 +162,39 @@ const Hold = () => {
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.roleCheckMainView}>
-                    <View style={styles.roleCheckView}>
-                      {item.role == 'Seller' ? (
-                        <View>
-                          <Text style={styles.roleCheckText}>
-                            Are you confrim to release money.
-                          </Text>
-                          <View style={styles.roleOptions}>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                // colors={['#0A0A0A', '#0091FF', '#BCE0FD']}
-                                colors={['#0091FF', '#BCE0FD']}
-                                style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
-                                <Text style={styles.optionText}>Confirm</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#336CF9', '#F64BBD']}
-                                style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
-                                <Text style={styles.optionText}>Decline</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      ) : (
-                        <View>
-                          <Text style={styles.roleCheckText}>
-                            You feel like you are getting scammed?
-                          </Text>
-                          <View style={styles.roleOptions}>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#0091FF', '#BCE0FD']}
-                                style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
-                                <Text style={styles.optionText}>Yes</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#336CF9', '#F64BBD']}
-                                style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
-                                <Text style={styles.optionText}>No</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )}
+                  <View style={styles.amountHeading}>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amountText}>Amount</Text>
                     </View>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amountText}>Hold Date</Text>
+                    </View>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amountText}>Released Date</Text>
+                    </View>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amountText}>Released to seller</Text>
+                    </View>
+                    <View style={styles.amountView}>
+                      <Text style={styles.amountText}>Verification Method</Text>
+                    </View>
+                  </View>
+                  <View style={styles.amountList}>
+                    <Text style={styles.amountItem}>{item.amount}</Text>
+                    <View>
+                      <Text style={styles.amountItem}>{item.holdDate}</Text>
+                      <Text style={styles.amountItem}>{item.holdTime}</Text>
+                    </View>
+                    <View>
+                      <Text style={styles.amountItem}>{item.releasedDate}</Text>
+                      <Text style={styles.amountItem}>{item.releasedTime}</Text>
+                    </View>
+                    <Text style={styles.amountItem}>
+                      {item.releasedToSeller}
+                    </Text>
+                    <Text style={styles.amountItem}>
+                      {item.verificationMethod}
+                    </Text>
                   </View>
                 </View>
               )
@@ -196,8 +213,8 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   secureTransactionView: {
-    backgroundColor: '#F9EAF4',
-    borderRadius: 10,
+    backgroundColor: '#2699FB',
+    // borderRadius: 10,
     height: 130,
     alignItems: 'center',
     justifyContent: 'center',
@@ -205,36 +222,58 @@ const styles = StyleSheet.create({
   secureTransactionTitle: {
     fontSize: 24,
     fontFamily: 'Poppins-Regular',
-    color: '#0D0E0F',
+    color: '#F8FAFF',
     paddingBottom: 10,
     textAlign: 'center',
   },
   secureTransactionsubTitle: {
     fontSize: 18,
     fontFamily: 'Poppins-Regular',
-    color: '#707070',
+    color: '#F8FAFF',
     paddingTop: 10,
     textAlign: 'center',
   },
   listHeading: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
-    paddingVertical: 30,
-    paddingHorizontal: 10,
+    paddingBottom: 40,
   },
   headingText: {
     fontSize: 13,
     fontFamily: 'Poppins-Regular',
-    color: '#2020D5',
+    color: '#33A6FF',
+    // width: 90,
+    textAlign: 'center',
+  },
+  amountHeading: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    // alignItems: 'center',
+    paddingBottom: 40,
+    // paddingHorizontal: 10,
+  },
+  amountView: {
+    width: '20%',
+  },
+  amountText: {
+    fontSize: 13,
+    fontFamily: 'Poppins-Regular',
+    color: '#33A6FF',
+    textAlign: 'center',
+    flexWrap: 'wrap',
+    // textAlignVertical: 'top',
+    // paddingHorizontal: 2,
   },
   list: {
-    // marginVertical: 30,
-    paddingBottom: 240,
-    paddingHorizontal: 10,
-    // marginLeft: 10,
-    // marginTop: 20,
-    // paddingTop: 30,
+    paddingHorizontal: 5,
+    paddingBottom: 180,
+  },
+  listItem: {
+    marginTop: 50,
+    paddingVertical: 40,
+    borderRadius: 30,
+    paddingHorizontal: 5,
   },
   innerList: {
     flexDirection: 'row',
@@ -243,7 +282,12 @@ const styles = StyleSheet.create({
     // alignContent: 'center',
     // alignSelf: 'center',
     // paddingVertical: 20,
-    paddingBottom: 50,
+    paddingBottom: 40,
+  },
+  amountList: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
   image: {
     width: 60,
@@ -252,11 +296,13 @@ const styles = StyleSheet.create({
   },
   nameView: {
     // paddingRight: 5,
+    // paddingTop: 5,
   },
   name: {
     fontSize: 13,
     fontFamily: 'Poppins-Regular',
-    color: '#2A2A2A',
+    color: '#2020D5',
+    paddingTop: 10,
   },
   roleView: {
     paddingRight: 10,
@@ -264,7 +310,7 @@ const styles = StyleSheet.create({
   role: {
     fontSize: 13,
     fontFamily: 'Poppins-Bold',
-    color: '#53AEFC',
+    color: '#0D0E0F',
   },
   transactionId: {
     fontSize: 13,
@@ -272,19 +318,19 @@ const styles = StyleSheet.create({
     color: '#2A2A2A',
   },
   productView: {
-    paddingLeft: 15,
+    paddingLeft: 10,
     // paddingRight: 5,
   },
   product: {
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
-    color: '#2A2A2A',
+    color: '#707070',
   },
 
   statusView: {
     width: 80,
     // height: 200,
-    paddingLeft: 5,
+    // paddingLeft: 5,
     borderRadius: 20,
     height: 50,
     alignItems: 'center',
@@ -295,6 +341,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Poppins-Regular',
     color: '#F8FAFF',
+    textAlign: 'center',
   },
   roleCheckMainView: {
     paddingBottom: 50,
@@ -302,32 +349,12 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     // borderRadius: 10,
   },
-  roleCheckView: {
-    flexDirection: 'row-reverse',
-    // width: 100,
-    backgroundColor: '#F9EAF4',
-    // paddingLeft: 40,
-    // marginRight: 100,
-    height: 150,
-    borderRadius: 10,
-    // marginLeft: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-  },
-  roleCheckText: {
+  amountItem: {
     fontSize: 13,
     fontFamily: 'Poppins-Regular',
-    color: '#2A2A2A',
-  },
-  roleOptions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: 10,
-  },
-  optionText: {
-    color: 'white',
+    color: '#707070',
+    // textAlign: 'center',
   },
 })
 
-export default Hold
+export default HoleTransaction
