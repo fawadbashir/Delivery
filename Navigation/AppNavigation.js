@@ -6,6 +6,7 @@ import OtpScreen from '../screens/Auth/OtpScreen'
 import CustomerCategory from '../screens/Auth/CustomerCategory'
 import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
+import EditAddress from '../screens/EditAddress'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
