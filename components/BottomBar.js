@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 100,
-    backgroundColor: '#f8faff',
+    backgroundColor: '#F8FAFF',
 
     // bottom: 0,
     // zIndex: -1,
