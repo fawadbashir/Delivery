@@ -6,7 +6,13 @@ import OtpScreen from '../screens/Auth/OtpScreen'
 import CustomerCategory from '../screens/Auth/CustomerCategory'
 import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
+
 import EditAddress from '../screens/EditAddress'
+
+import BuyerStartTransaction from '../screens/Buyer/StartTransaction'
+import SellerStartTransaction from '../screens/Seller/StartTransaction'
+import UserCategory from '../screens/UserCategory'
+
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -27,5 +33,11 @@ export const AuthNavigator = () => {
 }
 
 export const MainNavigator = () => {
-  return <MainStack.Navigator></MainStack.Navigator>
+  return (
+    <MainStack.Navigator headerMode={'none'} initialRouteName="chooseCategory">
+      <MainStack.Screen name="chooseCategory" component={UserCategory} />
+      <MainStack.Screen name="buying" component={BuyerStartTransaction} />
+      <MainStack.Screen name="selling" component={SellerStartTransaction} />
+    </MainStack.Navigator>
+  )
 }

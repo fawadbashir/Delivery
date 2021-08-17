@@ -9,7 +9,6 @@ import 'react-native-gesture-handler'
 import React from 'react'
 
 // import {DefaultTheme} from 'react-native-paper'
-import NavigationContainer from './Navigation/NavigationContainer'
 import {AuthProvider} from './context/auth'
 import Deal from './screens/Deal'
 import Deal2 from './screens/Deal2'
@@ -21,6 +20,11 @@ import ContactUs from './screens/ContactUs'
 import AddAddress from './screens/AddAddress'
 import EditAddress from './screens/EditAddress'
 // import StartTransaction from './screens/Seller/StartTransaction'
+
+import NavigationContainer from './Navigation/NavigationContainer'
+import Wallet from './screens/Wallet'
+
+
 // import UserCategory from './screens/UserCategory'
 // const theme = {
 //   ...DefaultTheme,
@@ -34,6 +38,7 @@ import EditAddress from './screens/EditAddress'
 
 const App = () => {
   return (
+
     // <AuthProvider>
     //   <NavigationContainer />
     // {/* <StartTransaction /> */}
@@ -44,7 +49,12 @@ const App = () => {
     // <HoleTransaction />
     // <ContactUs />
     // <AddAddress />
-    <EditAddress />
+    
+// <EditAddress />
+    <AuthProvider>
+      <Wallet />
+    </AuthProvider>
+
   )
 }
 
