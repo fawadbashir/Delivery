@@ -6,9 +6,13 @@ import OtpScreen from '../screens/Auth/OtpScreen'
 import CustomerCategory from '../screens/Auth/CustomerCategory'
 import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
+
+import EditAddress from '../screens/EditAddress'
+
 import BuyerStartTransaction from '../screens/Buyer/StartTransaction'
 import SellerStartTransaction from '../screens/Seller/StartTransaction'
 import UserCategory from '../screens/UserCategory'
+
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()

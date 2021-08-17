@@ -10,8 +10,20 @@ import React from 'react'
 
 // import {DefaultTheme} from 'react-native-paper'
 import {AuthProvider} from './context/auth'
+import Deal from './screens/Deal'
+import Deal2 from './screens/Deal2'
+// import StartTransaction from './screens/Buyer/StartTransaction'
+import Hold from './screens/Hold'
+import HoleTransaction from './screens/HoleTransaction'
+import StartTransaction from './screens/Seller/StartTransaction'
+import ContactUs from './screens/ContactUs'
+import AddAddress from './screens/AddAddress'
+import EditAddress from './screens/EditAddress'
+// import StartTransaction from './screens/Seller/StartTransaction'
+
 import NavigationContainer from './Navigation/NavigationContainer'
 import Wallet from './screens/Wallet'
+
 
 // import UserCategory from './screens/UserCategory'
 // const theme = {
@@ -26,9 +38,23 @@ import Wallet from './screens/Wallet'
 
 const App = () => {
   return (
+
+    // <AuthProvider>
+    //   <NavigationContainer />
+    // {/* <StartTransaction /> */}
+    //   {/* <UserCategory /> */}
+    // </AuthProvider>
+    // <Deal2 />
+    // <Hold />
+    // <HoleTransaction />
+    // <ContactUs />
+    // <AddAddress />
+    
+// <EditAddress />
     <AuthProvider>
       <Wallet />
     </AuthProvider>
+
   )
 }
 
