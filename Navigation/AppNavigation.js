@@ -6,6 +6,7 @@ import OtpScreen from '../screens/Auth/OtpScreen'
 import CustomerCategory from '../screens/Auth/CustomerCategory'
 import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
+import AddAddress from '../screens/AddAddress'
 import EditAddress from '../screens/EditAddress'
 
 const AuthStack = createStackNavigator()
@@ -27,5 +28,18 @@ export const AuthNavigator = () => {
 }
 
 export const MainNavigator = () => {
-  return <MainStack.Navigator></MainStack.Navigator>
+  return (
+    <MainStack.Navigator>
+      <MainStack.Screen
+        name="addAddress"
+        component={AddAddress}
+        options={{headerShown: false}}
+      />
+      <MainStack.Screen
+        name="editAddress"
+        component={EditAddress}
+        options={{headerShown: false}}
+      />
+    </MainStack.Navigator>
+  )
 }

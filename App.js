@@ -36,7 +36,7 @@ const App = () => {
   return (
     // <AuthProvider>
     //   <NavigationContainer />
-    // {/* <StartTransaction /> */}
+    //   {/* <StartTransaction /> */}
     //   {/* <UserCategory /> */}
     // </AuthProvider>
     // <Deal2 />
@@ -44,7 +44,8 @@ const App = () => {
     // <HoleTransaction />
     // <ContactUs />
     // <AddAddress />
-    <EditAddress />
+    // <EditAddress />
+    <StartTransaction />
   )
 }
 

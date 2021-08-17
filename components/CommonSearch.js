@@ -10,6 +10,7 @@ const CommonSearch = (props) => {
         placeholder={props.placeholder}
         style={styles.input}
         placeholderTextColor="#707070"
+        multiline={true}
         onChangeText={props.onChangeText}
       />
     </View>

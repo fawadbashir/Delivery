@@ -12,7 +12,8 @@ const AuthButton = (props) => {
       activeOpacity={0.6}
       disabled={props.disabled}>
       <LinearGradient
-        colors={[Colors.primary, '#192f6a']}
+        colors={['#4c669f', '#3b5998', '#192f6a']}
+        // colors={[Colors.primary, '#192f6a']}
         style={{...styles.authButton, ...props.authButton}}>
         <Text style={{...styles.authButtonText, ...props.authButtonText}}>
           {props.children}

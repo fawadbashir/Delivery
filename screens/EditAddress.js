@@ -12,56 +12,148 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from 'react-native-linear-gradient'
 import {add} from 'react-native-reanimated'
 import Input from '../components/Input'
+import {useNavigation} from '@react-navigation/native'
 
 const EditAddress = () => {
-  const fullNameRef = useRef()
-
+  const navigation = useNavigation()
   const [fullName, setFullName] = useState('')
+  const [mobileNo, setMobileNo] = useState('')
+  const [alternatePhone, setAlternatePhone] = useState('')
+  const [address, setAddress] = useState('')
+  const [city, setCity] = useState('')
+  const [landmark, setLandmark] = useState('')
+  const [locality, setLocality] = useState('')
+  const [pinCode, setpinCode] = useState('')
+  const [state, setState] = useState('')
+  const [country, setCountry] = useState('')
+
+  const [nameValid, setNameValid] = useState('')
+  const [mobileNoValid, setMobileNoValid] = useState('')
+  const [alternatePhoneValid, setAlternatePhoneVaild] = useState('')
+  const [addressValid, setAddressValid] = useState('')
+  const [cityValid, setCityValid] = useState('')
+  const [landmarkValid, setLandmarkValid] = useState('')
+  const [localityValid, setLocalityValid] = useState('')
+  const [pinCodeValid, setPinCodeValid] = useState('')
+  const [stateValid, setStateValid] = useState('')
+  const [countryValid, setCountryValid] = useState('')
+
   const updateFullName = (text) => {
     setFullName(text)
   }
-  const [mobileNo, setMobileNo] = useState('')
+
   const updateMobileNo = (text) => {
     setMobileNo(text)
   }
 
-  const [alternatePhone, setAlternatePhone] = useState('')
   const updateAlternatePhone = (text) => {
     setAlternatePhone(text)
   }
-  const [address, setAddress] = useState('')
+
   const updateAddress = (text) => {
     setAddress(text)
   }
-  const [city, setCity] = useState('')
+
   const updateCity = (text) => {
     setCity(text)
   }
 
-  const [landmark, setLandmark] = useState('')
   const updateLandmark = (text) => {
     setLandmark(text)
   }
 
-  const [locality, setLocality] = useState('')
   const updateLocality = (text) => {
     setLocality(text)
   }
 
-  const [pinCode, setpinCode] = useState('')
   const updatePinCode = (text) => {
     setpinCode(text)
   }
 
-  const [state, setState] = useState('')
   const updateState = (text) => {
     setState(text)
   }
 
-  const [country, setCountry] = useState('')
   const updateCountry = (text) => {
     setCountry(text)
   }
+
+  const proceedNext = () => {
+    if (fullName === '') {
+      setNameValid(true)
+    } else {
+      setNameValid(false)
+    }
+
+    if (mobileNo === '') {
+      setMobileNoValid(true)
+    } else {
+      setMobileNoValid(false)
+    }
+
+    if (alternatePhone === '') {
+      setAlternatePhoneVaild(true)
+    } else {
+      setAlternatePhoneVaild(false)
+    }
+
+    if (address === '') {
+      setAddressValid(true)
+    } else {
+      setAddressValid(false)
+    }
+
+    if (city === '') {
+      setCityValid(true)
+    } else {
+      setCityValid(false)
+    }
+
+    if (landmark === '') {
+      setLandmarkValid(true)
+    } else {
+      setLandmarkValid(false)
+    }
+
+    if (locality === '') {
+      setLocalityValid(true)
+    } else {
+      setLocalityValid(false)
+    }
+
+    if (pinCode === '') {
+      setPinCodeValid(true)
+    } else {
+      setPinCodeValid(false)
+    }
+
+    if (state === '') {
+      setStateValid(true)
+    } else {
+      setStateValid(false)
+    }
+
+    if (country === '') {
+      setCountryValid(true)
+    } else {
+      setCountryValid(false)
+    }
+
+    if (
+      (nameValid,
+      mobileNoValid,
+      alternatePhoneValid,
+      addressValid,
+      cityValid,
+      landmarkValid,
+      localityValid,
+      pinCodeValid,
+      stateValid === false)
+    ) {
+      navigation.navigate('addAddress')
+    }
+  }
+
   return (
     <View style={styles.screen}>
       <Image
@@ -78,6 +170,11 @@ const EditAddress = () => {
             onChangeText={updateFullName}
           />
         </View>
+
+        {nameValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Mobile No'}
@@ -85,8 +182,15 @@ const EditAddress = () => {
             placeholderTextColor="#2699FB"
             value={mobileNo}
             onChangeText={updateMobileNo}
+            keyboardType="numeric"
+            maxLength={12}
           />
         </View>
+
+        {mobileNoValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Alternate Phone No.'}
@@ -94,9 +198,16 @@ const EditAddress = () => {
             placeholderTextColor="#2699FB"
             value={alternatePhone}
             onChangeText={updateAlternatePhone}
+            keyboardType="numeric"
+            maxLength={12}
           />
         </View>
-        <View style={[styles.fieldView, {height: '30%'}]}>
+
+        {alternatePhoneValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
+        <View style={[styles.fieldView, {height: '20%'}]}>
           <TextInput
             placeholder={'Address'}
             style={styles.input}
@@ -106,6 +217,11 @@ const EditAddress = () => {
             onChangeText={updateAddress}
           />
         </View>
+
+        {addressValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'City'}
@@ -115,6 +231,11 @@ const EditAddress = () => {
             onChangeText={updateCity}
           />
         </View>
+
+        {cityValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Landmark'}
@@ -124,6 +245,11 @@ const EditAddress = () => {
             onChangeText={updateLandmark}
           />
         </View>
+
+        {landmarkValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Locality'}
@@ -133,15 +259,27 @@ const EditAddress = () => {
             onChangeText={updateLocality}
           />
         </View>
+
+        {localityValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Pin Code'}
             style={styles.input}
             placeholderTextColor="#2699FB"
             value={pinCode}
+            keyboardType="numeric"
+            maxLength={4}
             onChangeText={updatePinCode}
           />
         </View>
+
+        {pinCodeValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'State'}
@@ -151,6 +289,11 @@ const EditAddress = () => {
             onChangeText={updateState}
           />
         </View>
+
+        {stateValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
+
         <View style={styles.fieldView}>
           <TextInput
             placeholder={'Country'}
@@ -160,9 +303,13 @@ const EditAddress = () => {
             onChangeText={updateCountry}
           />
         </View>
+
+        {countryValid === true ? (
+          <Text style={styles.errorText}>Please Fill It</Text>
+        ) : null}
       </ScrollView>
       <View style={styles.options}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={proceedNext}>
           <LinearGradient
             colors={['#336CF9', '#1BE6D6']}
             style={styles.optionsView}
@@ -195,7 +342,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // marginVertical: 10,
     // paddingTop: 30,
-    paddingBottom: 230,
+    paddingBottom: 170,
   },
   fieldView: {
     borderColor: '#BCE0FD',
@@ -209,6 +356,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
     color: '#2699FB',
+  },
+  errorText: {
+    paddingTop: 5,
+    color: 'red',
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
   },
   options: {
     flexDirection: 'row',

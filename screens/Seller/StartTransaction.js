@@ -75,7 +75,7 @@ const StartTransaction = () => {
           {/* </KeyboardAvoidingView> */}
           <View
             style={{
-              height: window.height < 700 ? 182 : 255,
+              height: window.height < 700 ? 182 : 200,
               // paddingHorizontal: 20,
             }}>
             <FlatList

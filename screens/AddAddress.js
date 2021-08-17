@@ -1,25 +1,49 @@
 import React from 'react'
-import {View, StyleSheet, Text, Image, TouchableOpacity} from 'react-native'
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import LinearGradient from 'react-native-linear-gradient'
+import {useNavigation} from '@react-navigation/native'
 
-const AddAddress = () => {
+const AddAddress = ({route, navigation}) => {
+  // const {fullName, mobileNo} = route.params
+  console.log(route)
   return (
     <View style={styles.screen}>
       <Image source={require('../assets/signupImage.png')} />
+
       <View style={styles.addressView}>
         <View style={styles.itemsView}>
-          <Icon
-            stlyle={{paddingBottom: 5}}
-            name="add"
-            color="#D3D3D3"
-            size={35}
-          />
+          <Text style={styles.fullName}>Swati Mishra</Text>
+          <Text style={styles.otherDetails}>Ward No - 7,Keuto Street</Text>
+          <Text style={styles.otherDetails}>Landmark- shiv temple</Text>
+          <Text style={styles.otherDetails}>West Bengal India 713371</Text>
+          <Text style={styles.otherDetails}>Mobile No . 8637089622</Text>
+        </View>
+      </View>
+
+      <View style={styles.addressView}>
+        <View style={styles.itemsView}>
+          <TouchableOpacity onPress={() => navigation.navigate('editAddress')}>
+            <Icon
+              stlyle={{paddingBottom: 5}}
+              name="add"
+              color="#D3D3D3"
+              size={35}
+            />
+          </TouchableOpacity>
           <Text style={styles.addText}>Add Address</Text>
         </View>
       </View>
+
       <View style={styles.options}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('editAddress')}>
           <LinearGradient
             colors={['#336CF9', '#1BE6D6']}
             style={styles.optionsView}
@@ -54,12 +78,22 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#FFFFFF',
     width: '80%',
-    height: '30%',
-    marginTop: 40,
+    height: 200,
+    marginTop: 20,
   },
   itemsView: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  fullName: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 21,
+    color: '#0D0E0F',
+  },
+  otherDetails: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 21,
+    color: '#707070',
   },
   addText: {
     fontFamily: 'Poppins-Regular',
@@ -71,7 +105,7 @@ const styles = StyleSheet.create({
   options: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingTop: 40,
+    paddingVertical: 20,
     // paddingHorizontal: 30,
     width: '60%',
     alignContent: 'center',
@@ -80,7 +114,7 @@ const styles = StyleSheet.create({
   optionsView: {
     width: 80,
     // height: 200,
-    paddingLeft: 5,
+    // paddingLeft: 5,
     borderRadius: 20,
     height: 50,
     alignItems: 'center',
@@ -89,6 +123,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: 'white',
+    textAlign: 'center',
   },
 })
 export default AddAddress
