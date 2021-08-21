@@ -146,7 +146,7 @@ const SignUp = (props) => {
             control={control}
             rules={{
               required: true,
-              pattern: /^[789]\d{9,9}$/g,
+              // pattern: /^[789]\d{9,9}$/g,
             }}
             placeholder="Phone No."
             ref={(e) => {
@@ -158,6 +158,7 @@ const SignUp = (props) => {
             }}
             keyboardType="phone-pad"
             blurOnSubmit={false}
+            secureTextEntry={true}
             returnKeyType="next"
             placeholderTextColor={
               errors.phoneNumber ? Colors.errorColor : '#53aefc'
@@ -180,9 +181,10 @@ const SignUp = (props) => {
             onSubmitEditing={() => {
               confirmPasswordRef.current.focus()
             }}
+            secureTextEntry={true}
             blurOnSubmit={false}
             returnKeyType="next"
-            placeholderTextColor={errors.email ? '#b55151' : '#53aefc'}
+            placeholderTextColor={errors.password ? '#b55151' : '#53aefc'}
           />
         </View>
         <View

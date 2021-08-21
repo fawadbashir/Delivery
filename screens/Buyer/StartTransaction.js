@@ -6,6 +6,7 @@ import {
   FlatList,
   useWindowDimensions,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
@@ -15,7 +16,7 @@ import UserSearchItem from '../../components/UserSearchItem'
 import CommonSearch from '../../components/CommonSearch'
 
 const StartTransaction = () => {
-  const {sendRequest} = useHttpClient()
+  const {sendRequest, error, clearError} = useHttpClient()
   const [users, setUsers] = useState([])
   const window = useWindowDimensions()
 
@@ -27,6 +28,7 @@ const StartTransaction = () => {
       const response = await sendRequest(
         `https://deliverypay.in/api/getUsers?q=${query}`,
       )
+
       setUsers(
         response.map((user) => ({
           firstName: user.firstName,
@@ -37,7 +39,9 @@ const StartTransaction = () => {
       )
 
       // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      // Alert.alert('Error', error, [{onPress: clearError(), text: 'Okay'}])
+    }
   }
 
   return (
