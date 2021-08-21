@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native'
 import {rosybrown} from 'color-name'
 import CommonSearch from '../components/CommonSearch'
@@ -85,7 +86,7 @@ const Deal = () => {
         </View>
         <View
           style={{
-            height: window.height < 700 ? 182 : 360,
+            height: window.height < 700 ? 225 : 386,
             // marginBottom: 10,
             paddingTop: 10,
             // paddingBottom: 10,
@@ -116,9 +117,9 @@ const Deal = () => {
                       {item.requestStatus}
                     </Text>
                   </View>
-                  <View style={styles.chartStatusView}>
+                  <TouchableOpacity style={styles.chartStatusView}>
                     <Text style={styles.chartStatus}>{item.chartStatus}</Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 // </View>
               )
