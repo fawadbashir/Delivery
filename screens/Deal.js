@@ -86,7 +86,7 @@ const Deal = () => {
         </View>
         <View
           style={{
-            height: window.height < 700 ? 225 : 386,
+            height: window.height < 700 ? 182 : 365,
             // marginBottom: 10,
             paddingTop: 10,
             // paddingBottom: 10,

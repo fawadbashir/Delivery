@@ -15,7 +15,7 @@ import Input from '../components/Input'
 import {useNavigation} from '@react-navigation/native'
 
 const EditAddress = () => {
-  const navigation = useNavigation()
+  // const navigation = useNavigation()
   const [fullName, setFullName] = useState('')
   const [mobileNo, setMobileNo] = useState('')
   const [alternatePhone, setAlternatePhone] = useState('')
@@ -150,7 +150,7 @@ const EditAddress = () => {
       pinCodeValid,
       stateValid === false)
     ) {
-      navigation.navigate('addAddress')
+      // navigation.navigate('addAddress')
     }
   }
 
