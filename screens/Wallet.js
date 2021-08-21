@@ -141,7 +141,7 @@ const Wallet = () => {
           </View>
         </View>
         {/* Withdraw View */}
-        <View style={{...styles.moneyView, backgroundColor: '#f9eaf4  '}}>
+        <View style={[styles.moneyView, {backgroundColor: '#f9eaf4'}]}>
           <Text style={styles.moneyViewHeading}>Withdraw</Text>
           <View style={styles.moneyActions}>
             <View style={styles.amountContainer}>

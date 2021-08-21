@@ -43,21 +43,21 @@ const AddAddress = ({route, navigation}) => {
       </View>
 
       <View style={styles.options}>
-        <TouchableOpacity onPress={() => navigation.navigate('editAddress')}>
+        <TouchableOpacity activeOpacity={0.6}>
           <LinearGradient
             colors={['#336CF9', '#1BE6D6']}
             style={styles.optionsView}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}>
+            start={{x: 0, y: 1.2}}
+            end={{x: 1.2, y: 0}}>
             <Text style={styles.optionText}>Edit</Text>
           </LinearGradient>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.6}>
           <LinearGradient
             colors={['#336CF9', '#F64BBD']}
             style={styles.optionsView}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}>
+            start={{x: 0.1, y: 0.7}}
+            end={{x: 1.2, y: 1}}>
             <Text style={styles.optionText}>Remove</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -78,8 +78,12 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#FFFFFF',
     width: '80%',
-    height: 200,
-    marginTop: 20,
+    height: '30%',
+    marginTop: 40,
+    marginBottom: 20,
+    // borderStyle: ,
+    borderWidth: 1,
+    borderColor: '#2699FB',
   },
   itemsView: {
     justifyContent: 'center',
@@ -104,18 +108,18 @@ const styles = StyleSheet.create({
   },
   options: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 20,
+    justifyContent: 'space-evenly',
+    // paddingTop: 40,
     // paddingHorizontal: 30,
-    width: '60%',
+    // width: '100%',
     alignContent: 'center',
-    alignSelf: 'center',
+    // alignSelf: 'center',
   },
   optionsView: {
-    width: 80,
+    width: 120,
     // height: 200,
-    // paddingLeft: 5,
-    borderRadius: 20,
+    paddingLeft: 5,
+    borderRadius: 40,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -123,7 +127,9 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: 'white',
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
+    fontSize: 16,
   },
 })
 export default AddAddress

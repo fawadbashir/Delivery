@@ -210,7 +210,7 @@ const HoleTransaction = () => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingTop: 30,
+    // paddingTop: 30,
   },
   secureTransactionView: {
     backgroundColor: '#2699FB',
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 5,
-    paddingBottom: 180,
+    // paddingBottom: 180,
   },
   listItem: {
     marginTop: 50,
