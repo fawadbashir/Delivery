@@ -167,7 +167,7 @@ const EditAddress = () => {
             colors={['#336CF9', '#1BE6D6']}
             style={styles.optionsView}
             start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}>
+            end={{x: 1.2, y: 0}}>
             <Text style={styles.optionText}>Save</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -175,8 +175,8 @@ const EditAddress = () => {
           <LinearGradient
             colors={['#336CF9', '#F64BBD']}
             style={styles.optionsView}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}>
+            start={{x: 0.1, y: 0.1}}
+            end={{x: 1, y: -0.1}}>
             <Text style={styles.optionText}>Cancel</Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -212,20 +212,21 @@ const styles = StyleSheet.create({
   },
   options: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     // paddingTop: 40,
     // paddingHorizontal: 30,
-    width: '60%',
+    // width: '60%',
     alignContent: 'center',
-    alignSelf: 'center',
+    // alignSelf: 'center',
     marginTop: 30,
     marginBottom: 30,
   },
   optionsView: {
-    width: 80,
+    textAlign: 'center',
+    width: 120,
     // height: 200,
     paddingLeft: 5,
-    borderRadius: 20,
+    borderRadius: 30,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
