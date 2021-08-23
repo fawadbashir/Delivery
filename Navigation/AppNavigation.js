@@ -6,12 +6,12 @@ import OtpScreen from '../screens/Auth/OtpScreen'
 import CustomerCategory from '../screens/Auth/CustomerCategory'
 import ForgotPassword from '../screens/Auth/ForgotPassword'
 import NewPassword from '../screens/Auth/NewPassword'
-
+import AddAddress from '../screens/AddAddress'
 import EditAddress from '../screens/EditAddress'
-
 import BuyerStartTransaction from '../screens/Buyer/StartTransaction'
 import SellerStartTransaction from '../screens/Seller/StartTransaction'
 import UserCategory from '../screens/UserCategory'
+
 import Wallet from '../screens/Wallet'
 import AddAddress from '../screens/AddAddress'
 import Hold from '../screens/Hold'
@@ -19,6 +19,7 @@ import ContactUs from '../screens/ContactUs'
 import PaymentMethod from '../screens/PaymentMethod'
 import Deal from '../screens/Deal'
 import TransactionHistory from '../screens/TransactionHistory'
+
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -40,6 +41,7 @@ export const AuthNavigator = () => {
 
 export const MainNavigator = () => {
   return (
+
     <MainStack.Navigator headerMode={'none'} initialRouteName="chooseCategory">
       <MainStack.Screen name="chooseCategory" component={UserCategory} />
       <MainStack.Screen name="buying" component={BuyerStartTransaction} />
@@ -55,6 +57,7 @@ export const MainNavigator = () => {
       <MainStack.Screen name="contact" component={ContactUs} />
       <MainStack.Screen name="Hold" component={Hold} />
       <MainStack.Screen name="paymentMethod" component={PaymentMethod} />
-    </MainStack.Navigator>
+
+   
   )
 }

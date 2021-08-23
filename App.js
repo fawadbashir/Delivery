@@ -25,7 +25,9 @@ import CustomerCategory from './screens/Auth/CustomerCategory'
 import NavigationContainer from './Navigation/NavigationContainer'
 // import Wallet from './screens/Wallet'
 
+
 import TransactionHistory from './screens/TransactionHistory'
+
 // const theme = {
 //   ...DefaultTheme,
 //   colors: {
@@ -38,10 +40,12 @@ import TransactionHistory from './screens/TransactionHistory'
 
 const App = () => {
   return (
+
     <AuthProvider>
       {/* <NavigationContainer/>      */}
       <TransactionHistory />
     </AuthProvider>
+
   )
 }
 
