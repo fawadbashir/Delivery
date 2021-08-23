@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   env: {
-    node: true,
+    // node: false,
     es2021: true,
   },
   extends: ['eslint:recommended', 'plugin:react/recommended'],
@@ -25,4 +25,4 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
   },
-};
+}

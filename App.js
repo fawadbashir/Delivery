@@ -19,12 +19,15 @@ import StartTransaction from './screens/Seller/StartTransaction'
 import ContactUs from './screens/ContactUs'
 import AddAddress from './screens/AddAddress'
 import EditAddress from './screens/EditAddress'
+import CustomerCategory from './screens/Auth/CustomerCategory'
 // import StartTransaction from './screens/Seller/StartTransaction'
 
 import NavigationContainer from './Navigation/NavigationContainer'
-import Wallet from './screens/Wallet'
+// import Wallet from './screens/Wallet'
 
-// import UserCategory from './screens/UserCategory'
+
+import TransactionHistory from './screens/TransactionHistory'
+
 // const theme = {
 //   ...DefaultTheme,
 //   colors: {
@@ -37,18 +40,12 @@ import Wallet from './screens/Wallet'
 
 const App = () => {
   return (
-    // <AuthProvider>
-    //   <NavigationContainer />
-    //   {/* <StartTransaction /> */}
-    //   {/* <UserCategory /> */}
-    // </AuthProvider>
-    // <Deal2 />
-    // <Hold />
-    // <HoleTransaction />
-    // <ContactUs />
-    // <AddAddress />
-    // <EditAddress />
-    <StartTransaction />
+
+    <AuthProvider>
+      {/* <NavigationContainer/>      */}
+      <TransactionHistory />
+    </AuthProvider>
+
   )
 }
 

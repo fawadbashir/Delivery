@@ -12,6 +12,15 @@ import BuyerStartTransaction from '../screens/Buyer/StartTransaction'
 import SellerStartTransaction from '../screens/Seller/StartTransaction'
 import UserCategory from '../screens/UserCategory'
 
+import Wallet from '../screens/Wallet'
+import AddAddress from '../screens/AddAddress'
+import Hold from '../screens/Hold'
+import ContactUs from '../screens/ContactUs'
+import PaymentMethod from '../screens/PaymentMethod'
+import Deal from '../screens/Deal'
+import TransactionHistory from '../screens/TransactionHistory'
+
+
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
 
@@ -32,21 +41,23 @@ export const AuthNavigator = () => {
 
 export const MainNavigator = () => {
   return (
-    <MainStack.Navigator>
+
+    <MainStack.Navigator headerMode={'none'} initialRouteName="chooseCategory">
+      <MainStack.Screen name="chooseCategory" component={UserCategory} />
+      <MainStack.Screen name="buying" component={BuyerStartTransaction} />
+      <MainStack.Screen name="selling" component={SellerStartTransaction} />
+      <MainStack.Screen name="wallet" component={Wallet} />
+      <MainStack.Screen name="addAddress" component={AddAddress} />
+      <MainStack.Screen name="editAdress" component={EditAddress} />
+      <MainStack.Screen name="deal" component={Deal} />
       <MainStack.Screen
-        name="addAddress"
-        component={AddAddress}
-        options={{headerShown: false}}
+        name="transactionHistory"
+        component={TransactionHistory}
       />
-      <MainStack.Screen
-        name="editAddress"
-        component={EditAddress}
-        options={{headerShown: false}}
-      />
-      {/* <MainStack.Navigator headerMode={'none'} initialRouteName="chooseCategory"> */}
-      {/* <MainStack.Screen name="chooseCategory" component={UserCategory} /> */}
-      {/* <MainStack.Screen name="buying" component={BuyerStartTransaction} /> */}
-      {/* <MainStack.Screen name="selling" component={SellerStartTransaction} /> */}
-    </MainStack.Navigator>
+      <MainStack.Screen name="contact" component={ContactUs} />
+      <MainStack.Screen name="Hold" component={Hold} />
+      <MainStack.Screen name="paymentMethod" component={PaymentMethod} />
+
+   
   )
 }
