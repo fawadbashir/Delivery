@@ -24,7 +24,6 @@ import EditAddress from './screens/EditAddress'
 import NavigationContainer from './Navigation/NavigationContainer'
 import Wallet from './screens/Wallet'
 
-
 // import UserCategory from './screens/UserCategory'
 // const theme = {
 //   ...DefaultTheme,
@@ -38,10 +37,9 @@ import Wallet from './screens/Wallet'
 
 const App = () => {
   return (
-
     // <AuthProvider>
     //   <NavigationContainer />
-    // {/* <StartTransaction /> */}
+    //   {/* <StartTransaction /> */}
     //   {/* <UserCategory /> */}
     // </AuthProvider>
     // <Deal2 />
@@ -49,12 +47,8 @@ const App = () => {
     // <HoleTransaction />
     // <ContactUs />
     // <AddAddress />
-    
-// <EditAddress />
-    <AuthProvider>
-      <Wallet />
-    </AuthProvider>
-
+    // <EditAddress />
+    <StartTransaction />
   )
 }
 
