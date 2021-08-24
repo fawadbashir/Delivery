@@ -1,8 +1,10 @@
 import React from 'react'
 import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import {useNavigation} from '@react-navigation/native'
 
 const Header = () => {
+  const navigation = useNavigation()
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -44,7 +46,10 @@ const Header = () => {
             style={{width: 25, height: 25, top: 2}}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.5}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('contact')}
+          style={styles.actionButton}
+          activeOpacity={0.5}>
           <Image
             source={require('../assets/customerServiceIcon2.png')}
             style={{width: 30, height: 30, top: -5}}

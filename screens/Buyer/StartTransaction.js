@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {
   Text,
   StyleSheet,
@@ -14,10 +14,12 @@ import BottomBar from '../../components/BottomBar'
 import {useHttpClient} from '../../hooks/http-hook'
 import UserSearchItem from '../../components/UserSearchItem'
 import CommonSearch from '../../components/CommonSearch'
+import {Avatar} from 'react-native-paper'
 
 const StartTransaction = () => {
   const {sendRequest, error, clearError} = useHttpClient()
   const [users, setUsers] = useState([])
+  const [payments, setPayments] = useState([])
   const window = useWindowDimensions()
 
   const fetchUsers = async (query) => {
@@ -44,6 +46,22 @@ const StartTransaction = () => {
     }
   }
 
+  useEffect(() => {
+    const getRecentPayments = async () => {
+      try {
+        const response = await sendRequest(
+          'https://deliverypay.in/api/recentPayments',
+        )
+
+        console.log(response)
+        setPayments(response)
+      } catch (e) {
+        e
+      }
+    }
+    getRecentPayments()
+  }, [sendRequest])
+
   return (
     <>
       <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
@@ -67,21 +85,35 @@ const StartTransaction = () => {
             style={{
               height: window.height < 700 ? 182 : 255,
             }}>
-            <FlatList
-              style={{paddingHorizontal: 10}}
-              data={users}
-              key={(item) => item.id}
-              renderItem={(itemData) => {
-                return (
-                  <UserSearchItem
-                    image={itemData.item.image}
-                    firstName={itemData.item.firstName}
-                    lastName={itemData.item.lastName}
-                    milestoneType="Create"
-                  />
-                )
-              }}
-            />
+            {users.length > 1 ? (
+              <FlatList
+                style={{paddingHorizontal: 10}}
+                data={users}
+                key={(item) => item.id}
+                renderItem={(itemData) => {
+                  return (
+                    <UserSearchItem
+                      image={itemData.item.image}
+                      firstName={itemData.item.firstName}
+                      lastName={itemData.item.lastName}
+                      milestoneType="Create"
+                    />
+                  )
+                }}
+              />
+            ) : (
+              <View style={styles.paymentsView}>
+                {payments.map((payment) => (
+                  <View style={{alignItems: 'center'}} key={payment._id}>
+                    <Avatar.Image source={{uri: payment.profileImg}} />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                      }}>{`${payment.firstName} ${payment.lastName}`}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -94,6 +126,7 @@ const styles = StyleSheet.create({
   screen: {
     paddingHorizontal: 10,
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   heading: {
     textAlign: 'center',
@@ -128,6 +161,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Seoge-UI',
     fontSize: 14,
     flexGrow: 1,
+  },
+  paymentContainer: {},
+  paymentsView: {
+    width: '100%',
+    flexDirection: 'row',
+    marginTop: 15,
+    justifyContent: 'space-evenly',
+    flexWrap: 'wrap',
   },
 })
 

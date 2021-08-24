@@ -1,6 +1,6 @@
 import React, {useRef, useContext, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
-import fetch from 'node-fetch'
+
 import {
   View,
   StyleSheet,
@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  useWindowDimensions,
   ImageBackground,
   Alert,
   ActivityIndicator,
@@ -58,7 +57,7 @@ const Login = (props) => {
       )
 
       login(responseData.user.userId, responseData.user.phone)
-      props.navigation.navigate('otp')
+      // props.navigation.navigate('otp')
       // eslint-disable-next-line no-empty
     } catch (e) {}
   }

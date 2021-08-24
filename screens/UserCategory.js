@@ -62,11 +62,12 @@ const UserCategory = (props) => {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
+          disabled={userType === ''}
           style={{width: 171, marginVertical: 20}}
           activeOpacity={0.6}
           onPress={() =>
             props.navigation.navigate(
-              userType === 'buyer' ? 'buying' : 'selling',
+              userType === 'buyer' ? 'home/buying' : 'home/selling',
             )
           }>
           <LinearGradient
