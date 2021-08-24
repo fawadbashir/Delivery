@@ -23,6 +23,10 @@ import EditAddress from './screens/EditAddress'
 
 import NavigationContainer from './Navigation/NavigationContainer'
 import Wallet from './screens/Wallet'
+import PaymentSuccess from './screens/PaymentSuccess'
+import PaymentDetails from './screens/PaymentDetails'
+// import AccountSettings from './screens/AccountSettings'
+import AccountSettings from './screens/AccountSettings'
 
 // import UserCategory from './screens/UserCategory'
 // const theme = {
@@ -42,13 +46,16 @@ const App = () => {
     //   {/* <StartTransaction /> */}
     //   {/* <UserCategory /> */}
     // </AuthProvider>
-    // <Deal2 />
+    // <Deal />
     // <Hold />
     // <HoleTransaction />
     // <ContactUs />
     // <AddAddress />
     // <EditAddress />
-    <StartTransaction />
+    // <StartTransaction />
+    // <PaymentSuccess />
+    // <PaymentDetails />
+    <AccountSettings />
   )
 }
 
