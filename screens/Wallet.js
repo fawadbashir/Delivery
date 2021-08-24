@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {
   View,
   StyleSheet,
@@ -40,6 +40,8 @@ const data = {
 }
 
 const Wallet = ({navigation: {navigate}}) => {
+  const [money, setMoney] = useState()
+  const [withdraw, setWithdraw] = useState()
   const {sendRequest} = useHttpClient()
   const window = useWindowDimensions()
 
@@ -48,7 +50,7 @@ const Wallet = ({navigation: {navigate}}) => {
       'https://deliverypay.in/api/createAddMoneyOrder',
       'POST',
       JSON.stringify({
-        amount: 20,
+        amount: money,
       }),
       {
         Accept: 'application/json',
@@ -63,7 +65,7 @@ const Wallet = ({navigation: {navigate}}) => {
       image: 'https://i.imgur.com/3g7nmJC.png',
       currency: 'INR',
       key: 'rzp_live_99P71FzULLEPB7',
-      amount: '20',
+      amount: money,
       name: 'Acme Corp',
       order_id: response.order.id, //Replace this with an order_id created using Orders API.
       prefill: {
@@ -71,7 +73,7 @@ const Wallet = ({navigation: {navigate}}) => {
         contact: '9191919191',
         name: 'Gaurav Kumar',
       },
-      theme: {color: '#53a20e'},
+      theme: {color: '#2699FB'},
     }
     RazorpayCheckout.open(options)
       .then((data) => {
@@ -80,7 +82,47 @@ const Wallet = ({navigation: {navigate}}) => {
       })
       .catch((error) => {
         // handle failure
-        alert(`Error: ${error} `)
+        alert(`Error: ${error.code} | ${error.description}`)
+      })
+  }
+  const handleWithdraw = async () => {
+    const response = await sendRequest(
+      'https://deliverypay.in/api/createAddMoneyOrder',
+      'POST',
+      JSON.stringify({
+        amount: money,
+      }),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    )
+
+    console.log(response.order.id)
+
+    var options = {
+      description: 'Credits towards consultation',
+      image: 'https://i.imgur.com/3g7nmJC.png',
+      currency: 'INR',
+      key: 'rzp_live_99P71FzULLEPB7',
+      amount: withdraw,
+      name: 'Acme Corp',
+      order_id: response.order.id, //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: 'gaurav.kumar@example.com',
+        contact: '9191919191',
+        name: 'Gaurav Kumar',
+      },
+      theme: {color: '#2699FB'},
+    }
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        // handle success
+        alert(`Success: ${data.razorpay_payment_id}`)
+      })
+      .catch((error) => {
+        // handle failure
+        alert(`Error: ${error.code} | ${error.description}`)
       })
   }
 
@@ -173,6 +215,8 @@ const Wallet = ({navigation: {navigate}}) => {
               <View style={styles.amountContainer}>
                 <Text style={styles.currencySybmol}>₹</Text>
                 <TextInput
+                  value={money}
+                  onChangeText={(value) => setMoney(value)}
                   placeholder="Enter Amount"
                   keyboardType={'number-pad'}
                   style={styles.amountInput}
@@ -181,7 +225,8 @@ const Wallet = ({navigation: {navigate}}) => {
               <TouchableOpacity
                 style={{width: 82}}
                 activeOpacity={0.6}
-                onPress={addMoney}>
+                onPress={addMoney}
+                disabled={!money}>
                 <LinearGradient
                   colors={['#0091FF', '#0A425D']}
                   style={styles.moneyProceedButton}>
@@ -197,12 +242,18 @@ const Wallet = ({navigation: {navigate}}) => {
               <View style={styles.amountContainer}>
                 <Text style={styles.currencySybmol}>₹</Text>
                 <TextInput
+                  value={withdraw}
+                  onChangeText={(text) => setWithdraw(text)}
                   placeholder="Enter Amount"
                   keyboardType={'number-pad'}
                   style={styles.amountInput}
                 />
               </View>
-              <TouchableOpacity style={{width: 82}} activeOpacity={0.6}>
+              <TouchableOpacity
+                style={{width: 82}}
+                activeOpacity={0.6}
+                disabled={!withdraw}
+                onPress={handleWithdraw}>
                 <LinearGradient
                   colors={['#336CF9', '#F64BBD']}
                   start={{x: -1, y: 0}}
