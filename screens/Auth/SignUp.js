@@ -158,7 +158,6 @@ const SignUp = (props) => {
             }}
             keyboardType="phone-pad"
             blurOnSubmit={false}
-            secureTextEntry={true}
             returnKeyType="next"
             placeholderTextColor={
               errors.phoneNumber ? Colors.errorColor : '#53aefc'

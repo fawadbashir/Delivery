@@ -21,6 +21,7 @@ import PaymentMethod from '../screens/PaymentMethod'
 import Deal from '../screens/Deal'
 import TransactionHistory from '../screens/TransactionHistory'
 import BottomBar from '../components/BottomBar'
+import Chat from '../screens/Chat'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -67,6 +68,7 @@ export const MainNavigator = () => {
         <MainStack.Screen name="hold" component={Hold} />
         <MainStack.Screen name="paymentMethod" component={PaymentMethod} />
         <MainStack.Screen name="holeTransaction" component={HoleTransaction} />
+        <MainStack.Screen name="chat" component={Chat} />
       </MainStack.Navigator>
     </>
   )

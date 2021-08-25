@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -8,11 +8,14 @@ import {
   FlatList,
   useWindowDimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
-import {rosybrown} from 'color-name'
+
+import moment from 'moment'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
 import Colors from '../constants/colors'
+import {useHttpClient} from '../hooks/http-hook'
 
 const Data = [
   {
@@ -98,7 +101,51 @@ const Data = [
   },
 ]
 
-const HoleTransaction = () => {
+const HoleTransaction = (props) => {
+  const {sendRequest, error, clearError, isLoading} = useHttpClient()
+  const [transactions, setTransaction] = useState([])
+
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', async () => {
+      try {
+        const resData = await sendRequest(
+          'https://deliverypay.in/api/transactions',
+          'GET',
+        )
+
+        console.log(resData)
+        const validTransactions = resData
+          .map((transaction) => {
+            if ('client' in transaction) {
+              return {
+                firstName: transaction.client.firstName,
+                lastName: transaction.client.lastName,
+                productDetail: transaction.dscr,
+                transactionId: transaction.milestoneId._id,
+                releaseDate: transaction.milestoneId.releaseDate,
+                verificationMethod: transaction.milestoneId.verification,
+                amount: transaction.amount,
+                holdDate: transaction.createdAt,
+                status: transaction.milestoneId.status,
+                releaseTo: 'seller',
+                role: 'Buyer',
+                img: transaction.client._id.profileImg,
+              }
+            }
+          })
+          .filter((transaction) => transaction !== undefined)
+        console.log(validTransactions)
+        setTransaction(validTransactions)
+        if (error) {
+          Alert.alert(Error, error, [{onPress: () => clearError()}])
+          // return
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    })
+    return unsubscribe
+  }, [props.navigation])
   return (
     <>
       <Header />
@@ -113,8 +160,8 @@ const HoleTransaction = () => {
         </View>
         <View style={styles.list}>
           <FlatList
-            data={Data}
-            keyExtractor={(item, index) => item.id}
+            data={transactions}
+            keyExtractor={(item, index) => item.transactionId}
             renderItem={({item}) => {
               return (
                 <View
@@ -128,39 +175,38 @@ const HoleTransaction = () => {
                   <View style={styles.listHeading}>
                     <Text style={styles.headingText}>Name</Text>
                     <Text style={styles.headingText}>Role</Text>
-                    <Text style={styles.headingText}>Transaction Id</Text>
+                    {/* <Text style={styles.headingText}>Transaction Id</Text> */}
                     <Text style={styles.headingText}>Product</Text>
                     <Text style={styles.headingText}>Status</Text>
                   </View>
                   <View style={styles.innerList}>
                     <View style={styles.nameView}>
-                      <Image style={styles.image} source={item.image} />
-                      <Text style={styles.name}>{item.name}</Text>
+                      <Image style={styles.image} source={{uri: item.img}} />
+                      <Text
+                        style={
+                          styles.name
+                        }>{`${item.firstName} ${item.lastName}`}</Text>
                     </View>
                     <View style={styles.roleView}>
                       <Text style={styles.role}>{item.role}</Text>
                     </View>
                     <View style={styles.transactionIdView}>
-                      <Text style={styles.transactionId}>
+                      {/* <Text style={styles.transactionId}>
                         {item.transactionId}
-                      </Text>
+                      </Text> */}
                     </View>
                     <View style={styles.productView}>
-                      <Text style={styles.product}>{item.product}</Text>
+                      <Text style={styles.product}>{item.productDetail}</Text>
                     </View>
-                    <TouchableOpacity>
-                      <LinearGradient
-                        colors={
-                          item.status == 'Hold'
-                            ? ['#336CF9', '#1BE6D6']
-                            : ['#1BE6D6', '#10877D', '#0E736B']
-                        }
-                        start={{x: 0, y: 0}}
-                        end={{x: 1, y: 0}}
-                        style={styles.statusView}>
-                        <Text style={styles.status}>{item.status}</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
+                    {/* <TouchableOpacity> */}
+                    <LinearGradient
+                      colors={['#1BE6D6', '#0E736B']}
+                      // start={{x: 0, y: 0}}
+                      // end={{x: 1, y: 0}}
+                      style={styles.statusView}>
+                      <Text style={styles.status}>{item.status}</Text>
+                    </LinearGradient>
+                    {/* </TouchableOpacity> */}
                   </View>
                   <View style={styles.amountHeading}>
                     <View style={styles.amountView}>
@@ -182,16 +228,20 @@ const HoleTransaction = () => {
                   <View style={styles.amountList}>
                     <Text style={styles.amountItem}>{item.amount}</Text>
                     <View>
-                      <Text style={styles.amountItem}>{item.holdDate}</Text>
-                      <Text style={styles.amountItem}>{item.holdTime}</Text>
+                      {/* <Moment format="MMM DD, YYYY, hh:mm a"> */}
+                      <Text style={styles.amountItem}>
+                        {moment(item.holdDate).format('MMM DD, YY, hh:mm ')}
+                      </Text>
+                      {/* </Moment> */}
+                      {/* <Text style={styles.amountItem}>{item.holdTime}</Text> */}
                     </View>
                     <View>
-                      <Text style={styles.amountItem}>{item.releasedDate}</Text>
-                      <Text style={styles.amountItem}>{item.releasedTime}</Text>
+                      <Text style={styles.amountItem}>
+                        {moment(item.releaseDate).format('MMM DD, YY, hh:mm ')}
+                      </Text>
+                      {/* <Text style={styles.amountItem}>{item.releasedTime}</Text> */}
                     </View>
-                    <Text style={styles.amountItem}>
-                      {item.releasedToSeller}
-                    </Text>
+                    <Text style={styles.amountItem}>{item.releaseTo}</Text>
                     <Text style={styles.amountItem}>
                       {item.verificationMethod}
                     </Text>
@@ -235,7 +285,7 @@ const styles = StyleSheet.create({
   },
   listHeading: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-around',
     alignItems: 'center',
     paddingBottom: 40,
   },
@@ -267,7 +317,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 5,
-    // paddingBottom: 180,
+    paddingBottom: 120,
   },
   listItem: {
     marginTop: 50,
@@ -297,6 +347,7 @@ const styles = StyleSheet.create({
   nameView: {
     // paddingRight: 5,
     // paddingTop: 5,
+    alignItems: 'center',
   },
   name: {
     fontSize: 13,
@@ -331,8 +382,8 @@ const styles = StyleSheet.create({
     width: 80,
     // height: 200,
     // paddingLeft: 5,
-    borderRadius: 20,
-    height: 50,
+    borderRadius: 30,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     // backgroundColor: '#1BE6D6',
