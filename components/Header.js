@@ -1,8 +1,13 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import {useNavigation} from '@react-navigation/native'
+
+import {AuthContext} from '../context/auth'
 
 const Header = () => {
+  const {user} = useContext(AuthContext)
+  const navigation = useNavigation()
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -19,8 +24,8 @@ const Header = () => {
         </View>
         <View style={styles.userDetailContainer}>
           <View style={{marginRight: 10}}>
-            <Text style={styles.name}>Swati</Text>
-            <Text style={[styles.name, {marginTop: -5}]}>Mishra</Text>
+            <Text style={styles.name}>{user.firstName}</Text>
+            <Text style={[styles.name, {marginTop: -5}]}>{user.lastName}</Text>
           </View>
           <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
             <Icon name="person" color="#2699FB" size={30} />
@@ -44,7 +49,10 @@ const Header = () => {
             style={{width: 25, height: 25, top: 2}}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.5}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('contact')}
+          style={styles.actionButton}
+          activeOpacity={0.5}>
           <Image
             source={require('../assets/customerServiceIcon2.png')}
             style={{width: 30, height: 30, top: -5}}

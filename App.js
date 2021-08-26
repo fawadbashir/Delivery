@@ -8,7 +8,7 @@
 import 'react-native-gesture-handler'
 import React from 'react'
 
-// import {DefaultTheme} from 'react-native-paper'
+import {Provider as PaperProvider} from 'react-native-paper'
 import {AuthProvider} from './context/auth'
 import Deal from './screens/Deal'
 import Deal2 from './screens/Deal2'
@@ -25,7 +25,6 @@ import CustomerCategory from './screens/Auth/CustomerCategory'
 import NavigationContainer from './Navigation/NavigationContainer'
 // import Wallet from './screens/Wallet'
 
-
 import TransactionHistory from './screens/TransactionHistory'
 
 // const theme = {
@@ -40,12 +39,12 @@ import TransactionHistory from './screens/TransactionHistory'
 
 const App = () => {
   return (
-
     <AuthProvider>
-      {/* <NavigationContainer/>      */}
-      <TransactionHistory />
+      <PaperProvider>
+        <NavigationContainer />
+        {/* <TransactionHistory /> */}
+      </PaperProvider>
     </AuthProvider>
-
   )
 }
 
