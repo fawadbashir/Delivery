@@ -9,6 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   useWindowDimensions,
+  Linking,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import BottomBar from '../components/BottomBar'
@@ -60,57 +61,70 @@ const ContactUs = () => {
             <Text style={styles.contactHeading}>Contact us for Support</Text>
           </View>
           <View style={styles.fieldsContainer}>
-            <View style={styles.fieldsView}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Image
-                  source={require('../assets/Phone.png')}
-                  style={{width: 16, height: 16}}
-                />
-                <View style={styles.fieldsTextView}>
-                  <Text style={styles.fieldsText}>+123 456 789 234</Text>
-                  <Text style={styles.fieldsText}>Call</Text>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => Linking.openURL('tel:+123 456 789 234')}>
+              <View style={styles.fieldsView}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={require('../assets/Phone.png')}
+                    style={{width: 16, height: 16}}
+                  />
+                  <View style={styles.fieldsTextView}>
+                    <Text style={styles.fieldsText}>+123 456 789 234</Text>
+                    <Text style={styles.fieldsText}>Call</Text>
+                  </View>
                 </View>
-              </View>
-              <Image
-                source={require('../assets/arrowForward.png')}
-                style={{width: 10, height: 10}}
-              />
-            </View>
-            <View style={styles.fieldsView}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
-                  source={require('../assets/mail.png')}
-                  style={{width: 16, height: 16}}
+                  source={require('../assets/arrowForward.png')}
+                  style={{width: 10, height: 10}}
                 />
-                <View style={styles.fieldsTextView}>
-                  <Text style={styles.fieldsText}>
-                    DelieveryPaycustomer@gmail.com
-                  </Text>
-                  <Text style={styles.fieldsText}>Mail</Text>
-                </View>
               </View>
-              <Image
-                source={require('../assets/arrowForward.png')}
-                style={{width: 10, height: 10}}
-              />
-            </View>
-
-            <View style={styles.fieldsView}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() =>
+                Linking.openURL('mailto:DelieveryPaycustomer@gmail.com')
+              }>
+              <View style={styles.fieldsView}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={require('../assets/mail.png')}
+                    style={{width: 16, height: 16}}
+                  />
+                  <View style={styles.fieldsTextView}>
+                    <Text style={styles.fieldsText}>
+                      DelieveryPaycustomer@gmail.com
+                    </Text>
+                    <Text style={styles.fieldsText}>Mail</Text>
+                  </View>
+                </View>
                 <Image
-                  source={require('../assets/message.png')}
-                  style={{width: 16, height: 16}}
+                  source={require('../assets/arrowForward.png')}
+                  style={{width: 10, height: 10}}
                 />
-                <View style={styles.fieldsTextView}>
-                  <Text style={styles.fieldsText}>+123 456 789 234</Text>
-                  <Text style={styles.fieldsText}>Message</Text>
-                </View>
               </View>
-              <Image
-                source={require('../assets/arrowForward.png')}
-                style={{width: 10, height: 10}}
-              />
-            </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => Linking.openURL('sms:+123 456 789 234')}>
+              <View style={styles.fieldsView}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={require('../assets/message.png')}
+                    style={{width: 16, height: 16}}
+                  />
+                  <View style={styles.fieldsTextView}>
+                    <Text style={styles.fieldsText}>+123 456 789 234</Text>
+                    <Text style={styles.fieldsText}>Message</Text>
+                  </View>
+                </View>
+                <Image
+                  source={require('../assets/arrowForward.png')}
+                  style={{width: 10, height: 10}}
+                />
+              </View>
+            </TouchableOpacity>
             <View style={styles.fieldsView}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image

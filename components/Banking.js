@@ -4,7 +4,7 @@ import {Card} from 'react-native-paper'
 import LinearGradient from 'react-native-linear-gradient'
 import {Controller, useForm} from 'react-hook-form'
 
-const Banking = () => {
+const Banking = (props) => {
   const {
     control,
     handleSubmit,
@@ -12,15 +12,17 @@ const Banking = () => {
   } = useForm()
 
   const onSubmit = (data) => {
-    // props.onSubmit(data)
-    console.log(data)
+    props.onSubmit(data)
+    console.log(data, 'data')
   }
+  console.log(errors)
+
   return (
     <Card style={styles.card}>
       <Controller
-        name="fullName"
+        name="name"
         control={control}
-        rules={{required: true}}
+        rules={{required: true, pattern: /^([\w]{3,})+\s+([\w\s]{3,})+$/i}}
         render={({field: {value, onChange}}) => (
           <TextInput
             value={value}
@@ -74,9 +76,10 @@ const Banking = () => {
       <Controller
         name="accountNumber"
         control={control}
-        rules={{required: true}}
+        rules={{required: true, minLength: 16, maxLength: 16}}
         render={({field: {value, onChange}}) => (
           <TextInput
+            spellCheck={false}
             value={value}
             onChangeText={onChange}
             style={[styles.field, errors.accountNumber && styles.redBorder]}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -8,72 +8,119 @@ import {
   FlatList,
   useWindowDimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
-import {rosybrown} from 'color-name'
+import {io} from 'socket.io-client'
+
 import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 
-const Data = [
-  {
-    id: '1',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    phoneNumber: '+9187725777',
-    email: 'tejap@gmail.com',
-    address: 'Mumbai India',
-    requestStatus: 'Request send',
-    chartStatus: 'chart',
-  },
-  {
-    id: '2',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    phoneNumber: '+9187725777',
-    email: 'tejap@gmail.com',
-    address: 'Mumbai India',
-    requestStatus: 'Request send',
-    chartStatus: 'chart',
-  },
-  {
-    id: '3',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    phoneNumber: '+9187725777',
-    email: 'tejap@gmail.com',
-    address: 'Mumbai India',
-    requestStatus: 'Request send',
-    chartStatus: 'chart',
-  },
-  {
-    id: '4',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    phoneNumber: '+9187725777',
-    email: 'tejap@gmail.com',
-    address: 'Mumbai India',
-    requestStatus: 'Request send',
-    chartStatus: 'chart',
-  },
-  {
-    id: '5',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    phoneNumber: '+9187725777',
-    email: 'tejap@gmail.com',
-    address: 'Mumbai India',
-    requestStatus: 'Request send',
-    chartStatus: 'chart',
-  },
-]
+import {useHttpClient} from '../hooks/http-hook'
 
-const Deal = () => {
+const Deal = (props) => {
+  const [rooms, setRooms] = useState([])
+  const socket = io('https://deliverypay.in', {
+    extraHeaders: {
+      test: '1',
+      cookie:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZWxpdmVyeVBheSIsInN1YiI6IjYxMjc2MzlkMGM5YTAzNTBhNDU1YjU5YSIsImlhdCI6MTYyOTk3MTQyMn0.vlQkrrstkcUmweaPRgoE8h7r5Dtrz4NgPvLs0_tU18c',
+    },
+  })
+  // console.log(socket.id)
+  socket.connect()
+  // useEffect(() => {
+  socket.on('connect', (response) => console.log(response, 'connect'))
+  //   //socket.on('test', (r) => console.log(socket.id, 'test'))
+  //   socket.on('connectedToRoom', (r) => setRooms(r))
+  //   socket.emit('joinRooms', {rooms})
+  //   socket.emit('initiateChat', {client_id: '610532208a12c6447ed42e4c'}, (y) =>
+  //     console.log(y, 'initiateChat'),
+  //   )
+  //   socket.on('messageToUser', (response) =>
+  //     console.log(response, 'messageToUser'),
+  //   )
+  //   socket.on('newChat', (payload) => console.log(payload, 'newChat'))
+  // }, [])
+
+  // socket.onC
+
+  const [chats, setChats] = useState([])
+  const oldChat = useRef()
   const window = useWindowDimensions()
+  const {sendRequest, error, isLoading, clearError} = useHttpClient()
+
+  const searchChat = (text) => {
+    if (text) {
+      setChats((oldChats) => [
+        ...oldChats.filter((chat) =>
+          chat.phone.toLowerCase().includes(text.toLowerCase()),
+        ),
+      ])
+    } else {
+      setChats(oldChat.current)
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', async () => {
+      try {
+        // const response = await fetch('https://deliverypay.in/api/getChat')
+        // // console.log(response)
+        // // const response = await sendRequest('https://deliverypay.in/api/getChat')
+        // const resData = await response.json()
+        // socket.on('connect', (response) => console.log(response, 'connect'))
+        // //socket.on('test', (r) => console.log(socket.id, 'test'))
+        // socket.on('connectedToRoom', (r) => {
+        //   console.log(r)
+        //   setRooms(r)
+        // })
+        // socket.emit('joinRooms', {rooms})
+        // socket.emit(
+        //   'initiateChat',
+        //   {client_id: '60f1f3e065c83205eb57c392'},
+        //   (y) => console.log(y, 'initiateChat'),
+        // )
+        // socket.on('messageToUser', (response) =>
+        //   console.log(response, 'messageToUser'),
+        // )
+        // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
+        // const validArray = response.map((chat) => ({
+        //   id: chat._id,
+        //   firstName: chat.client.firstName,
+        //   lastName: chat.client.lastName,
+        //   email: chat.client.email,
+        //   phone: chat.client.phone,
+        //   image: chat.client.profileImg,
+        //   clientId: chat.client._id,
+        // }))
+        // console.log(resData)
+        // // console.log(validArray)
+        // if (error) {
+        //   Alert.alert('Error', error, [{onPress: () => clearError()}])
+        //   return
+        // }
+        // setChats(validArray)
+        // oldChat.current = validArray
+        // socket.emit(
+        //   'joinRooms',
+        //   {
+        //     rooms: response.map((room) => room._id),
+        //   },
+        //   (response1) => console.log(response1, 'response1'),
+        // )
+      } catch (e) {
+        // console.log(e)
+      }
+    })
+
+    return unsubscribe
+  }, [props.navigation])
   return (
     <>
       <Header />
       <View>
         <View style={styles.titleView}>
-          <Text style={styles.title}>Start a Chart</Text>
+          <Text style={styles.title}>Start a Chat</Text>
           <Image
             style={styles.tileImage}
             source={require('../assets/icons/arrow.png')}
@@ -81,6 +128,7 @@ const Deal = () => {
         </View>
         <View style={styles.searchBarView}>
           <CommonSearch
+            onChangeText={searchChat}
             placeholder={'Search with Skropay ID or Phone Number'}
           />
         </View>
@@ -95,7 +143,7 @@ const Deal = () => {
           }}>
           <FlatList
             // style={{marginBottom: 10}}
-            data={Data}
+            data={chats}
             keyExtractor={(item, index) => item.id}
             //   numColumns={3}
             renderItem={({item}) => {
@@ -104,11 +152,19 @@ const Deal = () => {
                 // <View style={styles.list}>
                 <View style={styles.innerList}>
                   <View style={styles.imageView}>
-                    <Image style={styles.image} source={item.image} />
+                    <Image
+                      style={styles.image}
+                      source={{
+                        uri:
+                          item.image ||
+                          'https://www.mountsinai.on.ca/wellbeing/our-team/team-images/person-placeholder/image_view_fullscreen',
+                      }}
+                    />
                   </View>
                   <View style={styles.details}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.phoneNumber}>{item.phoneNumber}</Text>
+                    <Text style={styles.name}>{item.firstName}</Text>
+                    <Text style={styles.name}>{item.lastName}</Text>
+                    <Text style={styles.phoneNumber}>{item.phone}</Text>
                     <Text style={styles.email}>{item.email}</Text>
                     <Text style={styles.address}>{item.address}</Text>
                   </View>
@@ -117,8 +173,25 @@ const Deal = () => {
                       {item.requestStatus}
                     </Text>
                   </View>
-                  <TouchableOpacity style={styles.chartStatusView}>
-                    <Text style={styles.chartStatus}>{item.chartStatus}</Text>
+                  <TouchableOpacity
+                    style={styles.chartStatusView}
+                    onPress={() => {
+                      console.log('es')
+                      // socket.emit(
+                      //   'initiateChat',
+                      //   {client_id: '60f1f3e065c83205eb57c392'},
+                      //   (y) => console.log(y, 'initiateChat'),
+                      // )
+                      // socket.on('connectedToRoom', (r) => console.log('test'))
+                      // socket.on('messageToUser', (response) =>
+                      //   console.log(response, 'messageToUser'),
+                      // )
+
+                      // props.navigation.navigate('chat', {
+                      //   chatId: item.clientId,
+                      // })
+                    }}>
+                    <Text style={styles.chartStatus}>Chat</Text>
                   </TouchableOpacity>
                 </View>
                 // </View>
@@ -205,6 +278,7 @@ const styles = StyleSheet.create({
   chartStatusView: {
     paddingRight: 20,
     paddingBottom: 30,
+    justifyContent: 'center',
   },
   chartStatus: {
     color: '#707070',
