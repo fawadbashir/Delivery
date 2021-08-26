@@ -23,9 +23,7 @@ import CustomerCategory from './screens/Auth/CustomerCategory'
 // import StartTransaction from './screens/Seller/StartTransaction'
 
 import NavigationContainer from './Navigation/NavigationContainer'
-// import Wallet from './screens/Wallet'
 
-import TransactionHistory from './screens/TransactionHistory'
 
 // const theme = {
 //   ...DefaultTheme,
@@ -39,12 +37,14 @@ import TransactionHistory from './screens/TransactionHistory'
 
 const App = () => {
   return (
+
     <AuthProvider>
       <PaperProvider>
         <NavigationContainer />
-        {/* <TransactionHistory /> */}
+       
       </PaperProvider>
     </AuthProvider>
+
   )
 }
 
