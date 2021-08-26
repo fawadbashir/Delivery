@@ -55,8 +55,17 @@ const Login = (props) => {
           'Content-Type': 'application/json',
         },
       )
-
-      login(responseData.user.userId, responseData.user.phone)
+      const {user} = responseData
+      login({
+        userId: user.userId,
+        userPhone: user.phone,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.profileImg,
+        paymentMethods: user.paymentMethods,
+        balance: user.balance,
+      })
       // props.navigation.navigate('otp')
       // eslint-disable-next-line no-empty
     } catch (e) {}
@@ -130,9 +139,9 @@ const Login = (props) => {
                   //   {value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/},
                   //   {value: /^[789]\d{9,9}$/g},
                   // ],
-                  pattern:
-                    // eslint-disable-next-line no-useless-escape
-                    /^([0-9]{10})|([A-Za-z0-9._%\+\-]+@[a-z0-9.\-]+\.[a-z]{2,3})$/,
+                  // pattern:
+                  // eslint-disable-next-line no-useless-escape
+                  // /^([0-9]{10})|([A-Za-z0-9._%\+\-]+@[a-z0-9.\-]+\.[a-z]{2,3})$/,
                 }}
                 keyboardType="email-address"
                 placeholder="Email or Phone No"

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {
   View,
   StyleSheet,
@@ -20,29 +20,38 @@ import BottomBar from '../components/BottomBar'
 import {useHttpClient} from '../hooks/http-hook'
 
 import Colors from '../constants/colors'
+import {AuthContext} from '../context/auth'
 
 const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  labels: ['Jan', 'Feb', 'Mar', 'Apr'],
   datasets: [
     {
       data: [
         75 * 10,
-        Math.random() * 100,
-        Math.random() * 100,
+        Math.floor(Math.random() * 100),
+        Math.floor(Math.random() * 100),
         95 * 100,
-        Math.random() * 100,
-        25 * 100,
-        Math.random() * 100,
       ],
-      color: '#ACC4FF',
+      // color: '#ACC4FF',
     },
   ],
 }
 
-const Wallet = ({navigation: {navigate}}) => {
+const Wallet = ({navigation: {navigate, addListener}}) => {
+  const {user} = useContext(AuthContext)
+
   const [money, setMoney] = useState()
   const [withdraw, setWithdraw] = useState()
   const {sendRequest} = useHttpClient()
+  const {sendRequest: withdrawRequest} = useHttpClient()
+  const [chartData, setChartData] = useState()
+  const {
+    sendRequest: dashboardRequest,
+    loading: dashboardLoading,
+    error: dashboardError,
+    clearError: clearDashboardError,
+  } = useHttpClient()
+  const [dashboardData, setDashboardData] = useState()
   const window = useWindowDimensions()
 
   const addMoney = async () => {
@@ -86,7 +95,7 @@ const Wallet = ({navigation: {navigate}}) => {
       })
   }
   const handleWithdraw = async () => {
-    const response = await sendRequest(
+    const response = await withdrawRequest(
       'https://deliverypay.in/api/createAddMoneyOrder',
       'POST',
       JSON.stringify({
@@ -126,6 +135,29 @@ const Wallet = ({navigation: {navigate}}) => {
       })
   }
 
+  useEffect(() => {
+    const unsubsribe = addListener('focus', async () => {
+      try {
+        const response = await dashboardRequest(
+          'https://deliverypay.in/api/dashboardData',
+        )
+
+        setDashboardData(response)
+        const barData = {labels: [], datasets: [{data: []}]}
+        response.monthlyBalance.forEach((month) => {
+          barData.labels.push(month._id)
+          barData.datasets[0].data.push(month.balance)
+        })
+        console.log(barData)
+        setChartData(barData)
+      } catch (e) {
+        console.log(e)
+      }
+    })
+
+    return unsubsribe
+  }, [addListener, dashboardRequest])
+
   return (
     <>
       <ScrollView style={styles.screen}>
@@ -139,17 +171,20 @@ const Wallet = ({navigation: {navigate}}) => {
                 <Text style={[styles.userText, {fontFamily: 'Poppins-Light'}]}>
                   Hello
                 </Text>
-                <Text style={styles.userText}>Swati Mishra</Text>
+                <Text
+                  style={
+                    styles.userText
+                  }>{`${user.firstName} ${user.lastName}`}</Text>
               </View>
             </View>
             <Icon name="person" color="#2699FB" size={30} />
           </View>
           <Text style={styles.heading}>Wallet Balance</Text>
-          <Text style={styles.balance}>₹0</Text>
+          <Text style={styles.balance}>₹{user.balance}</Text>
         </View>
         <View style={styles.whiteBackground}>
           <View style={styles.paymentMethodContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigate('paymentMethod')}>
               <Image
                 source={require('../assets/addpayment.png')}
                 style={{width: 21, height: 21}}
@@ -166,27 +201,34 @@ const Wallet = ({navigation: {navigate}}) => {
             </TouchableOpacity>
           </View>
           <Text style={styles.analytics}>Analytics</Text>
+
           <BarChart
-            data={data}
-            width={window.width} // from react-native
-            height={220}
+            showValuesOnTopOfBars
+            data={chartData ? chartData : data}
+            width={400} // from react-native
+            height={180}
             yAxisLabel="₹"
             yAxisSuffix="k"
-            yAxisInterval={1} // optional, defaults to 1
+            yAxisInterval={0} // optional, defaults to 1
             withInnerLines={false}
             // withCustomBarColorFromData={true}
             flatColor={true}
             withHorizontalLabels={false}
             showBarTops={false}
             chartConfig={{
+              scrollableInfoSize: 10,
               backgroundColor: '#000',
+              barPercentage: 0.7,
+              horizontalLabelRotation: 20,
+              barRadius: 10,
+              // width: '100%',
               propsForHorizontalLabels: {
                 fontFamily: 'Poppins-Regular',
               },
               backgroundGradientFrom: '#fff',
               backgroundGradientTo: '#fff',
               decimalPlaces: 2, // optional, defaults to 2dp
-              stackedBar: false,
+
               color: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               fillShadowGradient: '#ACC4FF',
@@ -194,7 +236,10 @@ const Wallet = ({navigation: {navigate}}) => {
               backgroundGradientFromOpacity: 1,
               backgroundGradientToOpacity: 1,
 
-              style: {},
+              style: {
+                borderRadius: 16,
+                borderColor: 'red',
+              },
 
               propsForLabels: {
                 disabled: true,
@@ -202,12 +247,10 @@ const Wallet = ({navigation: {navigate}}) => {
             }}
             // bezier
             style={{
-              // marginVertical: 8,
-              // paddingLeft: -20,
-              paddingRight: 20,
-              borderRadius: 16,
+              paddingRight: 10,
             }}
           />
+
           {/* Add Money View */}
           <View style={{...styles.moneyView, backgroundColor: '#e7f6fc'}}>
             <Text style={styles.moneyViewHeading}>Add Money</Text>
@@ -305,6 +348,7 @@ const styles = StyleSheet.create({
     // borderWidth: 10,
     backgroundColor: 'white',
     top: -20,
+
     flex: 1,
   },
   topRow: {

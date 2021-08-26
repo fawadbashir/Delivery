@@ -159,97 +159,104 @@ const HoleTransaction = (props) => {
           </Text>
         </View>
         <View style={styles.list}>
-          <FlatList
-            data={transactions}
-            keyExtractor={(item, index) => item.transactionId}
-            renderItem={({item}) => {
-              return (
-                <View
-                  style={[
-                    styles.listItem,
-                    {
-                      backgroundColor:
-                        item.role === 'Buyer' ? '#F9EAF4' : '#BCE0FD',
-                    },
-                  ]}>
-                  <View style={styles.listHeading}>
-                    <Text style={styles.headingText}>Name</Text>
-                    <Text style={styles.headingText}>Role</Text>
-                    {/* <Text style={styles.headingText}>Transaction Id</Text> */}
-                    <Text style={styles.headingText}>Product</Text>
-                    <Text style={styles.headingText}>Status</Text>
-                  </View>
-                  <View style={styles.innerList}>
-                    <View style={styles.nameView}>
-                      <Image style={styles.image} source={{uri: item.img}} />
-                      <Text
-                        style={
-                          styles.name
-                        }>{`${item.firstName} ${item.lastName}`}</Text>
+          {
+            <FlatList
+              data={transactions}
+              keyExtractor={(item, index) => item.transactionId}
+              renderItem={({item}) => {
+                return (
+                  <View
+                    style={[
+                      styles.listItem,
+                      {
+                        backgroundColor:
+                          item.role === 'Buyer' ? '#F9EAF4' : '#BCE0FD',
+                      },
+                    ]}>
+                    <View style={styles.listHeading}>
+                      <Text style={styles.headingText}>Name</Text>
+                      <Text style={styles.headingText}>Role</Text>
+                      {/* <Text style={styles.headingText}>Transaction Id</Text> */}
+                      <Text style={styles.headingText}>Product</Text>
+                      <Text style={styles.headingText}>Status</Text>
                     </View>
-                    <View style={styles.roleView}>
-                      <Text style={styles.role}>{item.role}</Text>
-                    </View>
-                    <View style={styles.transactionIdView}>
-                      {/* <Text style={styles.transactionId}>
+                    <View style={styles.innerList}>
+                      <View style={styles.nameView}>
+                        <Image style={styles.image} source={{uri: item.img}} />
+                        <Text
+                          style={
+                            styles.name
+                          }>{`${item.firstName} ${item.lastName}`}</Text>
+                      </View>
+                      <View style={styles.roleView}>
+                        <Text style={styles.role}>{item.role}</Text>
+                      </View>
+                      <View style={styles.transactionIdView}>
+                        {/* <Text style={styles.transactionId}>
                         {item.transactionId}
                       </Text> */}
+                      </View>
+                      <View style={styles.productView}>
+                        <Text style={styles.product}>{item.productDetail}</Text>
+                      </View>
+                      {/* <TouchableOpacity> */}
+                      <LinearGradient
+                        colors={['#1BE6D6', '#0E736B']}
+                        // start={{x: 0, y: 0}}
+                        // end={{x: 1, y: 0}}
+                        style={styles.statusView}>
+                        <Text style={styles.status}>{item.status}</Text>
+                      </LinearGradient>
+                      {/* </TouchableOpacity> */}
                     </View>
-                    <View style={styles.productView}>
-                      <Text style={styles.product}>{item.productDetail}</Text>
+                    <View style={styles.amountHeading}>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amountText}>Amount</Text>
+                      </View>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amountText}>Hold Date</Text>
+                      </View>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amountText}>Released Date</Text>
+                      </View>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amountText}>
+                          Released to seller
+                        </Text>
+                      </View>
+                      <View style={styles.amountView}>
+                        <Text style={styles.amountText}>
+                          Verification Method
+                        </Text>
+                      </View>
                     </View>
-                    {/* <TouchableOpacity> */}
-                    <LinearGradient
-                      colors={['#1BE6D6', '#0E736B']}
-                      // start={{x: 0, y: 0}}
-                      // end={{x: 1, y: 0}}
-                      style={styles.statusView}>
-                      <Text style={styles.status}>{item.status}</Text>
-                    </LinearGradient>
-                    {/* </TouchableOpacity> */}
-                  </View>
-                  <View style={styles.amountHeading}>
-                    <View style={styles.amountView}>
-                      <Text style={styles.amountText}>Amount</Text>
-                    </View>
-                    <View style={styles.amountView}>
-                      <Text style={styles.amountText}>Hold Date</Text>
-                    </View>
-                    <View style={styles.amountView}>
-                      <Text style={styles.amountText}>Released Date</Text>
-                    </View>
-                    <View style={styles.amountView}>
-                      <Text style={styles.amountText}>Released to seller</Text>
-                    </View>
-                    <View style={styles.amountView}>
-                      <Text style={styles.amountText}>Verification Method</Text>
-                    </View>
-                  </View>
-                  <View style={styles.amountList}>
-                    <Text style={styles.amountItem}>{item.amount}</Text>
-                    <View>
-                      {/* <Moment format="MMM DD, YYYY, hh:mm a"> */}
+                    <View style={styles.amountList}>
+                      <Text style={styles.amountItem}>{item.amount}</Text>
+                      <View>
+                        <Text style={styles.amountItem}>
+                          {moment(item.holdDate).format('MMM DD, YY, hh:mm ')}
+                        </Text>
+                        {/* </Moment> */}
+                        {/* <Text style={styles.amountItem}>{item.holdTime}</Text> */}
+                      </View>
+                      <View>
+                        <Text style={styles.amountItem}>
+                          {moment(item.releaseDate).format(
+                            'MMM DD, YY, hh:mm ',
+                          )}
+                        </Text>
+                        {/* <Text style={styles.amountItem}>{item.releasedTime}</Text> */}
+                      </View>
+                      <Text style={styles.amountItem}>{item.releaseTo}</Text>
                       <Text style={styles.amountItem}>
-                        {moment(item.holdDate).format('MMM DD, YY, hh:mm ')}
+                        {item.verificationMethod}
                       </Text>
-                      {/* </Moment> */}
-                      {/* <Text style={styles.amountItem}>{item.holdTime}</Text> */}
                     </View>
-                    <View>
-                      <Text style={styles.amountItem}>
-                        {moment(item.releaseDate).format('MMM DD, YY, hh:mm ')}
-                      </Text>
-                      {/* <Text style={styles.amountItem}>{item.releasedTime}</Text> */}
-                    </View>
-                    <Text style={styles.amountItem}>{item.releaseTo}</Text>
-                    <Text style={styles.amountItem}>
-                      {item.verificationMethod}
-                    </Text>
                   </View>
-                </View>
-              )
-            }}
-          />
+                )
+              }}
+            />
+          }
         </View>
       </View>
       <BottomBar />

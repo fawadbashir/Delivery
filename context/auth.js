@@ -18,8 +18,8 @@ export const AuthProvider = (props) => {
     setOtp((prevOtp) => prevOtp.filter((item) => item !== lastValue))
   }
 
-  const login = (id, phone) => {
-    setUser({userId: id, userPhone: phone})
+  const login = (user) => {
+    setUser(user)
   }
 
   const changeUserType = (user) => {
