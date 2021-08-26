@@ -8,7 +8,7 @@
 import 'react-native-gesture-handler'
 import React from 'react'
 
-// import {DefaultTheme} from 'react-native-paper'
+import {Provider as PaperProvider} from 'react-native-paper'
 import {AuthProvider} from './context/auth'
 import Deal from './screens/Deal'
 import Deal2 from './screens/Deal2'
@@ -19,16 +19,12 @@ import StartTransaction from './screens/Seller/StartTransaction'
 import ContactUs from './screens/ContactUs'
 import AddAddress from './screens/AddAddress'
 import EditAddress from './screens/EditAddress'
+import CustomerCategory from './screens/Auth/CustomerCategory'
 // import StartTransaction from './screens/Seller/StartTransaction'
 
 import NavigationContainer from './Navigation/NavigationContainer'
-import Wallet from './screens/Wallet'
-import PaymentSuccess from './screens/PaymentSuccess'
-import PaymentDetails from './screens/PaymentDetails'
-// import AccountSettings from './screens/AccountSettings'
-import AccountSettings from './screens/AccountSettings'
 
-// import UserCategory from './screens/UserCategory'
+
 // const theme = {
 //   ...DefaultTheme,
 //   colors: {
@@ -41,21 +37,14 @@ import AccountSettings from './screens/AccountSettings'
 
 const App = () => {
   return (
-    // <AuthProvider>
-    //   <NavigationContainer />
-    //   {/* <StartTransaction /> */}
-    //   {/* <UserCategory /> */}
-    // </AuthProvider>
-    // <Deal />
-    // <Hold />
-    // <HoleTransaction />
-    // <ContactUs />
-    // <AddAddress />
-    // <EditAddress />
-    // <StartTransaction />
-    // <PaymentSuccess />
-    // <PaymentDetails />
-    <AccountSettings />
+
+    <AuthProvider>
+      <PaperProvider>
+        <NavigationContainer />
+       
+      </PaperProvider>
+    </AuthProvider>
+
   )
 }
 

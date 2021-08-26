@@ -24,7 +24,7 @@ const UserSearchItem = (props) => {
           {` `}
         </Text>
       </View>
-      <TouchableOpacity activeOpacity={0.6}>
+      <TouchableOpacity activeOpacity={0.6} onPress={props.onPress}>
         <Text style={styles.milestone}>{props.milestoneType} Milestone</Text>
       </TouchableOpacity>
     </View>

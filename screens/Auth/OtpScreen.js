@@ -221,7 +221,7 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              disabled={otp.length < 7}
+              // disabled={otp.length < 7}
               onPress={submitUserOtp}>
               <Icon name="done" size={20} style={styles.iconText} />
             </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {
   View,
   StyleSheet,
@@ -10,179 +10,328 @@ import {
   TextInput,
 } from 'react-native'
 import {BarChart} from 'react-native-chart-kit'
+import RazorpayCheckout from 'react-native-razorpay'
+import LinearGradient from 'react-native-linear-gradient'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+
+import CreditCard from '../components/CreditCard'
+import BottomBar from '../components/BottomBar'
+
+import {useHttpClient} from '../hooks/http-hook'
 
 import Colors from '../constants/colors'
-import Icon from 'react-native-vector-icons/MaterialIcons'
-import CreditCard from '../components/CreditCard'
-
-import LinearGradient from 'react-native-linear-gradient'
+import {AuthContext} from '../context/auth'
 
 const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  labels: ['Jan', 'Feb', 'Mar', 'Apr'],
   datasets: [
     {
       data: [
         75 * 10,
-        Math.random() * 100,
-        Math.random() * 100,
+        Math.floor(Math.random() * 100),
+        Math.floor(Math.random() * 100),
         95 * 100,
-        Math.random() * 100,
-        25 * 100,
-        Math.random() * 100,
       ],
-      color: '#ACC4FF',
+      // color: '#ACC4FF',
     },
   ],
 }
 
-const Wallet = () => {
+const Wallet = ({navigation: {navigate, addListener}}) => {
+  const {user} = useContext(AuthContext)
+
+  const [money, setMoney] = useState()
+  const [withdraw, setWithdraw] = useState()
+  const {sendRequest} = useHttpClient()
+  const {sendRequest: withdrawRequest} = useHttpClient()
+  const [chartData, setChartData] = useState()
+  const {
+    sendRequest: dashboardRequest,
+    loading: dashboardLoading,
+    error: dashboardError,
+    clearError: clearDashboardError,
+  } = useHttpClient()
+  const [dashboardData, setDashboardData] = useState()
   const window = useWindowDimensions()
 
+  const addMoney = async () => {
+    const response = await sendRequest(
+      'https://deliverypay.in/api/createAddMoneyOrder',
+      'POST',
+      JSON.stringify({
+        amount: money,
+      }),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    )
+
+    console.log(response.order.id)
+
+    var options = {
+      description: 'Credits towards consultation',
+      image: 'https://i.imgur.com/3g7nmJC.png',
+      currency: 'INR',
+      key: 'rzp_live_99P71FzULLEPB7',
+      amount: money,
+      name: 'Acme Corp',
+      order_id: response.order.id, //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: 'gaurav.kumar@example.com',
+        contact: '9191919191',
+        name: 'Gaurav Kumar',
+      },
+      theme: {color: '#2699FB'},
+    }
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        // handle success
+        alert(`Success: ${data.razorpay_payment_id}`)
+      })
+      .catch((error) => {
+        // handle failure
+        alert(`Error: ${error.code} | ${error.description}`)
+      })
+  }
+  const handleWithdraw = async () => {
+    const response = await withdrawRequest(
+      'https://deliverypay.in/api/createAddMoneyOrder',
+      'POST',
+      JSON.stringify({
+        amount: money,
+      }),
+      {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    )
+
+    console.log(response.order.id)
+
+    var options = {
+      description: 'Credits towards consultation',
+      image: 'https://i.imgur.com/3g7nmJC.png',
+      currency: 'INR',
+      key: 'rzp_live_99P71FzULLEPB7',
+      amount: withdraw,
+      name: 'Acme Corp',
+      order_id: response.order.id, //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: 'gaurav.kumar@example.com',
+        contact: '9191919191',
+        name: 'Gaurav Kumar',
+      },
+      theme: {color: '#2699FB'},
+    }
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        // handle success
+        alert(`Success: ${data.razorpay_payment_id}`)
+      })
+      .catch((error) => {
+        // handle failure
+        alert(`Error: ${error.code} | ${error.description}`)
+      })
+  }
+
+  useEffect(() => {
+    const unsubsribe = addListener('focus', async () => {
+      try {
+        const response = await dashboardRequest(
+          'https://deliverypay.in/api/dashboardData',
+        )
+
+        setDashboardData(response)
+        const barData = {labels: [], datasets: [{data: []}]}
+        response.monthlyBalance.forEach((month) => {
+          barData.labels.push(month._id)
+          barData.datasets[0].data.push(month.balance)
+        })
+        console.log(barData)
+        setChartData(barData)
+      } catch (e) {
+        console.log(e)
+      }
+    })
+
+    return unsubsribe
+  }, [addListener, dashboardRequest])
+
   return (
-    <ScrollView style={styles.screen}>
-      <View style={styles.bluebackground}>
-        <View style={styles.topRow}>
-          <View style={styles.userInfoView}>
-            <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
-              <Icon name="person" color="#2699FB" size={30} />
+    <>
+      <ScrollView style={styles.screen}>
+        <View style={styles.bluebackground}>
+          <View style={styles.topRow}>
+            <View style={styles.userInfoView}>
+              <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
+                <Icon name="person" color="#2699FB" size={30} />
+              </TouchableOpacity>
+              <View style={styles.userTextContainer}>
+                <Text style={[styles.userText, {fontFamily: 'Poppins-Light'}]}>
+                  Hello
+                </Text>
+                <Text
+                  style={
+                    styles.userText
+                  }>{`${user.firstName} ${user.lastName}`}</Text>
+              </View>
+            </View>
+            <Icon name="person" color="#2699FB" size={30} />
+          </View>
+          <Text style={styles.heading}>Wallet Balance</Text>
+          <Text style={styles.balance}>₹{user.balance}</Text>
+        </View>
+        <View style={styles.whiteBackground}>
+          <View style={styles.paymentMethodContainer}>
+            <TouchableOpacity onPress={() => navigate('paymentMethod')}>
+              <Image
+                source={require('../assets/addpayment.png')}
+                style={{width: 21, height: 21}}
+              />
             </TouchableOpacity>
-            <View style={styles.userTextContainer}>
-              <Text style={[styles.userText, {fontFamily: 'Poppins-Light'}]}>
-                Hello
-              </Text>
-              <Text style={styles.userText}>Swati Mishra</Text>
+            <View style={{top: -20}}>
+              <CreditCard />
+            </View>
+            <TouchableOpacity>
+              <Image
+                source={require('../assets/nextpayment.png')}
+                style={{width: 21, height: 21}}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.analytics}>Analytics</Text>
+
+          <BarChart
+            showValuesOnTopOfBars
+            data={chartData ? chartData : data}
+            width={400} // from react-native
+            height={180}
+            yAxisLabel="₹"
+            yAxisSuffix="k"
+            yAxisInterval={0} // optional, defaults to 1
+            withInnerLines={false}
+            // withCustomBarColorFromData={true}
+            flatColor={true}
+            withHorizontalLabels={false}
+            showBarTops={false}
+            chartConfig={{
+              scrollableInfoSize: 10,
+              backgroundColor: '#000',
+              barPercentage: 0.7,
+              horizontalLabelRotation: 20,
+              barRadius: 10,
+              // width: '100%',
+              propsForHorizontalLabels: {
+                fontFamily: 'Poppins-Regular',
+              },
+              backgroundGradientFrom: '#fff',
+              backgroundGradientTo: '#fff',
+              decimalPlaces: 2, // optional, defaults to 2dp
+
+              color: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              fillShadowGradient: '#ACC4FF',
+              fillShadowGradientOpacity: 1,
+              backgroundGradientFromOpacity: 1,
+              backgroundGradientToOpacity: 1,
+
+              style: {
+                borderRadius: 16,
+                borderColor: 'red',
+              },
+
+              propsForLabels: {
+                disabled: true,
+              },
+            }}
+            // bezier
+            style={{
+              paddingRight: 10,
+            }}
+          />
+
+          {/* Add Money View */}
+          <View style={{...styles.moneyView, backgroundColor: '#e7f6fc'}}>
+            <Text style={styles.moneyViewHeading}>Add Money</Text>
+            <View style={styles.moneyActions}>
+              <View style={styles.amountContainer}>
+                <Text style={styles.currencySybmol}>₹</Text>
+                <TextInput
+                  value={money}
+                  onChangeText={(value) => setMoney(value)}
+                  placeholder="Enter Amount"
+                  keyboardType={'number-pad'}
+                  style={styles.amountInput}
+                />
+              </View>
+              <TouchableOpacity
+                style={{width: 82}}
+                activeOpacity={0.6}
+                onPress={addMoney}
+                disabled={!money}>
+                <LinearGradient
+                  colors={['#0091FF', '#0A425D']}
+                  style={styles.moneyProceedButton}>
+                  <Text style={styles.proceedText}>Proceed</Text>
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
           </View>
-          <Icon name="person" color="#2699FB" size={30} />
-        </View>
-        <Text style={styles.heading}>Wallet Balance</Text>
-        <Text style={styles.balance}>₹0</Text>
-      </View>
-      <View style={styles.whiteBackground}>
-        <View style={styles.paymentMethodContainer}>
-          <TouchableOpacity>
-            <Image
-              source={require('../assets/addpayment.png')}
-              style={{width: 21, height: 21}}
-            />
-          </TouchableOpacity>
-          <View style={{top: -20}}>
-            <CreditCard />
+          {/* Withdraw View */}
+          <View style={[styles.moneyView, {backgroundColor: '#f9eaf4'}]}>
+            <Text style={styles.moneyViewHeading}>Withdraw</Text>
+            <View style={styles.moneyActions}>
+              <View style={styles.amountContainer}>
+                <Text style={styles.currencySybmol}>₹</Text>
+                <TextInput
+                  value={withdraw}
+                  onChangeText={(text) => setWithdraw(text)}
+                  placeholder="Enter Amount"
+                  keyboardType={'number-pad'}
+                  style={styles.amountInput}
+                />
+              </View>
+              <TouchableOpacity
+                style={{width: 82}}
+                activeOpacity={0.6}
+                disabled={!withdraw}
+                onPress={handleWithdraw}>
+                <LinearGradient
+                  colors={['#336CF9', '#F64BBD']}
+                  start={{x: -1, y: 0}}
+                  end={{x: 1, y: 3}}
+                  style={styles.moneyProceedButton}>
+                  <Text style={styles.proceedText}>Proceed</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            style={styles.transactionView}
+            activeOpacity={0.4}
+            onPress={() => navigate('wallet/history')}>
+            <Text
+              style={{
+                fontFamily: 'Poppins Regular',
+                fontSize: 18,
+              }}>{`See all transaction history & Rewards `}</Text>
             <Image
               source={require('../assets/nextpayment.png')}
               style={{width: 21, height: 21}}
             />
           </TouchableOpacity>
         </View>
-        <Text style={styles.analytics}>Analytics</Text>
-        <BarChart
-          data={data}
-          width={window.width} // from react-native
-          height={220}
-          yAxisLabel="₹"
-          yAxisSuffix="k"
-          yAxisInterval={1} // optional, defaults to 1
-          withInnerLines={false}
-          // withCustomBarColorFromData={true}
-          flatColor={true}
-          withHorizontalLabels={false}
-          showBarTops={false}
-          chartConfig={{
-            backgroundColor: '#000',
-            propsForHorizontalLabels: {
-              fontFamily: 'Poppins-Regular',
-            },
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
-            decimalPlaces: 2, // optional, defaults to 2dp
-            stackedBar: false,
-            color: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            fillShadowGradient: '#ACC4FF',
-            fillShadowGradientOpacity: 1,
-            backgroundGradientFromOpacity: 1,
-            backgroundGradientToOpacity: 1,
-
-            style: {},
-
-            propsForLabels: {
-              disabled: true,
-            },
-          }}
-          // bezier
-          style={{
-            // marginVertical: 8,
-            // paddingLeft: -20,
-            paddingRight: 20,
-            borderRadius: 16,
-          }}
-        />
-        {/* Add Money View */}
-        <View style={{...styles.moneyView, backgroundColor: '#e7f6fc'}}>
-          <Text style={styles.moneyViewHeading}>Add Money</Text>
-          <View style={styles.moneyActions}>
-            <View style={styles.amountContainer}>
-              <Text style={styles.currencySybmol}>₹</Text>
-              <TextInput
-                placeholder="Enter Amount"
-                keyboardType={'number-pad'}
-                style={styles.amountInput}
-              />
-            </View>
-            <TouchableOpacity style={{width: 82}} activeOpacity={0.6}>
-              <LinearGradient
-                colors={['#0091FF', '#0A425D']}
-                style={styles.moneyProceedButton}>
-                <Text style={styles.proceedText}>Proceed</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
-        {/* Withdraw View */}
-        <View style={[styles.moneyView, {backgroundColor: '#f9eaf4'}]}>
-          <Text style={styles.moneyViewHeading}>Withdraw</Text>
-          <View style={styles.moneyActions}>
-            <View style={styles.amountContainer}>
-              <Text style={styles.currencySybmol}>₹</Text>
-              <TextInput
-                placeholder="Enter Amount"
-                keyboardType={'number-pad'}
-                style={styles.amountInput}
-              />
-            </View>
-            <TouchableOpacity style={{width: 82}} activeOpacity={0.6}>
-              <LinearGradient
-                colors={['#336CF9', '#F64BBD']}
-                start={{x: -1, y: 0}}
-                end={{x: 1, y: 3}}
-                style={styles.moneyProceedButton}>
-                <Text style={styles.proceedText}>Proceed</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.transactionView} activeOpacity={0.4}>
-          <Text
-            style={{
-              fontFamily: 'Poppins Regular',
-              fontSize: 18,
-            }}>{`See all transaction history & Rewards `}</Text>
-          <Image
-            source={require('../assets/nextpayment.png')}
-            style={{width: 21, height: 21}}
-          />
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      <BottomBar />
+    </>
   )
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingBottom: 30,
+    // paddingBottom: 30,
   },
   bluebackground: {
     // height: '35%',
@@ -199,6 +348,7 @@ const styles = StyleSheet.create({
     // borderWidth: 10,
     backgroundColor: 'white',
     top: -20,
+
     flex: 1,
   },
   topRow: {

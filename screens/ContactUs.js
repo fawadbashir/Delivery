@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import BottomBar from '../components/BottomBar'
@@ -14,46 +16,49 @@ import CommonSearch from '../components/CommonSearch'
 
 const ContactUs = () => {
   const [queries, setQueries] = useState('')
+  const window = useWindowDimensions()
   const updateText = (text) => {
     setQueries(text)
   }
 
   return (
     <>
-      <View style={styles.screen}>
-        <View style={styles.headerContainer}>
-          <View style={styles.top}>
-            <View style={styles.headingContainer}>
-              <Image
-                source={require('../assets/appHeadingIcon.png')}
-                // style={{marginRight: 10}}
-                style={{width: 50, height: 50, marginRight: 10}}
-              />
-              <View>
-                <Text style={styles.heading}>Delivery</Text>
-                <Text style={[styles.heading, {marginTop: -15}]}>PAY</Text>
+      <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
+        <ScrollView
+          style={[styles.screen, {height: window.height < 700 ? 580 : 650}]}>
+          <View style={styles.headerContainer}>
+            <View style={styles.top}>
+              <View style={styles.headingContainer}>
+                <Image
+                  source={require('../assets/appHeadingIcon.png')}
+                  // style={{marginRight: 10}}
+                  style={{width: 50, height: 50, marginRight: 10}}
+                />
+                <View>
+                  <Text style={styles.heading}>Delivery</Text>
+                  <Text style={[styles.heading, {marginTop: -15}]}>PAY</Text>
+                </View>
               </View>
             </View>
+            <View style={styles.actionsContainer}>
+              <TouchableOpacity style={styles.actionButton} activeOpacity={0.6}>
+                <Image
+                  source={require('../assets/logoutIcon.png')}
+                  style={{width: 40, height: 30}}
+                />
+              </TouchableOpacity>
+              <Text style={styles.actionText}>Log Out</Text>
+            </View>
           </View>
-          <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.actionButton} activeOpacity={0.6}>
-              <Image
-                source={require('../assets/logoutIcon.png')}
-                style={{width: 40, height: 30}}
-              />
-            </TouchableOpacity>
-            <Text style={styles.actionText}>Log Out</Text>
-          </View>
-        </View>
 
-        <View style={styles.contactImage}>
-          <Image
-            source={require('../assets/contact.png')}
-            style={{width: 90, height: 90}}
-          />
-          <Text style={styles.contactHeading}>Contact us for Support</Text>
-        </View>
-        <ScrollView style={{marginBottom: 10}}>
+          {/* <ScrollView style={{marginBottom: 10}}> */}
+          <View style={styles.contactImage}>
+            <Image
+              source={require('../assets/contact1.png')}
+              style={{width: 90, height: 90}}
+            />
+            <Text style={styles.contactHeading}>Contact us for Support</Text>
+          </View>
           <View style={styles.fieldsContainer}>
             <View style={styles.fieldsView}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -167,8 +172,9 @@ const ContactUs = () => {
               </Text>
             </View>
           </View>
+          {/* </ScrollView> */}
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
       <BottomBar />
     </>
   )
@@ -176,7 +182,7 @@ const ContactUs = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    // flex: 1,
   },
   headerContainer: {
     backgroundColor: '#F8FAFF',
