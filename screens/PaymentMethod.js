@@ -24,59 +24,54 @@ const PaymentMethod = () => {
   const window = useWindowDimensions()
   const {sendRequest, isLoading, error, clearError} = useHttpClient()
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     if (method === 'banking') {
-      try {
-        const response = await sendRequest(
-          'https://deliverypay.in/api/addPaymentMethod',
-          'POST',
+      console.log(data, 'paymentMethod')
+      sendRequest(
+        'https://deliverypay.in/api/addPaymentMethod',
+        'POST',
 
-          JSON.stringify({
-            type: 'BankAccount',
-            name: data.name,
-            accountNumber: data.accountNumber,
-            ifsc: data.ifsc,
-            bank: data.bank,
-          }),
-          {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        )
-        console.log(response)
-        if (error) {
-          Alert.alert('Error', error, [{onPress: () => clearError()}])
-        }
-      } catch (e) {
-        console.log(e)
+        JSON.stringify({
+          type: 'BankAccount',
+          name: data.name,
+          accountNumber: data.accountNumber,
+          ifsc: data.ifsc,
+          bank: data.bank,
+        }),
+        {
+          'Content-Type': 'application/json',
+        },
+      )
+        .then((response) => console.log(response))
+        .catch((e) => e)
+
+      if (error) {
+        Alert.alert('Error', error, [{onPress: () => clearError()}])
+      }
+    } else if (method === 'card') {
+      sendRequest(
+        'https://deliverypay.in/api/addPaymentMethod',
+        'POST',
+        JSON.stringify({
+          type: 'BankCard',
+          name: data.name,
+          accountNumber: data.accountNumber,
+          ifsc: data.ifsc,
+          bank: data.bank,
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ).then((response) => console.log(response))
+
+      if (error) {
+        Alert.alert('Error', error, [{onPress: () => clearError()}])
       }
     }
+    // else {
 
-    if (method === 'card') {
-      try {
-        const response = await sendRequest(
-          'https://deliverypay.in/api/addPaymentMethod',
-          'POST',
-          {
-            type: 'BankAccount',
-            name: data.name,
-            accountNumber: data.accountNumber,
-            ifsc: data.ifsc,
-            bank: data.bank,
-          },
-          {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        )
-        console.log(response)
-        if (error) {
-          Alert.alert('Error', error, [{onPress: () => clearError()}])
-        }
-      } catch (e) {
-        console.log(e)
-      }
-    }
+    // }
   }
   return (
     <>

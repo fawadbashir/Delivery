@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -8,11 +8,14 @@ import {
   FlatList,
   useWindowDimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
-import {rosybrown} from 'color-name'
+
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
 import Colors from '../constants/colors'
+import {useHttpClient} from '../hooks/http-hook'
+import {Modal, Portal} from 'react-native-paper'
 
 const Data = [
   {
@@ -62,8 +65,76 @@ const Data = [
     status: 'Hold',
   },
 ]
-const Hold = () => {
+const Hold = (props) => {
   const window = useWindowDimensions()
+  const [milestones, setMilestones] = useState([])
+  const [milestoneId, setMilestoneId] = useState()
+  const [visible, setVisible] = useState(false)
+
+  const {sendRequest, error, clearError, isLoading} = useHttpClient()
+  const {
+    sendRequest: requestCancel,
+    error: cancellationError,
+    clearError: clearCancelError,
+    isLoading: cancelLoading,
+  } = useHttpClient()
+
+  const cancelRequest = async (id) => {
+    try {
+      const response = await requestCancel(
+        'https://deliverypay.in/api/cancelMilestoneReques',
+        'DELETE',
+        JSON.stringify({
+          _id: id,
+        }),
+        {
+          'Content-Type': 'application/json',
+        },
+      )
+      console.log(response)
+      if (cancellationError)
+        Alert.alert('Error', cancellationError, [
+          {
+            onPress: () => clearCancelError(),
+          },
+        ])
+    } catch (e) {
+      e
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', async () => {
+      try {
+        const response = await sendRequest(
+          'https://deliverypay.in/api/milestone',
+        )
+
+        console.log(response)
+
+        const validMileStones = response.milestones.map((milestone) => ({
+          id: milestone._id,
+          status: milestone.status,
+          amount: milestone.amount,
+          description: milestone.dscr,
+          date: milestone.createdAt,
+          firstName: milestone.client.firstName,
+          lastName: milestone.client.lastName,
+          image: milestone.client.profileImg,
+          role: milestone.role,
+        }))
+        setMilestones(validMileStones)
+        if (error) {
+          Alert.alert('Error', error, [{onPress: () => clearError()}])
+        }
+      } catch (e) {
+        e
+      }
+    })
+
+    return unsubscribe
+  }, [clearError, error, props.navigation, sendRequest])
+
   return (
     <>
       <Header />
@@ -85,45 +156,73 @@ const Hold = () => {
         </View>
         <View style={styles.list}>
           <FlatList
-            data={Data}
-            keyExtractor={(item, index) => item.id}
+            initialNumToRender={7}
+            data={milestones}
+            keyExtractor={(item) => item.id}
             renderItem={({item}) => {
               return (
                 <View>
                   <View style={styles.innerList}>
                     <View style={styles.nameView}>
-                      <Image style={styles.image} source={item.image} />
-                      <Text style={styles.name}>{item.name}</Text>
+                      <Image style={styles.image} source={{uri: item.image}} />
+                      <Text style={styles.name}>
+                        {`${item.firstName}
+                        `}
+                        {/* ${item.lastName}  */}
+                      </Text>
                     </View>
                     <View style={styles.roleView}>
                       <Text style={styles.role}>{item.role}</Text>
                     </View>
                     <View style={styles.transactionIdView}>
                       <Text style={styles.transactionId}>
-                        {item.transactionId}
+                        {item.id.substring(0, 9)}
                       </Text>
                     </View>
                     <View style={styles.productView}>
-                      <Text style={styles.product}>{item.product}</Text>
+                      <Text style={styles.product}>{item.description}</Text>
                     </View>
-                    <TouchableOpacity>
-                      {/* <View style={styles.statusView}> */}
-                      <LinearGradient
-                        colors={
-                          item.status == 'Hold'
-                            ? ['#336CF9', '#1BE6D6']
-                            : ['#1BE6D6', '#013B67']
-                        }
-                        start={{x: 0, y: 0}}
-                        end={{x: 1, y: 0}}
-                        style={styles.statusView}>
-                        <Text style={styles.status}>{item.status}</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
+                    {(item.status === 'pending' || 'pendingRelease') && (
+                      <TouchableOpacity
+                        activeOpacity={0.6}
+                        onPress={cancelRequest.bind(this, item.id)}>
+                        {/* <View style={styles.statusView}> */}
+                        <LinearGradient
+                          colors={
+                            item.status == 'Hold'
+                              ? ['#336CF9', '#1BE6D6']
+                              : ['#1BE6D6', '#013B67']
+                          }
+                          // start={{x: 0, y: 0}}
+                          // end={{x: 1, y: 0}}
+                          style={styles.statusView}>
+                          <Text style={styles.status}>Release Requested</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
+                    {item.status === 'declined' && (
+                      <TouchableOpacity
+                        disabled={true}
+                        activeOpacity={0.6}
+                        onPress={cancelRequest.bind(this, item.id)}>
+                        {/* <View style={styles.statusView}> */}
+                        <LinearGradient
+                          colors={
+                            item.status == 'Hold'
+                              ? ['#336CF9', '#1BE6D6']
+                              : ['#1BE6D6', '#013B67']
+                          }
+                          // start={{x: 0, y: 0}}
+                          // end={{x: 1, y: 0}}
+                          style={styles.statusView}>
+                          <Text style={styles.status}>Declined</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
                   </View>
-                  <View style={styles.roleCheckMainView}>
-                    <View style={styles.roleCheckView}>
-                      {item.role == 'Seller' ? (
+                  {/* <View style={styles.roleCheckMainView}>
+                    <View style={styles.roleCheckView}> */}
+                  {/* {item.role == 'Seller' ? (
                         <View>
                           <Text style={styles.roleCheckText}>
                             Are you confrim to release money.
@@ -134,8 +233,9 @@ const Hold = () => {
                                 // colors={['#0A0A0A', '#0091FF', '#BCE0FD']}
                                 colors={['#0091FF', '#BCE0FD']}
                                 style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
+                                // start={{x: 0, y: 0}}
+                                // end={{x: 1, y: 0}}
+                              >
                                 <Text style={styles.optionText}>Confirm</Text>
                               </LinearGradient>
                             </TouchableOpacity>
@@ -160,8 +260,9 @@ const Hold = () => {
                               <LinearGradient
                                 colors={['#0091FF', '#BCE0FD']}
                                 style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
+                                // start={{x: 0, y: 0}}
+                                // end={{x: 1, y: 0}}
+                              >
                                 <Text style={styles.optionText}>Yes</Text>
                               </LinearGradient>
                             </TouchableOpacity>
@@ -169,16 +270,17 @@ const Hold = () => {
                               <LinearGradient
                                 colors={['#336CF9', '#F64BBD']}
                                 style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
+                                // start={{x: 0, y: 0}}
+                                // end={{x: 1, y: 0}}
+                              >
                                 <Text style={styles.optionText}>No</Text>
                               </LinearGradient>
                             </TouchableOpacity>
                           </View>
                         </View>
-                      )}
-                    </View>
-                  </View>
+                      )} */}
+                  {/* </View>
+                  </View> */}
                 </View>
               )
             }}
@@ -193,7 +295,7 @@ const Hold = () => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingTop: 30,
+    // paddingTop: 30,
   },
   secureTransactionView: {
     backgroundColor: '#F9EAF4',
@@ -251,12 +353,13 @@ const styles = StyleSheet.create({
     borderRadius: 60,
   },
   nameView: {
-    // paddingRight: 5,
+    alignItems: 'center',
   },
   name: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: '#2A2A2A',
+    textAlign: 'center',
   },
   roleView: {
     paddingRight: 10,

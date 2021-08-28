@@ -8,21 +8,23 @@ const Banking = (props) => {
   const {
     control,
     handleSubmit,
+
     formState: {errors},
-  } = useForm()
+  } = useForm({mode: 'all'})
 
   const onSubmit = (data) => {
     props.onSubmit(data)
-    console.log(data, 'data')
+    // console.log(data, 'data')
   }
-  console.log(errors)
+  // console.log(errors)
 
   return (
     <Card style={styles.card}>
       <Controller
         name="name"
         control={control}
-        rules={{required: true, pattern: /^([\w]{3,})+\s+([\w\s]{3,})+$/i}}
+        shouldUnregister={true}
+        // rules={{required: true}}
         render={({field: {value, onChange}}) => (
           <TextInput
             value={value}
@@ -33,6 +35,7 @@ const Banking = (props) => {
         )}
       />
       <Controller
+        shouldUnregister={true}
         control={control}
         name="bank"
         rules={{required: true}}
@@ -47,6 +50,7 @@ const Banking = (props) => {
       />
       <View>
         <Controller
+          shouldUnregister={true}
           name="city"
           control={control}
           rules={{required: true}}
@@ -61,6 +65,7 @@ const Banking = (props) => {
         />
       </View>
       <Controller
+        shouldUnregister={true}
         name="accountType"
         control={control}
         rules={{required: true}}
@@ -74,6 +79,7 @@ const Banking = (props) => {
         )}
       />
       <Controller
+        shouldUnregister={true}
         name="accountNumber"
         control={control}
         rules={{required: true, minLength: 16, maxLength: 16}}
@@ -89,6 +95,7 @@ const Banking = (props) => {
       />
 
       <Controller
+        shouldUnregister={true}
         control={control}
         name="ifsc"
         rules={{required: true}}

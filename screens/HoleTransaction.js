@@ -205,7 +205,11 @@ const HoleTransaction = (props) => {
                         // start={{x: 0, y: 0}}
                         // end={{x: 1, y: 0}}
                         style={styles.statusView}>
-                        <Text style={styles.status}>{item.status}</Text>
+                        <Text style={styles.status}>
+                          {item.status === 'pendingRelease'
+                            ? 'Requested'
+                            : item.status}
+                        </Text>
                       </LinearGradient>
                       {/* </TouchableOpacity> */}
                     </View>
@@ -234,21 +238,19 @@ const HoleTransaction = (props) => {
                       <Text style={styles.amountItem}>{item.amount}</Text>
                       <View>
                         <Text style={styles.amountItem}>
-                          {moment(item.holdDate).format('MMM DD, YY, hh:mm ')}
+                          {moment(item.holdDate).format('MMM DD, YY ')}
                         </Text>
                         {/* </Moment> */}
                         {/* <Text style={styles.amountItem}>{item.holdTime}</Text> */}
                       </View>
                       <View>
                         <Text style={styles.amountItem}>
-                          {moment(item.releaseDate).format(
-                            'MMM DD, YY, hh:mm ',
-                          )}
+                          {moment(item.releaseDate).format('MMM DD, YY ')}
                         </Text>
                         {/* <Text style={styles.amountItem}>{item.releasedTime}</Text> */}
                       </View>
                       <Text style={styles.amountItem}>{item.releaseTo}</Text>
-                      <Text style={styles.amountItem}>
+                      <Text style={[styles.amountItem, {textAlign: 'center'}]}>
                         {item.verificationMethod}
                       </Text>
                     </View>

@@ -1,4 +1,4 @@
-import React, {useRef, useContext, useEffect} from 'react'
+import React, {useRef, useContext, useEffect, useState} from 'react'
 import {useForm} from 'react-hook-form'
 
 import {
@@ -26,11 +26,12 @@ import Colors from '../../constants/colors'
 const Login = (props) => {
   const emailRef = useRef()
   const passwordRef = useRef()
+  const [isLoading, setIsLoading] = useState(false)
   // const window = useWindowDimensions()
 
   const {login} = useContext(AuthContext)
 
-  const {sendRequest, clearError, error, isLoading} = useHttpClient()
+  // const {sendRequest, clearError, error, isLoading} = useHttpClient()
 
   const {
     control,
@@ -45,19 +46,29 @@ const Login = (props) => {
   const onSubmit = async (data) => {
     const {email, password} = data
 
+    setIsLoading(true)
     try {
-      const responseData = await sendRequest(
-        'https://deliverypay.in/api/userLogin',
-        'POST',
-        JSON.stringify({username: email, password}),
-        {
+      const response = await fetch('https://deliverypay.in/api/userLogin', {
+        method: 'POST',
+        body: JSON.stringify({username: email, password}),
+        headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-      )
+        // credentials: 'include',
+      })
+
+      const responseData = await response.json()
+      // console.log(response)
+
+      if (!response.ok) {
+        throw new Error(responseData.message)
+      }
       const {user} = responseData
+      // console.log(user.userId)
       login({
-        userId: user.userId,
+        userId: user._id,
+        deliverypayId: user.userId,
         userPhone: user.phone,
         email: user.email,
         firstName: user.firstName,
@@ -65,17 +76,21 @@ const Login = (props) => {
         image: user.profileImg,
         paymentMethods: user.paymentMethods,
         balance: user.balance,
+        cookie: response.access_token,
       })
       // props.navigation.navigate('otp')
       // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      Alert.alert('Error', e.message)
+    }
+    setIsLoading(false)
   }
 
-  useEffect(() => {
-    if (error) {
-      Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
-    }
-  }, [error])
+  // useEffect(() => {
+  //   if (error) {
+  //     Alert.alert('Error', error, [{text: 'Okay', onPress: () => clearError()}])
+  //   }
+  // }, [error])
 
   // .then((response) => {
   //   login(response.user.userId, response.user.phone)

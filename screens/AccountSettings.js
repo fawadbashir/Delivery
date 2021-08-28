@@ -42,16 +42,21 @@ const AccountSettings = () => {
       const response = await sendRequest(
         'https://deliverypay.in/api/editUserProfile',
         'PATCH',
-        {
+        JSON.stringify({
           firstName: data.firstName,
           lastName: data.lastName,
           phone: data.phoneNo,
           email: data.email,
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
       )
       console.log(response)
       login({
-        userId: response.user.userId,
+        userId: response.user._id,
+        deliverypayId: response.user.userId,
         userPhone: response.user.phone,
         email: response.user.email,
         firstName: response.user.firstName,
@@ -81,7 +86,7 @@ const AccountSettings = () => {
       email: user.email,
       phoneNo: user.userPhone,
 
-      deliveryPayId: user.email,
+      deliverypayId: user.deliveryPayId,
     })
   }, [reset])
 
@@ -379,7 +384,7 @@ const AccountSettings = () => {
                       }}>
                       <Controller
                         control={control}
-                        name="deliveryPayId"
+                        name="deliverypayId"
                         rules={{
                           required: true,
                           pattern:

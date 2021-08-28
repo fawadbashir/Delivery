@@ -10,28 +10,30 @@ const UpiCard = (props) => {
   const {
     control,
     handleSubmit,
-
     formState: {errors},
-  } = useForm()
+  } = useForm({mode: 'all'})
+
   const {field} = useController({
     control: control,
-    defaultValue: '',
+    defaultValue: 'asdasd',
     name: 'upi',
     rules: {required: true},
   })
 
   const onSubmit = (data) => {
     // props.onSubmit(data)
+    console.log(data)
   }
 
   return (
     <Card style={{...styles.upiCard, ...props.style}}>
       <Text style={styles.upiText}>Please enter your UPI ID</Text>
-      <View style={styles.upiFieldContainer}>
+      <View style={[styles.upiFieldContainer, errors.upi && styles.redBorder]}>
         <TextInput
           placeholder="Ex:MobileNumber@upi"
           placeholderTextColor="grey"
-          {...field}
+          value={field.value}
+          onChangeText={field.onChange}
           keyboardType="name-phone-pad"
         />
         <TouchableOpacity activeOpacity={0.6} onPress={handleSubmit(onSubmit)}>
@@ -82,6 +84,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     justifyContent: 'space-between',
+  },
+  redBorder: {
+    borderColor: '#c12323',
   },
 })
 

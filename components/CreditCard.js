@@ -13,7 +13,8 @@ const CreditCard = (props) => {
           <Image source={require('../assets/visa.png')} />
         ) : (
           <Text style={styles.bankName}>
-            {`${props.bank.charAt(0).toUpperCase()}${props.bank.slice(1)}`}
+            {props.bank &&
+              `${props.bank.charAt(0).toUpperCase()}${props.bank.slice(1)}`}
           </Text>
         )}
       </View>

@@ -52,7 +52,6 @@ const SignUp = (props) => {
   })
 
   const onSubmit = (data) => {
-    console.log(data)
     const [firstName, lastName] = data.fullName.split(' ')
 
     const userData = {
@@ -63,20 +62,47 @@ const SignUp = (props) => {
       password: data.password,
     }
 
+    // sendRequest(
+    //   'https://deliverypay.in/api/registerUser',
+    //   'POST',
+    //   JSON.stringify(userData),
+    //   {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    // )
+    //   .then((response) => {
+    //     console.log(response, 'response')
+    //     props.navigation.navigate('otp')
+    //   })
+    //   .catch((e) => {})
+
+    console.log(userData)
     sendRequest(
-      'https://deliverypay.in/api/registerUser',
+      'https://deliverypay.in/api/sendPhoneVerificationCode',
       'POST',
-      JSON.stringify(userData),
+      JSON.stringify({
+        phone: userData.phone,
+      }),
       {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
     )
       .then((response) => {
-        console.log(response, 'response')
-        props.navigation.navigate('otp')
+        if (error) {
+          return Alert.alert('Error', error, [
+            {text: 'Okay', onPress: () => clearError()},
+          ])
+        }
+        console.log(response)
+        if (!error) {
+          props.navigation.navigate('otp', {
+            userData,
+          })
+        }
       })
-      .catch((e) => {})
+      .catch((e) => e)
   }
 
   useEffect(() => {
@@ -198,6 +224,7 @@ const SignUp = (props) => {
               required: true,
             }}
             placeholder="Confirm Password"
+            secureTextEntry={true}
             ref={(e) => {
               confirmPassword.ref(e)
               confirmPasswordRef.current = e

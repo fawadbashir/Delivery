@@ -29,7 +29,7 @@ const Deal = (props) => {
   // console.log(socket.id)
   socket.connect()
   // useEffect(() => {
-  socket.on('connect', (response) => console.log(response, 'connect'))
+  // socket.on('connect', (response) => console.log(response, 'connect'))
   //   //socket.on('test', (r) => console.log(socket.id, 'test'))
   //   socket.on('connectedToRoom', (r) => setRooms(r))
   //   socket.emit('joinRooms', {rooms})
@@ -63,18 +63,19 @@ const Deal = (props) => {
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
+      socket.connect()
       try {
-        // const response = await fetch('https://deliverypay.in/api/getChat')
-        // // console.log(response)
-        // // const response = await sendRequest('https://deliverypay.in/api/getChat')
-        // const resData = await response.json()
-        // socket.on('connect', (response) => console.log(response, 'connect'))
-        // //socket.on('test', (r) => console.log(socket.id, 'test'))
-        // socket.on('connectedToRoom', (r) => {
-        //   console.log(r)
-        //   setRooms(r)
-        // })
-        // socket.emit('joinRooms', {rooms})
+        const response = await fetch('https://deliverypay.in/api/getChat')
+        // console.log(response)
+        // const response = await sendRequest('https://deliverypay.in/api/getChat')
+        const resData = await response.json()
+        socket.on('connect', () => console.log(socket.connected))
+        //socket.on('test', (r) => console.log(socket.id, 'test'))
+        socket.on('connectedToRoom', (r) => {
+          console.log(r)
+          setRooms(r)
+        })
+        socket.emit('joinRooms', {rooms})
         // socket.emit(
         //   'initiateChat',
         //   {client_id: '60f1f3e065c83205eb57c392'},
@@ -84,15 +85,16 @@ const Deal = (props) => {
         //   console.log(response, 'messageToUser'),
         // )
         // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
-        // const validArray = response.map((chat) => ({
-        //   id: chat._id,
-        //   firstName: chat.client.firstName,
-        //   lastName: chat.client.lastName,
-        //   email: chat.client.email,
-        //   phone: chat.client.phone,
-        //   image: chat.client.profileImg,
-        //   clientId: chat.client._id,
-        // }))
+        const validArray = resData.map((chat) => ({
+          id: chat._id,
+          firstName: chat.client.firstName,
+          lastName: chat.client.lastName,
+          email: chat.client.email,
+          phone: chat.client.phone,
+          image: chat.client.profileImg,
+          clientId: chat.client._id,
+        }))
+        console.log(resData)
         // console.log(resData)
         // // console.log(validArray)
         // if (error) {
