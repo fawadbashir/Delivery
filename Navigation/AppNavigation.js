@@ -11,6 +11,17 @@ import EditAddress from '../screens/EditAddress'
 import BuyerStartTransaction from '../screens/Buyer/StartTransaction'
 import SellerStartTransaction from '../screens/Seller/StartTransaction'
 import UserCategory from '../screens/UserCategory'
+import HoleTransaction from '../screens/HoleTransaction'
+
+import Wallet from '../screens/Wallet'
+
+import Hold from '../screens/Hold'
+import ContactUs from '../screens/ContactUs'
+import PaymentMethod from '../screens/PaymentMethod'
+import Deal from '../screens/Deal'
+import TransactionHistory from '../screens/TransactionHistory'
+import BottomBar from '../components/BottomBar'
+import Chat from '../screens/Chat'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -32,21 +43,33 @@ export const AuthNavigator = () => {
 
 export const MainNavigator = () => {
   return (
-    <MainStack.Navigator>
-      <MainStack.Screen
-        name="addAddress"
-        component={AddAddress}
-        options={{headerShown: false}}
-      />
-      <MainStack.Screen
-        name="editAddress"
-        component={EditAddress}
-        options={{headerShown: false}}
-      />
-      {/* <MainStack.Navigator headerMode={'none'} initialRouteName="chooseCategory"> */}
-      {/* <MainStack.Screen name="chooseCategory" component={UserCategory} /> */}
-      {/* <MainStack.Screen name="buying" component={BuyerStartTransaction} /> */}
-      {/* <MainStack.Screen name="selling" component={SellerStartTransaction} /> */}
-    </MainStack.Navigator>
+    <>
+      <MainStack.Navigator
+        headerMode={'none'}
+        initialRouteName="chooseCategory">
+        <MainStack.Screen name="home/chooseCategory" component={UserCategory} />
+        <MainStack.Screen
+          name="home/buying"
+          component={BuyerStartTransaction}
+        />
+        <MainStack.Screen
+          name="home/selling"
+          component={SellerStartTransaction}
+        />
+        <MainStack.Screen name="wallet" component={Wallet} />
+        <MainStack.Screen name="addAddress" component={AddAddress} />
+        <MainStack.Screen name="editAdress" component={EditAddress} />
+        <MainStack.Screen name="deal" component={Deal} />
+        <MainStack.Screen
+          name="wallet/history"
+          component={TransactionHistory}
+        />
+        <MainStack.Screen name="contact" component={ContactUs} />
+        <MainStack.Screen name="hold" component={Hold} />
+        <MainStack.Screen name="paymentMethod" component={PaymentMethod} />
+        <MainStack.Screen name="holeTransaction" component={HoleTransaction} />
+        <MainStack.Screen name="chat" component={Chat} />
+      </MainStack.Navigator>
+    </>
   )
 }

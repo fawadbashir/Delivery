@@ -1,25 +1,49 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {
   Text,
   StyleSheet,
-  ScrollView,
   View,
-  TextInput,
   FlatList,
   useWindowDimensions,
   KeyboardAvoidingView,
+  Alert,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
-import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import {useHttpClient} from '../../hooks/http-hook'
 import UserSearchItem from '../../components/UserSearchItem'
 import CommonSearch from '../../components/CommonSearch'
+import {Avatar, Portal, Modal} from 'react-native-paper'
+import {Controller, useForm} from 'react-hook-form'
+import LinearGradient from 'react-native-linear-gradient'
 
 const StartTransaction = () => {
-  const {sendRequest} = useHttpClient()
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: {errors, isValid},
+  } = useForm()
+
+  const {sendRequest, error, clearError} = useHttpClient()
+  const {
+    sendRequest: milestoneRequest,
+    error: milestoneError,
+    clearError: clearMilestoneError,
+    loading: milestoneLoading,
+  } = useHttpClient()
+  const {
+    sendRequest: recentPaymentsRequest,
+    error: recentPaymentsError,
+    clearPaymentsError,
+  } = useHttpClient()
   const [users, setUsers] = useState([])
+  const [payments, setPayments] = useState([])
+  const [buyer, setBuyer] = useState({})
+  const [visible, setVisible] = useState(false)
   const window = useWindowDimensions()
 
   const fetchUsers = async (query) => {
@@ -30,91 +54,239 @@ const StartTransaction = () => {
       const response = await sendRequest(
         `https://deliverypay.in/api/getUsers?q=${query}`,
       )
+      console.log(response[0])
+
       setUsers(
         response.map((user) => ({
           firstName: user.firstName,
           lastName: user.lastName,
           image: user.profileImg,
           id: user._id,
+          phone: user.phone,
+          email: user.email,
         })),
       )
 
       // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      // Alert.alert('Error', error, [{onPress: clearError(), text: 'Okay'}])
+    }
   }
+
+  const onSubmit = async (data) => {
+    // console.log(
+    //   JSON.stringify({
+    //     buyer_id: buyer.id,
+    //     amount: data.amount,
+    //     dscr: data.detail,
+    //   }),
+    // )
+
+    try {
+      const response = await milestoneRequest(
+        'https://deliverypay.in/api/requestMilestone',
+        'POST',
+
+        JSON.stringify({
+          buyer_id: buyer.id,
+          amount: data.amount,
+          dscr: data.detail,
+          // products: [],
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      )
+
+      console.log(response)
+      setVisible(false)
+      Alert.alert('Success', 'Milestone requested')
+      reset()
+    } catch (e) {
+      console.log(e)
+    }
+    if (milestoneError) {
+      Alert.alert('Error', milestoneError, [{onPress: () => clearError()}])
+    }
+  }
+
+  const milestoneModal = () => {
+    return (
+      <Portal>
+        <Modal
+          visible={visible}
+          contentContainerStyle={styles.modalContainer}
+          onDismiss={() => {
+            setVisible(false)
+            setBuyer({})
+            reset()
+          }}>
+          <View style={styles.modalHeadingContainer}>
+            <Text style={styles.modalHeading}>Request Milestone</Text>
+          </View>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            <Avatar.Image source={{uri: buyer.image}} />
+            <View style={{alignItems: 'center'}}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontFamily: 'Poppins-SemiBold',
+                }}>{`${buyer.firstName} ${buyer.lastName}`}</Text>
+              <Text>{`${buyer.phone}`}</Text>
+              <Text>{`${buyer.email}`}</Text>
+            </View>
+          </View>
+          <Controller
+            control={control}
+            name="amount"
+            rules={{required: true}}
+            render={({field: {value, onChange}}) => (
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Amount"
+                placeholderTextColor="grey"
+                style={[styles.field, errors.amount && styles.redBorder]}
+                keyboardType={'number-pad'}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="detail"
+            rules={{required: true}}
+            render={({field: {value, onChange}}) => (
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Detail"
+                placeholderTextColor="grey"
+                style={[
+                  styles.field,
+                  errors.detail && styles.redBorder,
+                  {width: '80%'},
+                ]}
+              />
+            )}
+          />
+          <TouchableOpacity
+            style={{width: 171, marginVertical: 20}}
+            activeOpacity={0.6}
+            onPress={handleSubmit(onSubmit)}>
+            <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              colors={['#2598b6', '#1BE6D6']}
+              style={{
+                borderRadius: 20,
+                height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.callToActionText}>Request Milestone</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Modal>
+      </Portal>
+    )
+  }
+
+  useEffect(() => {
+    const getRecentPayments = async () => {
+      try {
+        const response = await recentPaymentsRequest(
+          'https://deliverypay.in/api/recentPayments',
+        )
+
+        setPayments(response)
+
+        if (recentPaymentsError) {
+          Alert.alert('Error', recentPaymentsError)
+        }
+      } catch (e) {
+        e
+      }
+    }
+    getRecentPayments()
+  }, [recentPaymentsRequest])
 
   return (
     <>
       <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
         <Header />
         <View style={styles.screen}>
-          {/* <KeyboardAvoidingView
-            contentContainerStyle={styles.screen}
-            behavior={'position'}> */}
           <Text style={styles.heading}>Start transcations with</Text>
           <Text style={styles.heading}>Delivery Pay</Text>
           <Text style={styles.secondHeading}>
             Let us help you make the safest transaction
           </Text>
           <Text style={styles.thirdHeading}>
-            Start selling with Delivery Pay
+            Start buying with Delivery Pay
           </Text>
-          {/* <View style={styles.inputContainer}>
-            <Icon name="search" color="#707070" size={25} />
-            <TextInput
-              placeholder="Search with Delivery Pay ID or Phone Number"
-              style={styles.input}
-              placeholderTextColor="#707070"
-              onChangeText={fetchUsers}
-            />
-          </View> */}
+
           <CommonSearch
             placeholder="Search with Delivery Pay ID or Phone Number"
             onChangeText={fetchUsers}
           />
-          {/* </KeyboardAvoidingView> */}
+
           <View
             style={{
-              height: window.height < 700 ? 182 : 200,
-              // paddingHorizontal: 20,
+              height: window.height < 700 ? 182 : 255,
             }}>
-            <FlatList
-              style={{paddingHorizontal: 10}}
-              data={users}
-              key={(item) => item.id}
-              renderItem={(itemData) => {
-                return (
-                  <UserSearchItem
-                    image={itemData.item.image}
-                    firstName={itemData.item.firstName}
-                    lastName={itemData.item.lastName}
-                    milestoneType="Request"
-                  />
-                )
-              }}
-              // keyboardDismissMode="interactive"
-            />
+            {users.length > 1 ? (
+              <FlatList
+                style={{paddingHorizontal: 10}}
+                data={users}
+                key={(item) => item.id}
+                renderItem={(itemData) => {
+                  return (
+                    <UserSearchItem
+                      image={itemData.item.image}
+                      firstName={itemData.item.firstName}
+                      lastName={itemData.item.lastName}
+                      milestoneType="Request"
+                      onPress={() => {
+                        setBuyer(itemData.item)
+                        setVisible(true)
+                      }}
+                    />
+                  )
+                }}
+              />
+            ) : (
+              <View style={styles.paymentsView}>
+                {payments.map((payment) => (
+                  <View style={{alignItems: 'center'}} key={payment._id}>
+                    <Avatar.Image source={{uri: payment.profileImg}} />
+                    <Text
+                      style={{
+                        fontSize: 16,
+                      }}>{`${payment.firstName} ${payment.lastName}`}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
-        {/* <View style={{bottom: 0, top: -20}}> */}
       </KeyboardAvoidingView>
       <BottomBar />
+      {milestoneModal()}
     </>
   )
 }
 
 const styles = StyleSheet.create({
   screen: {
-    // flexGrow: 1,
     paddingHorizontal: 10,
     alignItems: 'center',
-    // paddingBottom: 10,
+    backgroundColor: '#fff',
   },
   heading: {
     textAlign: 'center',
     fontFamily: 'Poppins-SemiBold',
     fontSize: 25,
-    // marginTop: 5,
   },
   secondHeading: {
     fontFamily: 'Poppins-Light',
@@ -138,13 +310,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
     marginTop: 25,
-    // marginBottom: 20,
   },
   input: {
     color: '#707070',
     fontFamily: 'Seoge-UI',
     fontSize: 14,
     flexGrow: 1,
+  },
+  paymentContainer: {},
+  paymentsView: {
+    width: '100%',
+    flexDirection: 'row',
+    marginTop: 15,
+    justifyContent: 'space-evenly',
+    flexWrap: 'wrap',
+  },
+  modalHeadingContainer: {
+    borderBottomColor: '#aaa',
+    borderBottomWidth: 2,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalHeading: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Regular',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    width: '80%',
+    paddingVertical: 10,
+    alignSelf: 'center',
+    borderRadius: 20,
+  },
+  field: {
+    borderBottomWidth: 2,
+    fontSize: 16,
+    width: '40%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    // alignItems: 'center',
+    borderBottomColor: '#cccc',
+    marginTop: 10,
+  },
+  redBorder: {
+    borderBottomColor: '#c12323',
+  },
+  callToActionText: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 16,
+    color: '#fff',
   },
 })
 

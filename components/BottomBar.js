@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import React from 'react'
 import {
   Image,
@@ -8,8 +9,13 @@ import {
   useWindowDimensions,
 } from 'react-native'
 
+import {useRoute, useNavigation} from '@react-navigation/native'
+
 const BottomBar = () => {
   const window = useWindowDimensions()
+  const navigation = useNavigation()
+  const route = useRoute()
+
   const buttonOnHeight = {
     width: window.height < 700 ? 37 : 47,
     height: window.height < 700 ? 33 : 44,
@@ -18,41 +24,87 @@ const BottomBar = () => {
     <View style={[styles.container, {height: window.height < 700 ? 80 : 100}]}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.personButton, buttonOnHeight]}
+          onPress={() => navigation.navigate('home/chooseCategory')}
+          style={[
+            route.name.includes('home')
+              ? styles.activeButton
+              : styles.personButton,
+            buttonOnHeight,
+          ]}
           activeOpacity={0.7}>
-          <Image source={require('../assets/homeIcon.png')} />
+          {route.name.includes('home') ? (
+            <Image source={require('../assets/homeactive.png')} />
+          ) : (
+            <Image source={require('../assets/homeIcon.png')} />
+          )}
         </TouchableOpacity>
         <Text style={styles.iconText}>Home</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.personButton, buttonOnHeight]}
+          onPress={() => navigation.navigate('deal')}
+          style={[
+            route.name === 'deal' ? styles.activeButton : styles.personButton,
+            buttonOnHeight,
+          ]}
           activeOpacity={0.7}>
-          <Image source={require('../assets/sendIcon.png')} />
+          {route.name === 'deal' ? (
+            <Image source={require('../assets/dealActive.png')} />
+          ) : (
+            <Image source={require('../assets/sendIcon.png')} />
+          )}
         </TouchableOpacity>
         <Text style={styles.iconText}>Deals</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.personButton, buttonOnHeight]}
+          onPress={() => navigation.navigate('wallet')}
+          style={[
+            route.name.includes('wallet')
+              ? styles.activeButton
+              : styles.personButton,
+            buttonOnHeight,
+          ]}
           activeOpacity={0.7}>
-          <Image source={require('../assets/walletIcon.png')} />
+          {route.name.includes('wallet') ? (
+            <Image source={require('../assets/walletActive.png')} />
+          ) : (
+            <Image source={require('../assets/walletIcon.png')} />
+          )}
         </TouchableOpacity>
         <Text style={styles.iconText}>Wallet</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.personButton, buttonOnHeight]}
+          onPress={() => navigation.navigate('holeTransaction')}
+          style={[
+            route.name === 'holeTransaction'
+              ? styles.activeButton
+              : styles.personButton,
+            buttonOnHeight,
+          ]}
           activeOpacity={0.7}>
-          <Image source={require('../assets/transactionIcon.png')} />
+          {route.name === 'holeTransaction' ? (
+            <Image source={require('../assets/transactionActive.png')} />
+          ) : (
+            <Image source={require('../assets/transactionIcon.png')} />
+          )}
         </TouchableOpacity>
         <Text style={styles.iconText}>Transaction</Text>
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.personButton, buttonOnHeight]}
+          onPress={() => navigation.navigate('hold')}
+          style={[
+            route.name === 'hold' ? styles.activeButton : styles.personButton,
+            buttonOnHeight,
+          ]}
           activeOpacity={0.7}>
-          <Image source={require('../assets/holdIcon.png')} />
+          {route.name === 'hold' ? (
+            <Image source={require('../assets/holdactive.png')} />
+          ) : (
+            <Image source={require('../assets/holdIcon.png')} />
+          )}
         </TouchableOpacity>
         <Text style={styles.iconText}>Hold</Text>
       </View>
@@ -82,6 +134,20 @@ const styles = StyleSheet.create({
 
   personButton: {
     backgroundColor: '#fff',
+    // padding: 10,
+    borderRadius: 50,
+    shadowColor: 'black',
+    shadowOpacity: 0.26,
+    shadowOffset: {width: 0, height: 2},
+    elevation: 10,
+    width: 47,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeButton: {
+    backgroundColor: '#5ab1fc',
+
     // padding: 10,
     borderRadius: 50,
     shadowColor: 'black',
