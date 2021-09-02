@@ -20,36 +20,52 @@ import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
 import {useState} from 'react/cjs/react.development'
 
+const Data = [
+  {
+    id: '1',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '2',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
+]
+
 const ChatScreen = () => {
-  const [buyerState, setBuyerState] = useState(false)
-  const [BuyerMessageText, setBuyerMessageText] = useState()
+  //   const [buyerState, setBuyerState] = useState(false)
+  //   const [BuyerMessageText, setBuyerMessageText] = useState()
 
   const window = useWindowDimensions()
 
-  const updateBuyerMessage = (text) => {
-    setBuyerMessageText(text)
-  }
+  //   const updateBuyerMessage = (text) => {
+  //     setBuyerMessageText(text)
+  //   }
 
-  const BuyerMessage = () => {
-    return buyerState === true ? (
-      <View style={styles.messageContainer}>
-        <View style={styles.messageView}>
-          <Text style={[styles.messageText, {backgroundColor: '#F9EAF4'}]}>
-            {/* Hello Mr.Teja Pujari, I want to buy a product as you are selling
-            with Delivery Pay service */}
-            {BuyerMessageText}
-          </Text>
-          <Text style={styles.timeText}>5 mins ago</Text>
-        </View>
-      </View>
-    ) : null
-  }
+  //   const BuyerMessage = () => {
+  //     return buyerState === true ? (
+  //       <View style={styles.messageContainer}>
+  //         <View style={styles.messageView}>
+  //           <Text style={[styles.messageText, {backgroundColor: '#F9EAF4'}]}>
+  //             {/* Hello Mr.Teja Pujari, I want to buy a product as you are selling
+  //             with Delivery Pay service */}
+  //             {BuyerMessageText}
+  //           </Text>
+  //           <Text style={styles.timeText}>5 mins ago</Text>
+  //         </View>
+  //       </View>
+  //     ) : null
+  //   }
 
   return (
     <>
       <Header />
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <ScrollView contentContainerStyle={styles.screen}>
+        <View style={styles.screen}>
           <View style={styles.innerList}>
             <View style={styles.imageView}>
               <Image
@@ -94,6 +110,31 @@ const ChatScreen = () => {
             />
             <Text style={styles.requestText}>Your request is pending</Text>
           </View>
+          <View
+            style={{
+              height: window.height < 700 ? 182 : 150,
+            }}>
+            <FlatList
+              data={Data}
+              keyExtractor={(item, index) => item.id}
+              renderItem={({item}) => {
+                return (
+                  <View style={styles.messageContainer}>
+                    <View style={styles.messageView}>
+                      <Text
+                        style={[
+                          styles.messageText,
+                          {backgroundColor: '#F9EAF4'},
+                        ]}>
+                        {item.message}
+                      </Text>
+                      <Text style={styles.timeText}>{item.time}</Text>
+                    </View>
+                  </View>
+                )
+              }}
+            />
+          </View>
 
           <View style={styles.searchBarContainer}>
             <View style={styles.searchBarView}>
@@ -102,21 +143,22 @@ const ChatScreen = () => {
                 style={styles.input}
                 placeholderTextColor="#707070"
                 multiline={true}
-                value={BuyerMessageText}
-                onChangeText={updateBuyerMessage}
+                // value={BuyerMessageText}
+                // onChangeText={}
               />
             </View>
 
             <TouchableOpacity
               style={styles.sendView}
-              onPress={() => setBuyerState(true)}>
+              //   onPress={() => setBuyerState(true)}
+            >
               <Image
                 style={styles.tileImage}
                 source={require('../assets/icons/sendMessage.png')}
               />
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
       <BottomBar />
     </>
@@ -125,7 +167,7 @@ const ChatScreen = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    // flex: 1,
+    flex: 1,
     paddingVertical: 10,
   },
 
@@ -263,7 +305,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   messageText: {
-    maxWidth: '95%',
+    // maxWidth: '95%',
+    // width: '50%',
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 35,
