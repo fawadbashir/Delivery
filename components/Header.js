@@ -43,7 +43,10 @@ const Header = () => {
             <Icon name="settings-voice" color="#707070" size={25} />
           </TouchableOpacity>
         </View> */}
-        <TouchableOpacity style={styles.actionButton} activeOpacity={0.6}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          activeOpacity={0.6}
+          onPress={() => navigation.navigate('settings')}>
           <Image
             source={require('../assets/settingsIcon2.png')}
             style={{width: 25, height: 25, top: 2}}

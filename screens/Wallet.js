@@ -191,9 +191,13 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
               />
             </TouchableOpacity>
             <View style={{top: -20}}>
-              <CreditCard />
+              <CreditCard
+                bank={user.paymentMethods[0].bank}
+                name={user.paymentMethods[0].name}
+                type={user.paymentMethods[0].type}
+              />
             </View>
-            <TouchableOpacity>
+            <TouchableOpacity disabled={user.paymentMethods.length - 1}>
               <Image
                 source={require('../assets/nextpayment.png')}
                 style={{width: 21, height: 21}}

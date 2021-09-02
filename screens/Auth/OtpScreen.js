@@ -21,15 +21,18 @@ const OtpScreen = (props) => {
     useContext(AuthContext)
 
   const {sendRequest, error, clearError} = useHttpClient()
+  const {
+    userData: {firstName, lastName, email, password},
+  } = props.route.params
 
   // const addToOtp = (value) => {
   //   setOtp((prevOtp) => [...prevOtp, value])
   // }
 
-  const submitUserOtp = () => {
+  const submitUserOtp = async () => {
     if (isForgotPassword) {
       try {
-        const responseData = sendRequest(
+        const responseData = await sendRequest(
           'https://deliverypay.in/api/submitUserForgotPassOTP',
           'POST',
           JSON.stringify({code: otp.join(','), phone: user.userPhone}),
@@ -50,18 +53,25 @@ const OtpScreen = (props) => {
       }
     } else {
       try {
-        const responseData = sendRequest(
-          'https://deliverypay.in/api/submitUserOTP',
+        const responseData = await sendRequest(
+          'https://deliverypay.in/api/registerUser',
           'POST',
-          JSON.stringify({code: otp.join(','), phone: user.userPhone}),
+          JSON.stringify({
+            code: otp.join(','),
+            firstName,
+            lastName,
+            password,
+            email,
+          }),
           {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
         )
-        if (responseData) {
-          props.navigation.navigate('newPassword')
-        }
+        // if (responseData) {
+        //   props.navigation.navigate('newPassword')
+        // }
+        console.log(responseData)
         // eslint-disable-next-line no-empty
       } catch (e) {}
       if (error) {
@@ -97,12 +107,12 @@ const OtpScreen = (props) => {
     }
   }, [user.userPhone])
 
-  useEffect(() => {
-    if (!isForgotPassword) {
-      fetchOtp()
-    }
-    console.log(user)
-  }, [fetchOtp, isForgotPassword, user])
+  // useEffect(() => {
+  //   if (!isForgotPassword) {
+  //     fetchOtp()
+  //   }
+  //   console.log(user)
+  // }, [fetchOtp, isForgotPassword, user])
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>

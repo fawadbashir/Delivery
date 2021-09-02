@@ -24,7 +24,6 @@ import CustomerCategory from './screens/Auth/CustomerCategory'
 
 import NavigationContainer from './Navigation/NavigationContainer'
 
-
 // const theme = {
 //   ...DefaultTheme,
 //   colors: {
@@ -37,14 +36,11 @@ import NavigationContainer from './Navigation/NavigationContainer'
 
 const App = () => {
   return (
-
     <AuthProvider>
       <PaperProvider>
         <NavigationContainer />
-       
       </PaperProvider>
     </AuthProvider>
-
   )
 }
 

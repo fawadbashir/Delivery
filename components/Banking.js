@@ -4,23 +4,27 @@ import {Card} from 'react-native-paper'
 import LinearGradient from 'react-native-linear-gradient'
 import {Controller, useForm} from 'react-hook-form'
 
-const Banking = () => {
+const Banking = (props) => {
   const {
     control,
     handleSubmit,
+
     formState: {errors},
-  } = useForm()
+  } = useForm({mode: 'all'})
 
   const onSubmit = (data) => {
-    // props.onSubmit(data)
-    console.log(data)
+    props.onSubmit(data)
+    // console.log(data, 'data')
   }
+  // console.log(errors)
+
   return (
     <Card style={styles.card}>
       <Controller
-        name="fullName"
+        name="name"
         control={control}
-        rules={{required: true}}
+        shouldUnregister={true}
+        // rules={{required: true}}
         render={({field: {value, onChange}}) => (
           <TextInput
             value={value}
@@ -31,6 +35,7 @@ const Banking = () => {
         )}
       />
       <Controller
+        shouldUnregister={true}
         control={control}
         name="bank"
         rules={{required: true}}
@@ -45,6 +50,7 @@ const Banking = () => {
       />
       <View>
         <Controller
+          shouldUnregister={true}
           name="city"
           control={control}
           rules={{required: true}}
@@ -59,6 +65,7 @@ const Banking = () => {
         />
       </View>
       <Controller
+        shouldUnregister={true}
         name="accountType"
         control={control}
         rules={{required: true}}
@@ -72,11 +79,13 @@ const Banking = () => {
         )}
       />
       <Controller
+        shouldUnregister={true}
         name="accountNumber"
         control={control}
-        rules={{required: true}}
+        rules={{required: true, minLength: 16, maxLength: 16}}
         render={({field: {value, onChange}}) => (
           <TextInput
+            spellCheck={false}
             value={value}
             onChangeText={onChange}
             style={[styles.field, errors.accountNumber && styles.redBorder]}
@@ -86,6 +95,7 @@ const Banking = () => {
       />
 
       <Controller
+        shouldUnregister={true}
         control={control}
         name="ifsc"
         rules={{required: true}}

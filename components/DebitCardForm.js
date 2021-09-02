@@ -30,7 +30,7 @@ const DebitCardForm = (props) => {
       <Controller
         control={control}
         name="name"
-        rules={{required: true}}
+        rules={{required: true, pattern: /^[a-zA-Z]+$/}}
         render={({field: {value, onChange}}) => (
           <TextInput
             value={value}

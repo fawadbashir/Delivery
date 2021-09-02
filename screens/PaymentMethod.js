@@ -7,64 +7,116 @@ import {
   TouchableOpacity,
   ScrollView,
   useWindowDimensions,
+  Alert,
+  KeyboardAvoidingView,
 } from 'react-native'
-import {Card, RadioButton} from 'react-native-paper'
+import {RadioButton} from 'react-native-paper'
 import UpiCard from '../components/UpiCard'
 import Header from '../components/Header'
 import BottomBar from '../components/BottomBar'
 
-import LinearGradient from 'react-native-linear-gradient'
-import {useForm} from 'react-hook-form'
 import DebitCardForm from '../components/DebitCardForm'
 import Banking from '../components/Banking'
+import {useHttpClient} from '../hooks/http-hook'
 
 const PaymentMethod = () => {
   const [method, setMethod] = useState('upi')
   const window = useWindowDimensions()
+  const {sendRequest, isLoading, error, clearError} = useHttpClient()
 
-  const onSubmit = () => {}
+  const onSubmit = (data) => {
+    if (method === 'banking') {
+      console.log(data, 'paymentMethod')
+      sendRequest(
+        'https://deliverypay.in/api/addPaymentMethod',
+        'POST',
+
+        JSON.stringify({
+          type: 'BankAccount',
+          name: data.name,
+          accountNumber: data.accountNumber,
+          ifsc: data.ifsc,
+          bank: data.bank,
+        }),
+        {
+          'Content-Type': 'application/json',
+        },
+      )
+        .then((response) => console.log(response))
+        .catch((e) => e)
+
+      if (error) {
+        Alert.alert('Error', error, [{onPress: () => clearError()}])
+      }
+    } else if (method === 'card') {
+      sendRequest(
+        'https://deliverypay.in/api/addPaymentMethod',
+        'POST',
+        JSON.stringify({
+          type: 'BankCard',
+          name: data.name,
+          accountNumber: data.accountNumber,
+          ifsc: data.ifsc,
+          bank: data.bank,
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ).then((response) => console.log(response))
+
+      if (error) {
+        Alert.alert('Error', error, [{onPress: () => clearError()}])
+      }
+    }
+    // else {
+
+    // }
+  }
   return (
-    <View>
-      <Header />
-      <ScrollView
-        style={[styles.mainView, {height: window.height < 700 ? 342 : 504}]}>
-        <Text style={styles.heading}>Add Money</Text>
-        <View style={styles.optionView}>
-          <RadioButton
-            value="upi"
-            color="#2699fb"
-            status={method === 'upi' ? 'checked' : 'unchecked'}
-            onPress={() => setMethod('upi')}
-          />
-          <Text style={styles.methodText}>UPI</Text>
-        </View>
+    <>
+      <KeyboardAvoidingView keyboardVerticalOffset={1} behavior="position">
+        <Header />
+        <ScrollView
+          style={[styles.mainView, {height: window.height < 700 ? 342 : 504}]}>
+          <Text style={styles.heading}>Add Money</Text>
+          <View style={styles.optionView}>
+            <RadioButton
+              value="upi"
+              color="#2699fb"
+              status={method === 'upi' ? 'checked' : 'unchecked'}
+              onPress={() => setMethod('upi')}
+            />
+            <Text style={styles.methodText}>UPI</Text>
+          </View>
 
-        {method === 'upi' && <UpiCard style={{marginVertical: 20}} />}
-        <View style={styles.optionView}>
-          <RadioButton
-            value="card"
-            color="#2699fb"
-            status={method === 'card' ? 'checked' : 'unchecked'}
-            onPress={() => setMethod('card')}
-          />
+          {method === 'upi' && <UpiCard style={{marginVertical: 20}} />}
+          <View style={styles.optionView}>
+            <RadioButton
+              value="card"
+              color="#2699fb"
+              status={method === 'card' ? 'checked' : 'unchecked'}
+              onPress={() => setMethod('card')}
+            />
 
-          <Text style={styles.methodText}>Add Debit/Credit Card</Text>
-        </View>
-        {method === 'card' && <DebitCardForm />}
-        <View style={styles.optionView}>
-          <RadioButton
-            value="banking"
-            color="#2699fb"
-            status={method === 'banking' ? 'checked' : 'unchecked'}
-            onPress={() => setMethod('banking')}
-          />
+            <Text style={styles.methodText}>Add Debit/Credit Card</Text>
+          </View>
+          {method === 'card' && <DebitCardForm onSubmit={onSubmit} />}
+          <View style={styles.optionView}>
+            <RadioButton
+              value="banking"
+              color="#2699fb"
+              status={method === 'banking' ? 'checked' : 'unchecked'}
+              onPress={() => setMethod('banking')}
+            />
 
-          <Text style={styles.methodText}>Net Banking</Text>
-        </View>
-        {method === 'banking' && <Banking />}
-      </ScrollView>
+            <Text style={styles.methodText}>Net Banking</Text>
+          </View>
+          {method === 'banking' && <Banking onSubmit={onSubmit} />}
+        </ScrollView>
+      </KeyboardAvoidingView>
       <BottomBar />
-    </View>
+    </>
   )
 }
 

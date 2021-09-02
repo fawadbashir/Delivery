@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {
   View,
   StyleSheet,
@@ -8,290 +8,410 @@ import {
   TextInput,
   ScrollView,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
   Keyboard,
+  Alert,
 } from 'react-native'
 import {Controller, useForm} from 'react-hook-form'
 import BottomBar from '../components/BottomBar'
 
+import {AuthContext} from '../context/auth'
+
+import {useHttpClient} from '../hooks/http-hook'
+import {ActivityIndicator} from 'react-native-paper'
+import Colors from '../constants/colors'
+
 const AccountSettings = () => {
+  const {sendRequest, isLoading, error, clearError} = useHttpClient()
   const [edit, setEdit] = useState(false)
+  const {user, login} = useContext(AuthContext)
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors, isValid},
+
+    formState: {errors},
   } = useForm({
     mode: 'all',
   })
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
+    console.log(data)
+    try {
+      const response = await sendRequest(
+        'https://deliverypay.in/api/editUserProfile',
+        'PATCH',
+        JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phoneNo,
+          email: data.email,
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      )
+      console.log(response)
+      login({
+        userId: response.user._id,
+        deliverypayId: response.user.userId,
+        userPhone: response.user.phone,
+        email: response.user.email,
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        image: response.user.profileImg,
+        paymentMethods: response.user.paymentMethods,
+        balance: response.user.balance,
+      })
+
+      if (error) {
+        Alert.alert('Error', error, [
+          {text: 'Okay', onPress: () => clearError()},
+        ])
+      }
+    } catch (e) {
+      console.log(e)
+    }
     setEdit(false)
     // props.onSubmit(data)
-    console.log(data, 'data')
+    // console.log(data, 'data')
   }
-
-  console.log(errors)
 
   useEffect(() => {
     reset({
-      fullName: 'Swati Mishra',
-      email: 'swatimishra0809@mail.com',
-      phoneNo: '8637089615',
-      password: '12345',
-      deliveryPayId: 'Tejapujari2@gmail.com',
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNo: user.userPhone,
+
+      deliverypayId: user.deliveryPayId,
     })
-  }, [])
+  }, [reset])
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.screen}>
-        <Image
-          style={{marginBottom: 10}}
-          source={require('../assets/signupImage.png')}
-        />
-        <ScrollView contentContainerStyle={styles.fieldsContainer}>
-          <Text style={styles.title}>Account Setting</Text>
-
-          <View style={[styles.fieldView, errors.fullName && styles.redBorder]}>
-            {edit === false ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.fieldEdit}>Full Name</Text>
-                <Text style={styles.fieldEdit}>Swati Mishra</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEdit(true)
-                  }}>
-                  <Text style={styles.fieldEdit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Controller
-                  control={control}
-                  name="fullName"
-                  rules={{required: true}}
-                  render={({field: {value, onChange}}) => (
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Full Name"
-                      placeholderTextColor="#2699FB"
-                      style={styles.input}
-                    />
-                  )}
-                />
-                <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                  <Text style={[styles.fieldEdit]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+      <>
+        {isLoading ? (
+          <View style={[styles.screen, {justifyContent: 'center'}]}>
+            <ActivityIndicator color={Colors.primary} size="large" />
           </View>
+        ) : (
+          <View style={styles.screen}>
+            <KeyboardAvoidingView
+              keyboardVerticalOffset={1}
+              behavior={'position'}>
+              <Image
+                style={{marginBottom: 10}}
+                source={require('../assets/signupImage.png')}
+              />
+              <ScrollView contentContainerStyle={styles.fieldsContainer}>
+                <Text style={styles.title}>Account Setting</Text>
 
-          <View style={[styles.fieldView, errors.email && styles.redBorder]}>
-            {edit === false ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.fieldEdit}>Email</Text>
-                <Text style={styles.fieldEdit}>swatimishr0809@mail.com</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEdit(true)
-                  }}>
-                  <Text style={styles.fieldEdit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Controller
-                  control={control}
-                  name="email"
-                  rules={{
-                    required: true,
-                    pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                  }}
-                  render={({field: {value, onChange}}) => (
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Email"
-                      placeholderTextColor="#2699FB"
-                      style={styles.input}
-                    />
+                <View
+                  style={[
+                    styles.fieldView,
+                    errors.fullName && styles.redBorder,
+                  ]}>
+                  {edit === false ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.fieldEdit}>First Name</Text>
+                      <Text
+                        style={styles.fieldEdit}>{`${user.firstName}`}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEdit(true)
+                        }}>
+                        <Text style={styles.fieldEdit}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Controller
+                        control={control}
+                        name="firstName"
+                        rules={{required: true}}
+                        render={({field: {value, onChange}}) => (
+                          <TextInput
+                            value={value}
+                            onChangeText={onChange}
+                            placeholder="First Name"
+                            placeholderTextColor="#2699FB"
+                            style={styles.input}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                        <Text style={[styles.fieldEdit]}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
                   )}
-                />
-                <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                  <Text style={[styles.fieldEdit]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+                </View>
+                <View
+                  style={[
+                    styles.fieldView,
+                    errors.fullName && styles.redBorder,
+                  ]}>
+                  {edit === false ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.fieldEdit}>Last Name</Text>
+                      <Text style={styles.fieldEdit}>{`${user.lastName}`}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEdit(true)
+                        }}>
+                        <Text style={styles.fieldEdit}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Controller
+                        control={control}
+                        name="lastName"
+                        rules={{required: true}}
+                        render={({field: {value, onChange}}) => (
+                          <TextInput
+                            value={value}
+                            onChangeText={onChange}
+                            placeholder="last Name"
+                            placeholderTextColor="#2699FB"
+                            style={styles.input}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                        <Text style={[styles.fieldEdit]}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
 
-          <View style={[styles.fieldView, errors.phoneNo && styles.redBorder]}>
-            {edit === false ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.fieldEdit}>PhoneNo</Text>
-                <Text style={styles.fieldEdit}>8637089615</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEdit(true)
-                  }}>
-                  <Text style={styles.fieldEdit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Controller
-                  control={control}
-                  name="phoneNo"
-                  rules={{required: true, type: 'number'}}
-                  render={({field: {value, onChange}}) => (
-                    <TextInput
-                      value={value}
-                      keyboardType="number-pad"
-                      onChangeText={onChange}
-                      placeholder="PhoneNo"
-                      placeholderTextColor="#2699FB"
-                      style={styles.input}
-                    />
+                <View
+                  style={[styles.fieldView, errors.email && styles.redBorder]}>
+                  {edit === false ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.fieldEdit}>Email</Text>
+                      <Text style={styles.fieldEdit}>{user.email}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEdit(true)
+                        }}>
+                        <Text style={styles.fieldEdit}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Controller
+                        control={control}
+                        name="email"
+                        rules={{
+                          required: true,
+                          pattern:
+                            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                        }}
+                        render={({field: {value, onChange}}) => (
+                          <TextInput
+                            value={value}
+                            onChangeText={onChange}
+                            placeholder="Email"
+                            placeholderTextColor="#2699FB"
+                            style={styles.input}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                        <Text style={[styles.fieldEdit]}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
                   )}
-                />
-                <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                  <Text style={[styles.fieldEdit]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+                </View>
 
-          <View style={[styles.fieldView, errors.password && styles.redBorder]}>
-            {edit === false ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.fieldEdit}>Password</Text>
-                <Text style={styles.fieldEdit}>12345</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEdit(true)
-                  }}>
-                  <Text style={styles.fieldEdit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Controller
-                  control={control}
-                  name="password"
-                  rules={{required: true}}
-                  render={({field: {value, onChange}}) => (
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Password"
-                      placeholderTextColor="#2699FB"
-                      style={styles.input}
-                      secureTextEntry={true}
-                    />
+                <View
+                  style={[
+                    styles.fieldView,
+                    errors.phoneNo && styles.redBorder,
+                  ]}>
+                  {edit === false ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.fieldEdit}>PhoneNo</Text>
+                      <Text style={styles.fieldEdit}>{user.userPhone}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEdit(true)
+                        }}>
+                        <Text style={styles.fieldEdit}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Controller
+                        control={control}
+                        name="phoneNo"
+                        rules={{required: true, type: 'number'}}
+                        render={({field: {value, onChange}}) => (
+                          <TextInput
+                            value={value}
+                            keyboardType="number-pad"
+                            onChangeText={onChange}
+                            placeholder="PhoneNo"
+                            placeholderTextColor="#2699FB"
+                            style={styles.input}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                        <Text style={[styles.fieldEdit]}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
                   )}
-                />
-                <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                  <Text style={[styles.fieldEdit]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+                </View>
 
-          <View
-            style={[
-              styles.fieldView,
-              errors.deliveryPayId && styles.redBorder,
-            ]}>
-            {edit === false ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text style={styles.fieldEdit}>Email</Text>
-                <Text style={styles.fieldEdit}>Tejapujari2@gmail.com</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEdit(true)
-                  }}>
-                  <Text style={styles.fieldEdit}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Controller
-                  control={control}
-                  name="deliveryPayId"
-                  rules={{
-                    required: true,
-                    pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-                  }}
-                  render={({field: {value, onChange}}) => (
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Delivery Pay Id"
-                      placeholderTextColor="#2699FB"
-                      style={styles.input}
+                {/* <View
+                style={[styles.fieldView, errors.password && styles.redBorder]}>
+                {edit === false ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={styles.fieldEdit}>Password</Text>
+                    <Text style={styles.fieldEdit}>12345</Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setEdit(true)
+                      }}>
+                      <Text style={styles.fieldEdit}>Edit</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Controller
+                      control={control}
+                      name="password"
+                      rules={{required: true}}
+                      render={({field: {value, onChange}}) => (
+                        <TextInput
+                          value={value}
+                          onChangeText={onChange}
+                          placeholder="Password"
+                          placeholderTextColor="#2699FB"
+                          style={styles.input}
+                          secureTextEntry={true}
+                        />
+                      )}
                     />
+                    <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                      <Text style={[styles.fieldEdit]}>Save</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View> */}
+
+                <View
+                  style={[
+                    styles.fieldView,
+                    errors.deliveryPayId && styles.redBorder,
+                  ]}>
+                  {edit === false ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={styles.fieldEdit}>Delivery Pay Id</Text>
+                      <Text style={styles.fieldEdit}>{`${user.email}`}</Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEdit(true)
+                        }}>
+                        <Text style={styles.fieldEdit}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Controller
+                        control={control}
+                        name="deliverypayId"
+                        rules={{
+                          required: true,
+                          pattern:
+                            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                        }}
+                        render={({field: {value, onChange}}) => (
+                          <TextInput
+                            value={value}
+                            onChangeText={onChange}
+                            placeholder="Delivery Pay Id"
+                            placeholderTextColor="#2699FB"
+                            style={styles.input}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+                        <Text style={[styles.fieldEdit]}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
                   )}
-                />
-                <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-                  <Text style={[styles.fieldEdit]}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
-        </ScrollView>
+        )}
         <BottomBar />
-      </View>
+      </>
     </TouchableWithoutFeedback>
   )
 }
@@ -303,6 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFF',
   },
   fieldsContainer: {
+    marginTop: 5,
     alignItems: 'center',
   },
   redBorder: {
@@ -319,7 +440,7 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     borderColor: '#BCE0FD',
     borderWidth: 1.5,
-    width: 300,
+    width: '85%',
     height: 60,
     paddingVertical: 5,
     paddingHorizontal: 15,

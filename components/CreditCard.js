@@ -2,18 +2,33 @@ import React from 'react'
 import {Image, View, Text, StyleSheet} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 
-const CreditCard = () => {
+const CreditCard = (props) => {
   return (
     <LinearGradient
       colors={['#53AEFC', '#1BE6D6']}
       style={styles.card}
       end={{x: 1, y: 1.9}}>
       <View style={styles.cardCompany}>
-        <Image source={require('../assets/visa.png')} />
+        {props.bankName ? (
+          <Image source={require('../assets/visa.png')} />
+        ) : (
+          <Text style={styles.bankName}>
+            {props.bank &&
+              `${props.bank.charAt(0).toUpperCase()}${props.bank.slice(1)}`}
+          </Text>
+        )}
       </View>
       <View style={styles.cardTextContainer}>
-        <Text style={styles.cardNumber}>XXXX XXXX XXXX 0695</Text>
-        <Text style={styles.cardHolder}>Teja Pujari 06/21</Text>
+        {props.name ? (
+          <Text style={styles.cardNumber}>{props.name}</Text>
+        ) : (
+          <Text style={styles.cardNumber}>XXXX XXXX XXXX 0695</Text>
+        )}
+        {props.type ? (
+          <Text style={styles.cardHolder}>{props.type}</Text>
+        ) : (
+          <Text style={styles.cardHolder}>Teja Pujari 06/21</Text>
+        )}
       </View>
     </LinearGradient>
   )
@@ -44,6 +59,11 @@ const styles = StyleSheet.create({
   cardHolder: {
     fontFamily: 'Poppins-Regular',
     fontSize: 18,
+  },
+  bankName: {
+    color: '#fff',
+    fontSize: 25,
+    fontFamily: 'Poppins-Bold',
   },
 })
 
