@@ -186,7 +186,7 @@ const ChatScreen = () => {
           </View>
           <View
             style={{
-              height: window.height < 700 ? 315 : 260,
+              height: window.height < 700 ? 315 : 305,
               marginVertical: 5,
             }}>
             <FlatList
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     // flex: 1,
   },
   headingContainer: {
-    marginTop: 10,
+    marginTop: 5,
     flexDirection: 'row',
     marginLeft: 20,
     justifyContent: 'space-between',
@@ -275,37 +275,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 5,
-    paddingTop: 5,
+    // paddingTop: 5,
     marginVertical: 5,
   },
 
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     // marginRight: 10,
   },
   details: {
-    paddingLeft: 5,
+    // paddingLeft: 5,
     // marginLeft: 10,
   },
   name: {
-    fontSize: 15,
+    fontSize: 12,
     color: '#2A2A2A',
     fontFamily: 'Poppins-Regular',
   },
   phoneNumber: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#2A2A2A',
     fontFamily: 'Poppins-Regular',
   },
   email: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#707070',
     fontFamily: 'Poppins-Regular',
   },
   address: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#707070',
     fontFamily: 'Poppins-Regular',
   },
@@ -356,10 +356,10 @@ const styles = StyleSheet.create({
   payText: {
     color: '#707070',
     fontFamily: 'Poppins-Regular',
-    fontSize: 13,
+    fontSize: 12,
   },
   requestView: {
-    marginTop: 10,
+    marginTop: 5,
     // marginHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     color: '#707070',
     fontFamily: 'Poppins-Regular',
-    fontSize: 16,
+    fontSize: 14,
   },
   searchBarContainer: {
     marginBottom: 20,
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
 
   messageContainer: {
     marginHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 5,
   },
   messageView: {
     borderRadius: 35,
