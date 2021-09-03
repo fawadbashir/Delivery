@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -8,17 +8,20 @@ import {
   FlatList,
   useWindowDimensions,
   TouchableOpacity,
-  ScrollView,
   TextInput,
-  requireNativeComponent,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import {rosybrown} from 'color-name'
 import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
-import {useState} from 'react/cjs/react.development'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import {useNavigation} from '@react-navigation/native'
+
+import {AuthContext} from '../context/auth'
 
 const Data = [
   {
@@ -34,38 +37,109 @@ const Data = [
     time: '2 mins ago',
     status: 'seller',
   },
+  {
+    id: '3',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '4',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
+  {
+    id: '5',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '6',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
+  {
+    id: '7',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '8',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
+  {
+    id: '9',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '10',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
+  {
+    id: '11',
+    message:
+      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
+    time: '5 mins ago',
+    status: 'buyer',
+  },
+  {
+    id: '12',
+    message: 'Hello Miss Swati ',
+    time: '2 mins ago',
+    status: 'seller',
+  },
 ]
 
 const ChatScreen = () => {
-  //   const [buyerState, setBuyerState] = useState(false)
-  //   const [BuyerMessageText, setBuyerMessageText] = useState()
-
   const window = useWindowDimensions()
-
-  //   const updateBuyerMessage = (text) => {
-  //     setBuyerMessageText(text)
-  //   }
-
-  //   const BuyerMessage = () => {
-  //     return buyerState === true ? (
-  //       <View style={styles.messageContainer}>
-  //         <View style={styles.messageView}>
-  //           <Text style={[styles.messageText, {backgroundColor: '#F9EAF4'}]}>
-  //             {/* Hello Mr.Teja Pujari, I want to buy a product as you are selling
-  //             with Delivery Pay service */}
-  //             {BuyerMessageText}
-  //           </Text>
-  //           <Text style={styles.timeText}>5 mins ago</Text>
-  //         </View>
-  //       </View>
-  //     ) : null
-  //   }
-
+  const {user} = useContext(AuthContext)
+  const navigation = useNavigation()
   return (
     <>
-      <Header />
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
         <View style={styles.screen}>
+          <View style={styles.headingContainer}>
+            <View style={{flexDirection: 'row'}}>
+              <Image
+                source={require('../assets/appHeadingIcon.png')}
+                // style={{marginRight: 10}}
+                style={{width: 50, height: 50, marginRight: 10}}
+              />
+              <View>
+                <Text style={styles.heading}>Delivery</Text>
+                <Text style={[styles.heading, {marginTop: -15}]}>PAY</Text>
+              </View>
+            </View>
+
+            <View style={{marginRight: 10, top: -20}}>
+              <View>
+                <Text style={styles.name}>{user.firstName}</Text>
+                <Text style={[styles.name, {marginTop: -5}]}>
+                  {user.lastName}
+                </Text>
+              </View>
+
+              <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
+                <Icon name="person" color="#2699FB" size={30} />
+              </TouchableOpacity>
+              <View style={{flexDirection: 'row'}}></View>
+            </View>
+          </View>
+
           <View style={styles.innerList}>
             <View style={styles.imageView}>
               <Image
@@ -112,24 +186,38 @@ const ChatScreen = () => {
           </View>
           <View
             style={{
-              height: window.height < 700 ? 182 : 150,
+              height: window.height < 700 ? 315 : 260,
+              marginVertical: 5,
             }}>
             <FlatList
               data={Data}
               keyExtractor={(item, index) => item.id}
               renderItem={({item}) => {
-                return (
-                  <View style={styles.messageContainer}>
-                    <View style={styles.messageView}>
-                      <Text
-                        style={[
-                          styles.messageText,
-                          {backgroundColor: '#F9EAF4'},
-                        ]}>
-                        {item.message}
-                      </Text>
-                      <Text style={styles.timeText}>{item.time}</Text>
+                return item.status === 'buyer' ? (
+                  <View
+                    style={[styles.messageContainer, {alignItems: 'flex-end'}]}>
+                    <View
+                      style={[
+                        styles.messageView,
+                        {backgroundColor: '#F9EAF4', borderBottomLeftRadius: 0},
+                      ]}>
+                      <Text style={styles.messageText}>{item.message}</Text>
                     </View>
+                    <Text style={styles.timeText}>{item.time}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.messageContainer}>
+                    <View
+                      style={[
+                        styles.messageView,
+                        {
+                          backgroundColor: '#BCE0FD',
+                          borderBottomRightRadius: 0,
+                        },
+                      ]}>
+                      <Text style={styles.messageText}>{item.message}</Text>
+                    </View>
+                    <Text style={styles.timeText}>{item.time}</Text>
                   </View>
                 )
               }}
@@ -159,23 +247,36 @@ const ChatScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
       <BottomBar />
+
+      {/* </TouchableWithoutFeedback> */}
     </>
   )
 }
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-    paddingVertical: 10,
+    // flex: 1,
   },
-
+  headingContainer: {
+    marginTop: 10,
+    flexDirection: 'row',
+    marginLeft: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  heading: {
+    fontFamily: 'Poppins-BoldItalic',
+    fontSize: 22,
+    color: '#5ab1fc',
+  },
   innerList: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 5,
+    paddingTop: 5,
+    marginVertical: 5,
   },
 
   image: {
@@ -247,10 +348,10 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   payView: {
-    marginTop: 30,
+    // marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 5,
   },
   payText: {
     color: '#707070',
@@ -258,17 +359,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   requestView: {
-    marginTop: 30,
+    marginTop: 10,
+    // marginHorizontal: 20,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   requestText: {
+    marginLeft: 20,
     color: '#707070',
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
-    marginTop: 10,
   },
   searchBarContainer: {
-    // marginTop: 20,
+    marginBottom: 20,
     flexDirection: 'row',
     marginHorizontal: 20,
     justifyContent: 'space-between',
@@ -297,23 +401,19 @@ const styles = StyleSheet.create({
   },
 
   messageContainer: {
-    flexDirection: 'row-reverse',
+    marginHorizontal: 20,
+    marginVertical: 10,
   },
   messageView: {
-    marginHorizontal: 20,
-    marginVertical: 20,
-    alignItems: 'flex-end',
-  },
-  messageText: {
-    // maxWidth: '95%',
-    // width: '50%',
+    borderRadius: 35,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    borderRadius: 35,
+    width: '80%',
+  },
+  messageText: {
     color: '#707070',
     fontFamily: 'Poppins-Regular',
     fontSize: 12,
-    borderBottomLeftRadius: 0,
   },
   timeText: {
     marginTop: 10,
