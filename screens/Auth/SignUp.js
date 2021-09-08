@@ -34,6 +34,7 @@ const SignUp = (props) => {
     control,
     handleSubmit,
     register,
+    watch,
 
     formState: {errors},
   } = useForm({mode: 'onSubmit'})
@@ -41,15 +42,7 @@ const SignUp = (props) => {
   const email = register('email')
   const phoneNumber = register('phoneNumber')
   const password = register('password')
-  const confirmPassword = register('confirmPassword', {
-    validate: (value) => {
-      return (
-        value ===
-          passwordRef.current._internalFiberInstanceHandleDEV.pendingProps
-            .text || 'The passwords do not match'
-      )
-    },
-  })
+  const confirmPassword = register('confirmPassword')
 
   const onSubmit = (data) => {
     const [firstName, lastName] = data.fullName.split(' ')
@@ -222,6 +215,8 @@ const SignUp = (props) => {
             control={control}
             rules={{
               required: true,
+              validate: (value) =>
+                value === watch('password') || 'The passwords do not match',
             }}
             placeholder="Confirm Password"
             secureTextEntry={true}

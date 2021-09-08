@@ -26,6 +26,7 @@ export const useHttpClient = () => {
         )
         if (!response.ok) {
           // console.log(responseData.message)
+          console.log(responseData)
           throw new Error(responseData.message)
         }
         // console.log(response)

@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 import 'react-native-gesture-handler'
-import React from 'react'
+import React, {useEffect} from 'react'
 
 import {Provider as PaperProvider} from 'react-native-paper'
 import {AuthProvider} from './context/auth'
@@ -21,6 +21,7 @@ import AddAddress from './screens/AddAddress'
 import EditAddress from './screens/EditAddress'
 import CustomerCategory from './screens/Auth/CustomerCategory'
 // import StartTransaction from './screens/Seller/StartTransaction'
+import SplashScreen from 'react-native-splash-screen'
 
 import NavigationContainer from './Navigation/NavigationContainer'
 
@@ -35,6 +36,11 @@ import NavigationContainer from './Navigation/NavigationContainer'
 // }
 
 const App = () => {
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide()
+    }, 2000)
+  }, [])
   return (
     <AuthProvider>
       <PaperProvider>

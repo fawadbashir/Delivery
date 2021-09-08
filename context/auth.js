@@ -9,7 +9,8 @@ export const AuthProvider = (props) => {
   const [userType, setUserType] = useState('')
 
   const addToOtp = (value) => {
-    setOtp((prevOtp) => [...prevOtp, value])
+    setOtp((prevOtp) => [...prevOtp, value.toString()])
+    console.log(otp)
   }
 
   const clearOtpValue = () => {
@@ -40,6 +41,7 @@ export const AuthProvider = (props) => {
         clearOtpValue,
         changeUserType,
         userType,
+        setOtp,
       }}>
       {props.children}
     </AuthContext.Provider>

@@ -14,15 +14,16 @@ import fetch from 'node-fetch'
 import {AuthContext} from '../../context/auth'
 
 import {useHttpClient} from '../../hooks/http-hook'
+import {ActivityIndicator} from 'react-native-paper'
 
 const OtpScreen = (props) => {
   // const [otp, setOtp] = useState([])
-  const {user, isForgotPassword, otp, addToOtp, clearOtpValue} =
+  const {user, isForgotPassword, otp, addToOtp, clearOtpValue, login, setOtp} =
     useContext(AuthContext)
 
-  const {sendRequest, error, clearError} = useHttpClient()
+  const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const {
-    userData: {firstName, lastName, email, password},
+    userData: {firstName, lastName, email, password, phone},
   } = props.route.params
 
   // const addToOtp = (value) => {
@@ -35,7 +36,7 @@ const OtpScreen = (props) => {
         const responseData = await sendRequest(
           'https://deliverypay.in/api/submitUserForgotPassOTP',
           'POST',
-          JSON.stringify({code: otp.join(','), phone: user.userPhone}),
+          JSON.stringify({code: otp.join(''), phone: user.userPhone}),
           {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -57,21 +58,34 @@ const OtpScreen = (props) => {
           'https://deliverypay.in/api/registerUser',
           'POST',
           JSON.stringify({
-            code: otp.join(','),
+            code: otp.join(''),
             firstName,
             lastName,
             password,
             email,
+            phone,
           }),
           {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
         )
-        // if (responseData) {
-        //   props.navigation.navigate('newPassword')
-        // }
+        setOtp([])
+        login({
+          userId: responseData.user._id,
+          deliverypayId: responseData.user.userId,
+          userPhone: responseData.user.phone,
+          email: responseData.user.email,
+          firstName: responseData.user.firstName,
+          lastName: responseData.user.lastName,
+          image: responseData.user.profileImg,
+          paymentMethods: responseData.user.paymentMethods,
+          balance: responseData.user.balance,
+        })
+
         console.log(responseData)
+        Alert.alert('Success', 'Signed Up Successfully')
+
         // eslint-disable-next-line no-empty
       } catch (e) {}
       if (error) {
@@ -224,16 +238,23 @@ const OtpScreen = (props) => {
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              onPress={() => addToOtp(0)}
-              disabled={otp.length === 7}>
+              disabled={otp.length === 6}
+              onPress={() => {
+                addToOtp(0)
+                console.log(otp)
+              }}>
               <Text style={styles.buttonText}>0</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonContainer}
               activeOpacity={0.6}
-              // disabled={otp.length < 7}
+              disabled={otp.length < 6}
               onPress={submitUserOtp}>
-              <Icon name="done" size={20} style={styles.iconText} />
+              {isLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Icon name="done" size={20} style={styles.iconText} />
+              )}
             </TouchableOpacity>
           </View>
         </View>
