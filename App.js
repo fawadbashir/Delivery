@@ -9,18 +9,8 @@ import 'react-native-gesture-handler'
 import React, {useEffect} from 'react'
 
 import {Provider as PaperProvider} from 'react-native-paper'
-import {AuthProvider} from './context/auth'
-import Deal from './screens/Deal'
-import Deal2 from './screens/Deal2'
-// import StartTransaction from './screens/Buyer/StartTransaction'
-import Hold from './screens/Hold'
-import HoleTransaction from './screens/HoleTransaction'
-import StartTransaction from './screens/Seller/StartTransaction'
-import ContactUs from './screens/ContactUs'
-import AddAddress from './screens/AddAddress'
-import EditAddress from './screens/EditAddress'
-import CustomerCategory from './screens/Auth/CustomerCategory'
-// import StartTransaction from './screens/Seller/StartTransaction'
+import {AppProvider} from './context/auth'
+
 import SplashScreen from 'react-native-splash-screen'
 
 import NavigationContainer from './Navigation/NavigationContainer'
@@ -42,11 +32,11 @@ const App = () => {
     }, 2000)
   }, [])
   return (
-    <AuthProvider>
+    <AppProvider>
       <PaperProvider>
         <NavigationContainer />
       </PaperProvider>
-    </AuthProvider>
+    </AppProvider>
   )
 }
 

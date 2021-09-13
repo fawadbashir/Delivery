@@ -20,7 +20,7 @@ import BottomBar from '../components/BottomBar'
 import {useHttpClient} from '../hooks/http-hook'
 
 import Colors from '../constants/colors'
-import {AuthContext} from '../context/auth'
+import {AppContext} from '../context/auth'
 
 const data = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr'],
@@ -38,7 +38,7 @@ const data = {
 }
 
 const Wallet = ({navigation: {navigate, addListener}}) => {
-  const {user} = useContext(AuthContext)
+  const {user} = useContext(AppContext)
 
   const [money, setMoney] = useState()
   const [withdraw, setWithdraw] = useState()

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useContext} from 'react'
 import {
   ScrollView,
   Text,
@@ -9,11 +9,16 @@ import {
 } from 'react-native'
 
 import AuthButton from '../../components/AuthButton'
+import {AppContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
 const CustomerCategory = (props) => {
-  const goToLogin = () => props.navigation.navigate('login')
+  const {changeUserType} = useContext(AppContext)
+  const goToLogin = (type) => {
+    changeUserType(type)
+    props.navigation.navigate('login')
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
@@ -31,13 +36,13 @@ const CustomerCategory = (props) => {
           style={{marginTop: 30}}
           authButton={{width: 250}}
           authButtonText={{fontSize: 16}}
-          onPress={goToLogin}>
+          onPress={goToLogin.bind(this, 'buyer')}>
           I am a Buyer
         </AuthButton>
         <TouchableOpacity
           style={styles.sellerButton}
           activeOpacity={0.6}
-          onPress={goToLogin}>
+          onPress={goToLogin.bind(this, 'seller')}>
           <Text style={styles.sellerButtonText}>I am a Seller</Text>
         </TouchableOpacity>
       </View>

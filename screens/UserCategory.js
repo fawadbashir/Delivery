@@ -11,10 +11,10 @@ import {RadioButton} from 'react-native-paper'
 import Header from '../components/Header'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
-import {AuthContext} from '../context/auth'
+import {AppContext} from '../context/auth'
 
 const UserCategory = (props) => {
-  const {changeUserType, userType} = useContext(AuthContext)
+  const {changeUserType, userType} = useContext(AppContext)
 
   const changeToSeller = () => changeUserType('seller')
   const changeToBuyer = () => changeUserType('buyer')
@@ -85,6 +85,22 @@ const UserCategory = (props) => {
             </Text>
           </LinearGradient>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.transactionView}
+          activeOpacity={0.4}
+          onPress={() => props.navigation.navigate('holeTransaction')}>
+          <Text
+            style={{
+              fontFamily: 'Poppins Regular',
+              fontSize: 18,
+            }}>
+            See All Transactions
+          </Text>
+          <Image
+            source={require('../assets/nextpayment.png')}
+            style={{width: 21, height: 21}}
+          />
+        </TouchableOpacity>
       </ScrollView>
       <BottomBar />
     </>
@@ -138,6 +154,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
     color: '#fff',
+  },
+  transactionView: {
+    marginBottom: 15,
+    marginRight: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
   },
 })
 

@@ -1,5 +1,6 @@
 import React, {useRef, useContext, useEffect, useState} from 'react'
 import {useForm} from 'react-hook-form'
+import fetch from 'node-fetch'
 
 import {
   View,
@@ -12,6 +13,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  BackHandler,
 } from 'react-native'
 
 import {Card} from 'react-native-paper'
@@ -19,7 +21,7 @@ import {Card} from 'react-native-paper'
 import AuthButton from '../../components/AuthButton'
 import Input from '../../components/Input'
 import {useHttpClient} from '../../hooks/http-hook'
-import {AuthContext} from '../../context/auth'
+import {AppContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
@@ -29,7 +31,7 @@ const Login = (props) => {
   const [isLoading, setIsLoading] = useState(false)
   // const window = useWindowDimensions()
 
-  const {login} = useContext(AuthContext)
+  const {login} = useContext(AppContext)
 
   // const {sendRequest, clearError, error, isLoading} = useHttpClient()
 
@@ -55,17 +57,23 @@ const Login = (props) => {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        // credentials: 'include',
       })
 
       const responseData = await response.json()
-      // console.log(response)
+      console.log(response)
 
       if (!response.ok) {
         throw new Error(responseData.message)
       }
+      const accessToken = response.headers.map['set-cookie']
+
+      const regEx = accessToken.split(' ')
+
+      // console.log(regEx[0])
+      const cookie = regEx[0].replace('access_token=', '').replace(';', '')
+
       const {user} = responseData
-      // console.log(user.userId)
+
       login({
         userId: user._id,
         deliverypayId: user.userId,
@@ -76,10 +84,8 @@ const Login = (props) => {
         image: user.profileImg,
         paymentMethods: user.paymentMethods,
         balance: user.balance,
-        cookie: response.access_token,
+        cookie,
       })
-      // props.navigation.navigate('otp')
-      // eslint-disable-next-line no-empty
     } catch (e) {
       Alert.alert('Error', e.message)
     }
@@ -245,7 +251,7 @@ const Login = (props) => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    flexGrow: 1,
     // alignItems: 'center',
   },
   mainHeading: {

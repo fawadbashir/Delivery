@@ -24,6 +24,7 @@ export const useHttpClient = () => {
         activeHttpRequests.current = activeHttpRequests.current.filter(
           (reqCtrl) => reqCtrl !== httpAbortCntrl,
         )
+
         if (!response.ok) {
           // console.log(responseData.message)
           console.log(responseData)

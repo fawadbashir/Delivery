@@ -20,7 +20,7 @@ import {Card} from 'react-native-paper'
 import AuthButton from '../../components/AuthButton'
 import Input from '../../components/Input'
 import {useHttpClient} from '../../hooks/http-hook'
-import {AuthContext} from '../../context/auth'
+import {AppContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
@@ -30,7 +30,7 @@ const NewPassword = (props) => {
   //   const otpRef = useRef()
   const window = useWindowDimensions()
 
-  const {login} = useContext(AuthContext)
+  const {login} = useContext(AppContext)
 
   const {sendRequest, clearError, error, isLoading} = useHttpClient()
 

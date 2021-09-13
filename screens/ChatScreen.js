@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -14,100 +14,101 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
-import {rosybrown} from 'color-name'
+
+import {useRoute} from '@react-navigation/native'
+import {io} from 'socket.io-client'
+
 import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import {useNavigation} from '@react-navigation/native'
+import DocumentPicker from 'react-native-document-picker'
 
-import {AuthContext} from '../context/auth'
+import {AppContext} from '../context/auth'
 
-const Data = [
-  {
-    id: '1',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '2',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-  {
-    id: '3',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '4',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-  {
-    id: '5',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '6',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-  {
-    id: '7',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '8',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-  {
-    id: '9',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '10',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-  {
-    id: '11',
-    message:
-      'Hello Mr.Teja Pujari, I want to buy a product as you are selling with Delivery Pay service',
-    time: '5 mins ago',
-    status: 'buyer',
-  },
-  {
-    id: '12',
-    message: 'Hello Miss Swati ',
-    time: '2 mins ago',
-    status: 'seller',
-  },
-]
-
-const ChatScreen = () => {
+const ChatScreen = (props) => {
   const window = useWindowDimensions()
-  const {user} = useContext(AuthContext)
-  const navigation = useNavigation()
+  const {user} = useContext(AppContext)
+  const {clientId, name, email} = props.route.params
+  const {socket, rooms} = props
+  const [messages, setMessages] = useState([])
+  const [message, setMessage] = useState('')
+  const listRef = useRef()
+
+  const filePickerHandler = async () => {
+    try {
+      const response = await DocumentPicker.pick({
+        type: [
+          // DocumentPicker.types.pdf,
+          // DocumentPicker.types.docx,
+          // DocumentPicker.types.doc,
+          DocumentPicker.types.images,
+        ],
+        mode: 'import',
+      })
+
+      // images[fileIndex] = {
+      //   uri: response.uri,
+      //   type: response.type,
+      //   fileName: response.name,
+      // }
+      console.log(response[0])
+      const formData = new FormData()
+      formData.append('file')
+      const imageResponse = await fetch(`https://cdn.deliverypay.in/`, {
+        body: formData,
+        method: 'POST',
+      })
+      const resData = await imageResponse.json()
+      if (!response.ok) {
+        console.log(resData)
+      }
+      console.log(resData)
+      console.log(resData)
+    } catch (e) {
+      // setVisible(false)
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    listRef.current.scrollToEnd()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', () => {
+      setMessages(props.route.params.messages)
+
+      socket.emit('initiateChat', {client_id: clientId}, (y) =>
+        console.log(y, 'initiateChat'),
+      )
+      socket.on('messageToUser', (response) => {
+        console.log(response, 'messageToUserfromChatSceen')
+
+        setMessages((prev) => prev.concat(response))
+        listRef.current.scrollToEnd()
+      })
+    })
+
+    return unsubscribe
+  }, [clientId, props.navigation, props.route.params.messages, socket])
+
+  const sendMessage = () => {
+    socket.emit(
+      'messageToServer',
+      {
+        rooms,
+        message: {
+          text: message,
+          to: clientId,
+        },
+      },
+      (r) => console.log(r),
+    )
+
+    setMessage('')
+  }
+
   return (
     <>
       <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
@@ -125,18 +126,23 @@ const ChatScreen = () => {
               </View>
             </View>
 
-            <View style={{marginRight: 10, top: -20}}>
+            <View
+              style={{
+                marginRight: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
               <View>
                 <Text style={styles.name}>{user.firstName}</Text>
-                <Text style={[styles.name, {marginTop: -5}]}>
+                {/* <Text style={[styles.name, {marginTop: -5}]}>
                   {user.lastName}
-                </Text>
+                </Text> */}
               </View>
 
               <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
                 <Icon name="person" color="#2699FB" size={30} />
               </TouchableOpacity>
-              <View style={{flexDirection: 'row'}}></View>
+              {/* <View style={{flexDirection: 'row'}}></View> */}
             </View>
           </View>
 
@@ -148,20 +154,18 @@ const ChatScreen = () => {
               />
             </View>
             <View style={styles.details}>
-              <Text style={styles.name}>Teja Pujari</Text>
-              <Text style={styles.phoneNumber}>+9187725777</Text>
-              <Text style={styles.email}>tejap@gmail.com</Text>
+              <Text style={styles.name}>{`${name}`}</Text>
+              <Text style={styles.phoneNumber}>{user.phoneNumber}</Text>
+              <Text style={styles.email}>{email}</Text>
               <Text style={styles.address}>Mumbai India</Text>
             </View>
             <View style={styles.requestStatusView}>
               <Text style={styles.requestStatus}>Connected</Text>
             </View>
-            <TouchableOpacity style={styles.chartStatusView}>
-              <Text style={styles.chartStatus}>Chart</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.payView}>
-            <TouchableOpacity style={{width: '25%'}}>
+            <TouchableOpacity
+              style={{width: '25%'}}
+              activeOpacity={0.6}
+              onPress={() => props.navigation.navigate('wallet')}>
               <LinearGradient
                 colors={['#336CF9', '#1BE6D6']}
                 style={styles.optionsView}
@@ -170,12 +174,14 @@ const ChatScreen = () => {
                 <Text style={styles.optionText}>Pay</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <View style={{width: '75%'}}>
-              <Text style={styles.payText}>
-                Click on pay if your deal is done it will be debited to Delivery
-                Pay wallet with teja pujari
-              </Text>
-            </View>
+          </View>
+          <View style={styles.payView}>
+            {/* <View style={{width: '75%'}}> */}
+            <Text style={styles.payText}>
+              Click on pay if your deal is done it will be debited to Delivery
+              Pay wallet with {name}
+            </Text>
+            {/* </View> */}
           </View>
           <View style={styles.requestView}>
             <Image
@@ -186,39 +192,89 @@ const ChatScreen = () => {
           </View>
           <View
             style={{
-              height: window.height < 700 ? 315 : 305,
-              marginVertical: 5,
+              height: window.height < 700 ? 314 : 385,
+              // marginVertical: 5,
             }}>
             <FlatList
-              data={Data}
-              keyExtractor={(item, index) => item.id}
+              // initialNumToRender={50}
+              data={messages}
+              extraData={true}
+              ref={(ref) => (listRef.current = ref)}
+              keyExtractor={(item, index) => item._id}
               renderItem={({item}) => {
-                return item.status === 'buyer' ? (
-                  <View
-                    style={[styles.messageContainer, {alignItems: 'flex-end'}]}>
-                    <View
-                      style={[
-                        styles.messageView,
-                        {backgroundColor: '#F9EAF4', borderBottomLeftRadius: 0},
-                      ]}>
-                      <Text style={styles.messageText}>{item.message}</Text>
-                    </View>
-                    <Text style={styles.timeText}>{item.time}</Text>
-                  </View>
+                if (item.media) {
+                  console.log(item.media)
+                }
+                return item.from !== props.route.params.clientId ? (
+                  <>
+                    {/* {item.media ? (
+                      <Image
+                        source={{
+                          uri: item.media,
+                        }}
+                        style={{width: 15, height: 15}}
+                      />
+                    ) : ( */}
+                    {item.media ? (
+                      <Image
+                        source={{uri: item.media}}
+                        resizeMethod="scale"
+                        style={{
+                          width: 200,
+                          height: 200,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles.messageContainer,
+                          {alignItems: 'flex-end'},
+                        ]}>
+                        <View
+                          style={[
+                            styles.messageView,
+                            {
+                              backgroundColor: '#F9EAF4',
+                              borderBottomLeftRadius: 0,
+                            },
+                          ]}>
+                          <Text style={styles.messageText}>{item.text}</Text>
+                        </View>
+                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                      </View>
+                    )}
+                    {/* )} */}
+                  </>
                 ) : (
-                  <View style={styles.messageContainer}>
-                    <View
-                      style={[
-                        styles.messageView,
-                        {
-                          backgroundColor: '#BCE0FD',
-                          borderBottomRightRadius: 0,
-                        },
-                      ]}>
-                      <Text style={styles.messageText}>{item.message}</Text>
-                    </View>
-                    <Text style={styles.timeText}>{item.time}</Text>
-                  </View>
+                  <>
+                    {item.media ? (
+                      <Image
+                        source={{uri: item.media}}
+                        resizeMethod="scale"
+                        style={{
+                          width: 200,
+                          height: 200,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <View style={styles.messageContainer}>
+                        <View
+                          style={[
+                            styles.messageView,
+                            {
+                              // marginBottom: 0,
+                              backgroundColor: '#BCE0FD',
+                              borderBottomRightRadius: 0,
+                            },
+                          ]}>
+                          <Text style={styles.messageText}>{item.text}</Text>
+                        </View>
+                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                      </View>
+                    )}
+                  </>
                 )
               }}
             />
@@ -231,15 +287,17 @@ const ChatScreen = () => {
                 style={styles.input}
                 placeholderTextColor="#707070"
                 multiline={true}
-                // value={BuyerMessageText}
-                // onChangeText={}
+                value={message}
+                onChangeText={(text) => setMessage(text)}
               />
             </View>
-
+            <TouchableOpacity onPress={filePickerHandler}>
+              <Icon name="attach-file" size={30} />
+            </TouchableOpacity>
             <TouchableOpacity
-              style={styles.sendView}
-              //   onPress={() => setBuyerState(true)}
-            >
+              disabled={!message}
+              style={styles.sendButton}
+              onPress={sendMessage}>
               <Image
                 style={styles.tileImage}
                 source={require('../assets/icons/sendMessage.png')}
@@ -280,8 +338,8 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 80,
-    height: 80,
+    width: 50,
+    height: 50,
     borderRadius: 40,
     // marginRight: 10,
   },
@@ -357,6 +415,7 @@ const styles = StyleSheet.create({
     color: '#707070',
     fontFamily: 'Poppins-Regular',
     fontSize: 12,
+    textAlign: 'center',
   },
   requestView: {
     marginTop: 5,
@@ -372,13 +431,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   searchBarContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
     flexDirection: 'row',
-    marginHorizontal: 20,
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
   },
   searchBarView: {
-    width: '80%',
+    width: '70%',
     borderWidth: 1,
     borderColor: '#707070',
     borderRadius: 30,
@@ -387,15 +446,16 @@ const styles = StyleSheet.create({
   input: {
     color: '#707070',
     fontFamily: 'Poppins-Regular',
-    fontSize: 19,
+    // fontSize: 16,
     textAlignVertical: 'center',
   },
-  sendView: {
+  sendButton: {
     // marginLeft: 10,
     backgroundColor: '#336CF9',
-    width: '15%',
-    height: 50,
-    borderRadius: 40,
+    width: 45,
+    height: 45,
+    borderRadius: 100,
+
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -406,14 +466,14 @@ const styles = StyleSheet.create({
   },
   messageView: {
     borderRadius: 35,
-    paddingVertical: 20,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     width: '80%',
   },
   messageText: {
-    color: '#707070',
+    color: '#000',
     fontFamily: 'Poppins-Regular',
-    fontSize: 12,
+    fontSize: 14,
   },
   timeText: {
     marginTop: 10,

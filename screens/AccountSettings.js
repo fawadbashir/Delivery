@@ -15,7 +15,7 @@ import {
 import {Controller, useForm} from 'react-hook-form'
 import BottomBar from '../components/BottomBar'
 
-import {AuthContext} from '../context/auth'
+import {AppContext} from '../context/auth'
 
 import {useHttpClient} from '../hooks/http-hook'
 import {ActivityIndicator} from 'react-native-paper'
@@ -24,7 +24,7 @@ import Colors from '../constants/colors'
 const AccountSettings = () => {
   const {sendRequest, isLoading, error, clearError} = useHttpClient()
   const [edit, setEdit] = useState(false)
-  const {user, login} = useContext(AuthContext)
+  const {user, login} = useContext(AppContext)
 
   const {
     control,
@@ -35,8 +35,10 @@ const AccountSettings = () => {
   } = useForm({
     mode: 'all',
   })
+  console.log(errors)
 
   const onSubmit = async (data) => {
+    console.log('hello')
     console.log(data)
     try {
       const response = await sendRequest(
@@ -86,7 +88,7 @@ const AccountSettings = () => {
       email: user.email,
       phoneNo: user.userPhone,
 
-      deliverypayId: user.deliveryPayId,
+      deliverypayId: user.deliverypayId,
     })
   }, [reset])
 
@@ -367,7 +369,10 @@ const AccountSettings = () => {
                         alignItems: 'center',
                       }}>
                       <Text style={styles.fieldEdit}>Delivery Pay Id</Text>
-                      <Text style={styles.fieldEdit}>{`${user.email}`}</Text>
+                      <Text
+                        style={
+                          styles.fieldEdit
+                        }>{`${user.deliverypayId.substring(0, 20)}`}</Text>
                       <TouchableOpacity
                         onPress={() => {
                           setEdit(true)
@@ -387,8 +392,6 @@ const AccountSettings = () => {
                         name="deliverypayId"
                         rules={{
                           required: true,
-                          pattern:
-                            /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                         }}
                         render={({field: {value, onChange}}) => (
                           <TextInput

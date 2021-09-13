@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState, useContext} from 'react'
 import {createStackNavigator} from '@react-navigation/stack'
 import Login from '../screens/Auth/Login'
 import SignUp from '../screens/Auth/SignUp'
@@ -22,7 +22,17 @@ import Deal from '../screens/Deal'
 import TransactionHistory from '../screens/TransactionHistory'
 
 import AccountSettings from '../screens/AccountSettings'
-import Chat from '../screens/Chat'
+import ChatScreen from '../screens/ChatScreen'
+import MyOrders from '../screens/Buyer/MyOrders'
+import DisputeResloution from '../screens/Buyer/DisputeResolution'
+import PendingOrders from '../screens/Buyer/PendingOrders'
+import CurrentOrders from '../screens/Buyer/CurrentOrders'
+import {io} from 'socket.io-client'
+
+import {AppContext} from '../context/auth'
+import OrderHistory from '../screens/Buyer/OrderHistory'
+import OrderSummary from '../screens/Buyer/OrderSummary'
+import DisputeSummary from '../screens/Buyer/DisputeSummary'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -43,6 +53,27 @@ export const AuthNavigator = () => {
 }
 
 export const MainNavigator = () => {
+  const {user} = useContext(AppContext)
+  const [rooms, setRooms] = useState([])
+  const socket = io('https://deliverypay.in', {
+    extraHeaders: {
+      test: '1',
+      cookie: user.cookie,
+    },
+    transports: ['websocket'],
+  })
+  socket.connect()
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect()
+    }
+    socket.on('messageToUser', (response) =>
+      console.log(response, 'messageToUserfrom deal'),
+    )
+
+    return () => socket.disconnect()
+  }, [socket])
+
   return (
     <>
       <MainStack.Navigator
@@ -60,7 +91,16 @@ export const MainNavigator = () => {
         <MainStack.Screen name="wallet" component={Wallet} />
         <MainStack.Screen name="addAddress" component={AddAddress} />
         <MainStack.Screen name="editAdress" component={EditAddress} />
-        <MainStack.Screen name="deal" component={Deal} />
+        <MainStack.Screen name="deal">
+          {(props) => (
+            <Deal
+              {...props}
+              socket={socket}
+              rooms={rooms}
+              setRooms={setRooms}
+            />
+          )}
+        </MainStack.Screen>
         <MainStack.Screen
           name="wallet/history"
           component={TransactionHistory}
@@ -69,8 +109,29 @@ export const MainNavigator = () => {
         <MainStack.Screen name="hold" component={Hold} />
         <MainStack.Screen name="paymentMethod" component={PaymentMethod} />
         <MainStack.Screen name="holeTransaction" component={HoleTransaction} />
-        <MainStack.Screen name="chat" component={Chat} />
+        <MainStack.Screen name="chat">
+          {(props) => <ChatScreen {...props} socket={socket} rooms={rooms} />}
+        </MainStack.Screen>
         <MainStack.Screen name="settings" component={AccountSettings} />
+        <MainStack.Screen name="orders/myOrders" component={MyOrders} />
+        <MainStack.Screen
+          name="orders/pendingOrders"
+          component={PendingOrders}
+        />
+        <MainStack.Screen
+          name="orders/disputes"
+          component={DisputeResloution}
+        />
+        <MainStack.Screen
+          name="orders/CurrentOrders"
+          component={CurrentOrders}
+        />
+        <MainStack.Screen name="orders/orderHistory" component={OrderHistory} />
+        <MainStack.Screen name="orders/summary" component={OrderSummary} />
+        <MainStack.Screen
+          name="orders/disputeSummary"
+          component={DisputeSummary}
+        />
       </MainStack.Navigator>
     </>
   )

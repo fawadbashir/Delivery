@@ -20,6 +20,7 @@
     "react-hook-form": "^7.12.1",
     "react-native": "0.64.2",
     "react-native-chart-kit": "^6.11.0",
+    "react-native-document-picker": "^6.0.4",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-linear-gradient": "^2.5.6",
     "react-native-paper": "^4.9.2",

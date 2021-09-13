@@ -1,9 +1,9 @@
 import React, {createContext, useState} from 'react'
 
-export const AuthContext = createContext({})
+export const AppContext = createContext({})
 
-export const AuthProvider = (props) => {
-  const [user, setUser] = useState({userId: '', userPhone: ''})
+export const AppProvider = (props) => {
+  const [user, setUser] = useState()
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [otp, setOtp] = useState([])
   const [userType, setUserType] = useState('')
@@ -22,6 +22,7 @@ export const AuthProvider = (props) => {
   const login = (user) => {
     setUser(user)
   }
+  const logout = () => setUser(null)
 
   const changeUserType = (user) => {
     setUserType(user)
@@ -30,7 +31,7 @@ export const AuthProvider = (props) => {
   const userForgotPassword = () => setIsForgotPassword(true)
 
   return (
-    <AuthContext.Provider
+    <AppContext.Provider
       value={{
         login,
         user,
@@ -42,8 +43,9 @@ export const AuthProvider = (props) => {
         changeUserType,
         userType,
         setOtp,
+        logout,
       }}>
       {props.children}
-    </AuthContext.Provider>
+    </AppContext.Provider>
   )
 }

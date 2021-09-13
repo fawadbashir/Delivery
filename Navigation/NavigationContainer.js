@@ -4,13 +4,13 @@ import {NavigationContainer} from '@react-navigation/native'
 import {AuthNavigator} from './AppNavigation'
 import {MainNavigator} from './AppNavigation'
 import BottomBar from '../components/BottomBar'
-import {AuthContext} from '../context/auth'
+import {AppContext} from '../context/auth'
 
 const AppNavigationContainer = () => {
-  const {user} = useContext(AuthContext)
+  const {user} = useContext(AppContext)
   return (
     <NavigationContainer>
-      {user.userId ? <MainNavigator /> : <AuthNavigator />}
+      {user ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   )
 }

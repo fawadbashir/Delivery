@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {
   Image,
   StyleSheet,
@@ -13,9 +13,10 @@ import {
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import BottomBar from '../components/BottomBar'
-import CommonSearch from '../components/CommonSearch'
+import {AppContext} from '../context/auth'
 
 const ContactUs = () => {
+  const {logout} = useContext(AppContext)
   const [queries, setQueries] = useState('')
   const window = useWindowDimensions()
   const updateText = (text) => {
@@ -42,7 +43,10 @@ const ContactUs = () => {
               </View>
             </View>
             <View style={styles.actionsContainer}>
-              <TouchableOpacity style={styles.actionButton} activeOpacity={0.6}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                activeOpacity={0.6}
+                onPress={logout}>
                 <Image
                   source={require('../assets/logoutIcon.png')}
                   style={{width: 40, height: 30}}

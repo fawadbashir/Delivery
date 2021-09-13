@@ -19,7 +19,7 @@ import {Card} from 'react-native-paper'
 import AuthButton from '../../components/AuthButton'
 import Input from '../../components/Input'
 import {useHttpClient} from '../../hooks/http-hook'
-import {AuthContext} from '../../context/auth'
+import {AppContext} from '../../context/auth'
 
 import Colors from '../../constants/colors'
 
@@ -28,7 +28,7 @@ const ForgotPassword = (props) => {
 
   // const window = useWindowDimensions()
 
-  const {login, userForgotPassword} = useContext(AuthContext)
+  const {login, userForgotPassword} = useContext(AppContext)
 
   const {sendRequest, clearError, error, isLoading} = useHttpClient()
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useContext} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -10,24 +10,27 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native'
-import {io} from 'socket.io-client'
 
 import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 
 import {useHttpClient} from '../hooks/http-hook'
+import {AuthContext} from '../context/auth'
 
 const Deal = (props) => {
-  const [rooms, setRooms] = useState([])
-  const socket = io('https://deliverypay.in', {
-    extraHeaders: {
-      test: '1',
-      cookie:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZWxpdmVyeVBheSIsInN1YiI6IjYxMjc2MzlkMGM5YTAzNTBhNDU1YjU5YSIsImlhdCI6MTYyOTk3MTQyMn0.vlQkrrstkcUmweaPRgoE8h7r5Dtrz4NgPvLs0_tU18c',
-    },
-  })
+  const {socket, rooms, setRooms} = props
+
+  // const [rooms, setRooms] = useState([])
+  // const socket = io('https://deliverypay.in', {
+  //   extraHeaders: {
+  //     test: '1',
+  //     cookie:
+  //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkZWxpdmVyeVBheSIsInN1YiI6IjYxMDJkMzM5MTBlODI2NjUzZDAzNmE3NCIsImlhdCI6MTYzMTE5NzgzOX0.9y9-99DRkko8ZGmy-OEIf_JW-f1S_1KoizXQul8EUus',
+  //   },
+  // })
+  // socket.connect()
   // console.log(socket.id)
-  socket.connect()
+  // socket.connect()
   // useEffect(() => {
   // socket.on('connect', (response) => console.log(response, 'connect'))
   //   //socket.on('test', (r) => console.log(socket.id, 'test'))
@@ -50,41 +53,28 @@ const Deal = (props) => {
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
 
   const searchChat = (text) => {
-    if (text) {
-      setChats((oldChats) => [
-        ...oldChats.filter((chat) =>
-          chat.phone.toLowerCase().includes(text.toLowerCase()),
-        ),
-      ])
-    } else {
-      setChats(oldChat.current)
-    }
+    // if (text) {
+    //   setChats((oldChats) => [
+    //     ...oldChats.filter((chat) =>
+    //       chat.phone.toLowerCase().includes(text.toLowerCase()),
+    //     ),
+    //   ])
+    // } else {
+    //   setChats(oldChat.current)
+    // }
   }
+  console.log(socket.connected)
 
   useEffect(() => {
+    const abrtCntrl = new AbortController()
     const unsubscribe = props.navigation.addListener('focus', async () => {
-      socket.connect()
       try {
-        const response = await fetch('https://deliverypay.in/api/getChat')
-        // console.log(response)
-        // const response = await sendRequest('https://deliverypay.in/api/getChat')
+        // if (chats.length === 0) {
+        const response = await fetch('https://deliverypay.in/api/getChat', {})
         const resData = await response.json()
-        socket.on('connect', () => console.log(socket.connected))
-        //socket.on('test', (r) => console.log(socket.id, 'test'))
-        socket.on('connectedToRoom', (r) => {
-          console.log(r)
-          setRooms(r)
+        socket.emit('joinRooms', {
+          rooms: resData.map((contact) => contact._id),
         })
-        socket.emit('joinRooms', {rooms})
-        // socket.emit(
-        //   'initiateChat',
-        //   {client_id: '60f1f3e065c83205eb57c392'},
-        //   (y) => console.log(y, 'initiateChat'),
-        // )
-        // socket.on('messageToUser', (response) =>
-        //   console.log(response, 'messageToUser'),
-        // )
-        // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
         const validArray = resData.map((chat) => ({
           id: chat._id,
           firstName: chat.client.firstName,
@@ -93,30 +83,41 @@ const Deal = (props) => {
           phone: chat.client.phone,
           image: chat.client.profileImg,
           clientId: chat.client._id,
+          messages: chat.messages,
         }))
         console.log(resData)
-        // console.log(resData)
-        // // console.log(validArray)
-        // if (error) {
-        //   Alert.alert('Error', error, [{onPress: () => clearError()}])
-        //   return
+
+        setChats(validArray)
         // }
-        // setChats(validArray)
-        // oldChat.current = validArray
-        // socket.emit(
-        //   'joinRooms',
-        //   {
-        //     rooms: response.map((room) => room._id),
-        //   },
-        //   (response1) => console.log(response1, 'response1'),
-        // )
+        // console.log(response)
+        // const response = await sendRequest('https://deliverypay.in/api/getChat')
+        //socket.on('connect', () => console.log(socket.id, 'socketId'))
+
+        //socket.on('test', (r) => console.log(socket.id, 'test'))
+
+        socket.on('connectedToRoom', (r) => {
+          console.log(r)
+          setRooms(r.rooms.map((room) => room))
+        })
+
+        socket.emit(
+          'initiateChat',
+          {client_id: '60fee8603435a87f6a609ec6'},
+          (y) => console.log(y, 'initiateChat'),
+        )
+
+        socket.on('messageToUser', (response) =>
+          console.log(response, 'messageToUserfrom deal'),
+        )
+
+        // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
       } catch (e) {
-        // console.log(e)
+        Alert.alert('Error', e.message)
       }
     })
 
     return unsubscribe
-  }, [props.navigation])
+  }, [props.navigation, setRooms, socket])
   return (
     <>
       <Header />
@@ -136,18 +137,15 @@ const Deal = (props) => {
         </View>
         <View
           style={{
-            height: window.height < 700 ? 315 : 365,
-            // marginBottom: 10,
+            height: window.height < 700 ? 315 : 386,
+
             paddingTop: 10,
-            // paddingBottom: 10,
-            // top: -10,
+
             paddingHorizontal: 10,
           }}>
           <FlatList
-            // style={{marginBottom: 10}}
             data={chats}
             keyExtractor={(item, index) => item.id}
-            //   numColumns={3}
             renderItem={({item}) => {
               // console.log(item)
               return (
@@ -178,23 +176,48 @@ const Deal = (props) => {
                   <TouchableOpacity
                     style={styles.chartStatusView}
                     onPress={() => {
-                      console.log('es')
+                      // console.log('es')
+                      // socket.on('connectedToRoom', (r) => {
+                      //   console.log(r, 'rrom')
+                      //   setRooms(r)
+                      // })
                       // socket.emit(
                       //   'initiateChat',
-                      //   {client_id: '60f1f3e065c83205eb57c392'},
+                      //   {client_id: item.clientId},
                       //   (y) => console.log(y, 'initiateChat'),
                       // )
-                      // socket.on('connectedToRoom', (r) => console.log('test'))
+
+                      // socket.emit('joinRooms', {rooms})
+                      console.log(rooms)
+                      // socket.emit('messageToServer', {
+                      //   rooms,
+                      //   message: {
+                      //     text: 'hello',
+                      //     to: '60fee8603435a87f6a609ec6',
+                      //   },
+                      // })
+
                       // socket.on('messageToUser', (response) =>
                       //   console.log(response, 'messageToUser'),
                       // )
 
-                      // props.navigation.navigate('chat', {
-                      //   chatId: item.clientId,
-                      // })
+                      props.navigation.navigate('chat', {
+                        rooms,
+                        email: item.email,
+                        name: `${item.firstName}`,
+                        clientId: item.clientId,
+
+                        messages: item.messages,
+                      })
                     }}>
                     <Text style={styles.chartStatus}>Chat</Text>
                   </TouchableOpacity>
+                  {/* <TouchableOpacity
+                    onPress={() =>
+                      
+                    }>
+                    <Text>hello</Text>
+                  </TouchableOpacity> */}
                 </View>
                 // </View>
               )

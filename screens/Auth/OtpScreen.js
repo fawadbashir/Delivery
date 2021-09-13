@@ -11,7 +11,7 @@ import colors from '../../constants/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import fetch from 'node-fetch'
 
-import {AuthContext} from '../../context/auth'
+import {AppContext} from '../../context/auth'
 
 import {useHttpClient} from '../../hooks/http-hook'
 import {ActivityIndicator} from 'react-native-paper'
@@ -19,7 +19,7 @@ import {ActivityIndicator} from 'react-native-paper'
 const OtpScreen = (props) => {
   // const [otp, setOtp] = useState([])
   const {user, isForgotPassword, otp, addToOtp, clearOtpValue, login, setOtp} =
-    useContext(AuthContext)
+    useContext(AppContext)
 
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const {

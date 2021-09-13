@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import Header from '../components/Header'
 import {
   Text,
@@ -11,65 +11,27 @@ import {
   Alert,
 } from 'react-native'
 
+import {Modal, Portal} from 'react-native-paper'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
-import Colors from '../constants/colors'
+
 import {useHttpClient} from '../hooks/http-hook'
-import {Modal, Portal} from 'react-native-paper'
+import ApproveDecline from '../components/ApproveDecline'
+import ReleaseConfirm from '../components/ReleaseConfirm'
+import DisputeModal from '../components/DisputeModal'
 
-const Data = [
-  {
-    id: '1',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    role: 'Buyer',
-    transactionId: '9598464165',
-    product: 'Mobile',
-    status: 'Released',
-  },
-
-  {
-    id: '2',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    role: 'Seller',
-    transactionId: '9598464165',
-    product: 'Mobile',
-    status: 'Released',
-  },
-  {
-    id: '3',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    role: 'Buyer',
-    transactionId: '9598464165',
-    product: 'Mobile',
-    status: 'Manual Verification',
-  },
-  {
-    id: '4',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    role: 'Buyer',
-    transactionId: '9598464165',
-    product: 'Seller',
-    status: 'Hold',
-  },
-  {
-    id: '5',
-    image: require('../assets/profile.jpg'),
-    name: 'Teja Pujari',
-    role: 'Seller',
-    transactionId: '9598464165',
-    product: 'Mobile',
-    status: 'Hold',
-  },
-]
 const Hold = (props) => {
   const window = useWindowDimensions()
   const [milestones, setMilestones] = useState([])
   const [milestoneId, setMilestoneId] = useState()
+  const [amount, setAmount] = useState()
   const [visible, setVisible] = useState(false)
+  const [approveVisible, setApproveVisible] = useState(false)
+  const [releaseVisible, setReleaseVisible] = useState(false)
+  const [transactionModal, setTransactionModal] = useState()
+  const [clientId, setClientId] = useState()
+  const [disputeVisible, setDisputeVisible] = useState(false)
+  const [role, setRole] = useState()
 
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const {
@@ -103,40 +65,128 @@ const Hold = (props) => {
     }
   }
 
-  useEffect(() => {
-    const unsubscribe = props.navigation.addListener('focus', async () => {
-      try {
-        const response = await sendRequest(
-          'https://deliverypay.in/api/milestone',
-        )
+  const detailModal = () => {
+    return (
+      <Portal>
+        <Modal
+          visible={transactionModal}
+          dismissable={true}
+          onDismiss={() => setTransactionModal(null)}
+          contentContainerStyle={{
+            backgroundColor: 'white',
+            width: '95%',
+            // height: 200,
+            padding: 30,
+            justifyContent: 'center',
+            alignSelf: 'center',
+            borderRadius: 10,
+            // alignItems: 'center',
+          }}>
+          <Text style={modalStyles.heading}>Transaction Detail</Text>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Name:</Text>
+            <Text style={modalStyles.text}> {transactionModal?.name}</Text>
+          </View>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Role:</Text>
+            <Text style={modalStyles.text}>{transactionModal?.role}</Text>
+          </View>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Status:</Text>
+            <Text style={modalStyles.text}> {transactionModal?.status}</Text>
+          </View>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Product:</Text>
+            <Text style={modalStyles.text}> {transactionModal?.product}</Text>
+          </View>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Transaction ID:</Text>
+            <Text style={modalStyles.text}>
+              {'   '}
+              {transactionModal?.transactionId}
+            </Text>
+          </View>
+          <View style={modalStyles.detailContainer}>
+            <Text style={modalStyles.text}>Amount</Text>
+            <Text style={modalStyles.text}>
+              {'   '}
+              {transactionModal?.amount}
+            </Text>
+          </View>
+        </Modal>
+      </Portal>
+    )
+  }
 
-        console.log(response)
+  const modalStyles = StyleSheet.create({
+    detailContainer: {flexDirection: 'row', justifyContent: 'space-between'},
+    text: {
+      fontSize: 16,
+      fontFamily: 'Poppins-Regular',
+    },
+    heading: {
+      textAlign: 'center',
+      fontSize: 22,
+      marginBottom: 20,
+    },
+  })
 
-        const validMileStones = response.milestones.map((milestone) => ({
-          id: milestone._id,
-          status: milestone.status,
-          amount: milestone.amount,
-          description: milestone.dscr,
-          date: milestone.createdAt,
-          firstName: milestone.client.firstName,
-          lastName: milestone.client.lastName,
-          image: milestone.client.profileImg,
-          role: milestone.role,
-        }))
-        setMilestones(validMileStones)
-        if (error) {
-          Alert.alert('Error', error, [{onPress: () => clearError()}])
-        }
-      } catch (e) {
-        e
+  const getMilestones = useCallback(async () => {
+    try {
+      const response = await sendRequest('https://deliverypay.in/api/milestone')
+
+      console.log(response)
+
+      const validMileStones = response.milestones.map((milestone) => ({
+        id: milestone._id,
+        status: milestone.status,
+        amount: milestone.amount,
+        description: milestone.dscr,
+        date: milestone.createdAt,
+        firstName: milestone.client.firstName,
+        lastName: milestone.client.lastName,
+        image: milestone.client.profileImg,
+        role: milestone.role,
+        clientId: milestone.client._id,
+      }))
+      setMilestones(validMileStones)
+      if (error) {
+        Alert.alert('Error', error, [{onPress: () => clearError()}])
       }
-    })
+    } catch (e) {
+      e
+    }
+  }, [clearError, error, sendRequest])
+
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', getMilestones)
 
     return unsubscribe
-  }, [clearError, error, props.navigation, sendRequest])
+  }, [getMilestones, props.navigation])
 
   return (
     <>
+      <DisputeModal
+        id={milestoneId}
+        clientId={clientId}
+        open={disputeVisible}
+        setOpen={setDisputeVisible}
+        role={role}
+      />
+      <ReleaseConfirm
+        open={releaseVisible}
+        setOpen={setReleaseVisible}
+        id={milestoneId}
+      />
+      {approveVisible && (
+        <ApproveDecline
+          open={approveVisible}
+          setOpen={setApproveVisible}
+          id={milestoneId}
+          amount={amount}
+        />
+      )}
+      {detailModal()}
       <Header />
       <View style={styles.screen}>
         <View style={styles.secureTransactionView}>
@@ -154,15 +204,28 @@ const Hold = (props) => {
           <Text style={styles.headingText}>Product</Text>
           <Text style={styles.headingText}>Status</Text>
         </View>
-        <View style={styles.list}>
+        <View>
           <FlatList
+            style={{marginBottom: 40}}
             initialNumToRender={7}
             data={milestones}
             keyExtractor={(item) => item.id}
             renderItem={({item}) => {
               return (
-                <View>
-                  <View style={styles.innerList}>
+                <>
+                  <TouchableOpacity
+                    style={styles.innerList}
+                    activeOpacity={0.7}
+                    onPress={() =>
+                      setTransactionModal({
+                        name: `${item.firstName} ${item.lastName}`,
+                        role: `${item.role}`,
+                        transactionId: item.id,
+                        status: item.status,
+                        product: item.description,
+                        amount: item.amount,
+                      })
+                    }>
                     <View style={styles.nameView}>
                       <Image style={styles.image} source={{uri: item.image}} />
                       <Text style={styles.name}>
@@ -180,12 +243,19 @@ const Hold = (props) => {
                       </Text>
                     </View>
                     <View style={styles.productView}>
-                      <Text style={styles.product}>{item.description}</Text>
+                      <Text style={styles.product}>
+                        {item.description.substring(0, 5)}
+                      </Text>
                     </View>
-                    {(item.status === 'pending' || 'pendingRelease') && (
+                    {item.status === 'pendingRelease' && (
                       <TouchableOpacity
                         activeOpacity={0.6}
-                        onPress={cancelRequest.bind(this, item.id)}>
+                        onPress={() => {
+                          setDisputeVisible(true)
+                          setClientId(item.clientId)
+                          setMilestoneId(item.id)
+                          setRole(item.role)
+                        }}>
                         {/* <View style={styles.statusView}> */}
                         <LinearGradient
                           colors={
@@ -200,11 +270,15 @@ const Hold = (props) => {
                         </LinearGradient>
                       </TouchableOpacity>
                     )}
-                    {item.status === 'declined' && (
+
+                    {item.status === 'pending' && (
                       <TouchableOpacity
-                        disabled={true}
                         activeOpacity={0.6}
-                        onPress={cancelRequest.bind(this, item.id)}>
+                        onPress={() => {
+                          setApproveVisible(true)
+                          setMilestoneId(item.id)
+                          setAmount(item.amount)
+                        }}>
                         {/* <View style={styles.statusView}> */}
                         <LinearGradient
                           colors={
@@ -215,73 +289,74 @@ const Hold = (props) => {
                           // start={{x: 0, y: 0}}
                           // end={{x: 1, y: 0}}
                           style={styles.statusView}>
-                          <Text style={styles.status}>Declined</Text>
+                          <Text style={styles.status}>Pending</Text>
                         </LinearGradient>
                       </TouchableOpacity>
                     )}
-                  </View>
-                  {/* <View style={styles.roleCheckMainView}>
-                    <View style={styles.roleCheckView}> */}
-                  {/* {item.role == 'Seller' ? (
-                        <View>
-                          <Text style={styles.roleCheckText}>
-                            Are you confrim to release money.
-                          </Text>
-                          <View style={styles.roleOptions}>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                // colors={['#0A0A0A', '#0091FF', '#BCE0FD']}
-                                colors={['#0091FF', '#BCE0FD']}
-                                style={styles.statusView}
-                                // start={{x: 0, y: 0}}
-                                // end={{x: 1, y: 0}}
-                              >
-                                <Text style={styles.optionText}>Confirm</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#336CF9', '#F64BBD']}
-                                style={styles.statusView}
-                                start={{x: 0, y: 0}}
-                                end={{x: 1, y: 0}}>
-                                <Text style={styles.optionText}>Decline</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      ) : (
-                        <View>
-                          <Text style={styles.roleCheckText}>
-                            You feel like you are getting scammed?
-                          </Text>
-                          <View style={styles.roleOptions}>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#0091FF', '#BCE0FD']}
-                                style={styles.statusView}
-                                // start={{x: 0, y: 0}}
-                                // end={{x: 1, y: 0}}
-                              >
-                                <Text style={styles.optionText}>Yes</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                              <LinearGradient
-                                colors={['#336CF9', '#F64BBD']}
-                                style={styles.statusView}
-                                // start={{x: 0, y: 0}}
-                                // end={{x: 1, y: 0}}
-                              >
-                                <Text style={styles.optionText}>No</Text>
-                              </LinearGradient>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )} */}
-                  {/* </View>
-                  </View> */}
-                </View>
+
+                    {item.status === 'declined' && (
+                      <TouchableOpacity
+                        disabled={true}
+                        activeOpacity={0.6}
+                        style={styles.declinedButton}>
+                        {/* <View style={styles.statusView}> */}
+
+                        <Text style={styles.declinedText}>Declined</Text>
+                      </TouchableOpacity>
+                    )}
+                    {item.status === 'inProgress' && (
+                      <TouchableOpacity
+                        activeOpacity={0.6}
+                        onPress={() => {
+                          setReleaseVisible(true)
+                          setMilestoneId(item.id)
+                          setAmount(item.amount)
+                        }}>
+                        <LinearGradient
+                          colors={['#1BE6D6', '#013B67']}
+                          style={styles.statusView}>
+                          <Text style={styles.status}>Release</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
+                    {item.status === 'released' && (
+                      <TouchableOpacity
+                        disabled={true}
+                        activeOpacity={0.6}
+                        // onPress={() => {
+                        //   setReleaseVisible(true)
+                        //   setMilestoneId(item.id)
+                        //   setAmount(item.amount)
+                        // }}
+                      >
+                        <LinearGradient
+                          colors={['#1BE6D6', '#013B67']}
+                          style={styles.statusView}>
+                          <Text style={styles.status}>Released</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
+                    {item.status === 'dispute' && (
+                      <TouchableOpacity
+                        activeOpacity={0.6}
+                        onPress={() => {
+                          setDisputeVisible(true)
+                          setMilestoneId(item.id)
+                          setAmount(item.amount)
+                          setRole(item.role)
+                          setClientId(item.clientId)
+                        }}>
+                        <LinearGradient
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 1}}
+                          colors={['#f64bbd', '#ff5757']}
+                          style={styles.statusView}>
+                          <Text style={styles.status}>Approve Dispute</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
+                  </TouchableOpacity>
+                </>
               )
             }}
           />
@@ -299,8 +374,8 @@ const styles = StyleSheet.create({
   },
   secureTransactionView: {
     backgroundColor: '#F9EAF4',
-    borderRadius: 10,
-    height: 130,
+
+    paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -308,25 +383,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Poppins-Regular',
     color: '#0D0E0F',
-    paddingBottom: 10,
+    // paddingBottom: 10,
     textAlign: 'center',
   },
   secureTransactionsubTitle: {
     fontSize: 18,
     fontFamily: 'Poppins-Regular',
     color: '#707070',
-    paddingTop: 10,
+    // paddingTop: 10,
     textAlign: 'center',
   },
   listHeading: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingVertical: 30,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    // paddingHorizontal: 10,
   },
   headingText: {
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: 'Poppins-Regular',
     color: '#2020D5',
   },
@@ -345,11 +420,11 @@ const styles = StyleSheet.create({
     // alignContent: 'center',
     // alignSelf: 'center',
     // paddingVertical: 20,
-    paddingBottom: 50,
+    marginBottom: 10,
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     borderRadius: 60,
   },
   nameView: {
@@ -362,7 +437,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   roleView: {
-    paddingRight: 10,
+    // paddingRight: 10,
   },
   role: {
     fontSize: 13,
@@ -370,7 +445,7 @@ const styles = StyleSheet.create({
     color: '#53AEFC',
   },
   transactionId: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: '#2A2A2A',
   },
@@ -379,17 +454,17 @@ const styles = StyleSheet.create({
     // paddingRight: 5,
   },
   product: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: '#2A2A2A',
   },
 
   statusView: {
     width: 80,
-    // height: 200,
-    paddingLeft: 5,
-    borderRadius: 20,
-    height: 50,
+
+    // padding: 10,
+    borderRadius: 100,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
     // backgroundColor: '#1BE6D6',
@@ -398,6 +473,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'Poppins-Regular',
     color: '#F8FAFF',
+    textAlign: 'center',
   },
   roleCheckMainView: {
     paddingBottom: 50,
@@ -430,6 +506,32 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: 'white',
+  },
+  declinedButton: {
+    borderRadius: 50,
+    borderColor: '#f64bbd',
+    borderWidth: 2,
+    width: 80,
+
+    // padding: 10,
+
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  declinedText: {
+    color: '#f64bbd',
+    fontWeight: '700',
+  },
+  releasedButton: {
+    borderRadius: 50,
+    borderColor: '#2598b6',
+    borderWidth: 2,
+    width: 80,
+  },
+  releasedText: {
+    color: '#2598b6',
+    fontWeight: '700',
   },
 })
 

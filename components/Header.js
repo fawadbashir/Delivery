@@ -2,11 +2,12 @@ import React, {useContext} from 'react'
 import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
-
-import {AuthContext} from '../context/auth'
+import Svg, {Path} from 'react-native-svg'
+import {AppContext} from '../context/auth'
+import colors from '../constants/colors'
 
 const Header = () => {
-  const {user} = useContext(AuthContext)
+  const {user, userType, changeUserType} = useContext(AppContext)
   const navigation = useNavigation()
   return (
     <View style={styles.container}>
@@ -33,6 +34,46 @@ const Header = () => {
         </View>
       </View>
       <View style={styles.actionsContainer}>
+        <View style={{flexGrow: 1, flexDirection: 'row'}}>
+          <View style={styles.choiceContainer}>
+            <TouchableOpacity
+              onPress={() => changeUserType('buyer')}
+              style={[
+                styles.choiceButton,
+                userType === 'buyer' && {
+                  borderRadius: 50,
+                  borderLeftWidth: 0.5,
+                  backgroundColor: colors.purple,
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.inActiveText,
+                  userType === 'buyer' && styles.activeText,
+                ]}>
+                Buyer
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => changeUserType('seller')}
+              style={[
+                styles.choiceButton,
+                userType === 'seller' && {
+                  borderRadius: 50,
+
+                  backgroundColor: colors.blue,
+                },
+              ]}>
+              <Text
+                style={[
+                  styles.inActiveText,
+                  userType === 'seller' && styles.activeText,
+                ]}>
+                Seller
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         {/* <View style={styles.inputContainer}>
           <TextInput
             placeholder="Search"
@@ -47,10 +88,25 @@ const Header = () => {
           style={styles.actionButton}
           activeOpacity={0.6}
           onPress={() => navigation.navigate('settings')}>
-          <Image
+          {/* <Image
             source={require('../assets/settingsIcon2.png')}
             style={{width: 25, height: 25, top: 2}}
-          />
+          /> */}
+          <Svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="25"
+            height="25"
+            style={{top: 2}}
+            viewBox="0 0 15.795 14.752">
+            <Path
+              id="Icon_ionic-ios-settings"
+              data-name="Icon ionic-ios-settings"
+              d="M18.991,11.874A1.907,1.907,0,0,1,20.3,10.1a7.257,7.257,0,0,0-.975-2.193,2.185,2.185,0,0,1-.827.165,2.111,2.111,0,0,1-1.436-.553,1.807,1.807,0,0,1-.42-2.112,8.355,8.355,0,0,0-2.345-.91,2.086,2.086,0,0,1-3.793,0,8.381,8.381,0,0,0-2.349.91,1.8,1.8,0,0,1-.42,2.112,2.144,2.144,0,0,1-2.262.388,7.415,7.415,0,0,0-.971,2.2,1.855,1.855,0,0,1,0,3.541,7.257,7.257,0,0,0,.975,2.193A2.176,2.176,0,0,1,6.3,15.68a2.111,2.111,0,0,1,1.436.553,1.808,1.808,0,0,1,.42,2.108,8.43,8.43,0,0,0,2.349.91,2.082,2.082,0,0,1,3.784,0,8.381,8.381,0,0,0,2.349-.91,1.809,1.809,0,0,1,.42-2.108,2.1,2.1,0,0,1,1.436-.553,2.16,2.16,0,0,1,.823.161,7.3,7.3,0,0,0,.975-2.193A1.915,1.915,0,0,1,18.991,11.874Zm-6.557,3.069A3.186,3.186,0,0,1,9.144,11.87,3.186,3.186,0,0,1,12.435,8.8a3.186,3.186,0,0,1,3.291,3.072A3.186,3.186,0,0,1,12.435,14.943Z"
+              transform="translate(-4.5 -4.5)"
+              fill="#707070"
+              opacity="0.58"
+            />
+          </Svg>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate('contact')}
@@ -118,7 +174,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
 
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   inputContainer: {
@@ -150,6 +206,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     marginHorizontal: 5,
+  },
+
+  choiceContainer: {
+    flexDirection: 'row',
+    // width: '78%',
+    borderWidth: 0.5,
+    borderColor: '#ccc',
+    borderRadius: 50,
+    backgroundColor: '#F5F5F5',
+    elevation: 5,
+
+    // flexGrow: 1,
+  },
+  activeText: {
+    color: 'white',
+    fontFamily: 'Poppins-Regular',
+  },
+  inActiveText: {
+    color: 'black',
+    fontFamily: 'Poppins-Regular',
+  },
+  choiceButton: {
+    backgroundColor: '#F5F5F5',
+    padding: 10,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
   },
 })
 
