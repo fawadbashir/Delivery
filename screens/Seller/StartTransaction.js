@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {
   Text,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
+import {AppContext} from '../../context/auth'
 
 import {useHttpClient} from '../../hooks/http-hook'
 import UserSearchItem from '../../components/UserSearchItem'
@@ -19,8 +20,9 @@ import CommonSearch from '../../components/CommonSearch'
 import {Avatar, Portal, Modal} from 'react-native-paper'
 import {Controller, useForm} from 'react-hook-form'
 import LinearGradient from 'react-native-linear-gradient'
+import {CommonActions} from '@react-navigation/native'
 
-const StartTransaction = () => {
+const StartTransaction = (props) => {
   const {
     control,
     handleSubmit,
@@ -29,6 +31,7 @@ const StartTransaction = () => {
   } = useForm()
 
   const {sendRequest, error, clearError} = useHttpClient()
+  const {userType} = useContext(AppContext)
   const {
     sendRequest: milestoneRequest,
     error: milestoneError,
@@ -127,13 +130,15 @@ const StartTransaction = () => {
           </View>
           <View
             style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
-            <Avatar.Image source={{uri: buyer.image}} />
+            {buyer && <Avatar.Image source={{uri: buyer.image}} />}
             <View style={{alignItems: 'center'}}>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontFamily: 'Poppins-SemiBold',
-                }}>{`${buyer.firstName} ${buyer.lastName}`}</Text>
+              {buyer && (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Poppins-SemiBold',
+                  }}>{`${buyer.firstName} ${buyer.lastName}`}</Text>
+              )}
               <Text>{`${buyer.phone}`}</Text>
               <Text>{`${buyer.email}`}</Text>
             </View>
@@ -203,14 +208,25 @@ const StartTransaction = () => {
         setPayments(response)
 
         if (recentPaymentsError) {
-          Alert.alert('Error', recentPaymentsError)
+          Alert.alert('Error', recentPaymentsError, [{onPress: clearError}])
         }
       } catch (e) {
         e
       }
     }
     getRecentPayments()
-  }, [recentPaymentsRequest])
+  }, [clearError, recentPaymentsError, recentPaymentsRequest])
+
+  useEffect(() => {
+    if (userType === 'buyer') {
+      props.navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'home/chooseCategory'}],
+        }),
+      )
+    }
+  }, [props.navigation, userType])
 
   return (
     <>

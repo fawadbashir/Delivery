@@ -47,6 +47,7 @@ const PendingOrders = ({navigation}) => {
     }
     getOrders()
   }, [error, sendRequest])
+
   return (
     <>
       <Header />
@@ -63,6 +64,14 @@ const PendingOrders = ({navigation}) => {
         />
       ) : (
         <FlatList
+          contentContainerStyle={{flexGrow: 1}}
+          ListEmptyComponent={
+            <View style={styles.emptyListView}>
+              <Text style={styles.emptyListText}>
+                There are no orders. How about starting adding some?
+              </Text>
+            </View>
+          }
           style={{backgroundColor: 'white'}}
           data={orders}
           keyExtractor={(item) => item.id}
@@ -97,6 +106,16 @@ const styles = StyleSheet.create({
   order: {
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
+    textAlign: 'center',
+  },
+  emptyListView: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyListText: {
+    fontSize: 20,
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
   },
 })

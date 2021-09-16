@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useContext} from 'react'
 import {
   TouchableOpacity,
   View,
@@ -6,11 +6,26 @@ import {
   Text,
   ScrollView,
 } from 'react-native'
+import {CommonActions} from '@react-navigation/native'
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
 import colors from '../../constants/colors'
 
+import {AppContext} from '../../context/auth'
+
 const MyOrders = ({navigation}) => {
+  const {userType} = useContext(AppContext)
+
+  useEffect(() => {
+    if (userType === 'seller') {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'home/chooseCategory'}],
+        }),
+      )
+    }
+  }, [navigation, userType])
   return (
     <>
       <Header />

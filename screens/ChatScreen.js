@@ -13,27 +13,83 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native'
 
-import {useRoute} from '@react-navigation/native'
-import {io} from 'socket.io-client'
-
-import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import DocumentPicker from 'react-native-document-picker'
+import {Avatar, Portal, Modal} from 'react-native-paper'
+import {useForm, Controller} from 'react-hook-form'
 
 import {AppContext} from '../context/auth'
+import colors from '../constants/colors'
+import {useHttpClient} from '../hooks/http-hook'
 
 const ChatScreen = (props) => {
   const window = useWindowDimensions()
   const {user} = useContext(AppContext)
-  const {clientId, name, email} = props.route.params
+  const {clientId, name, email, phone, image, seller} = props.route.params
   const {socket, rooms} = props
   const [messages, setMessages] = useState([])
   const [message, setMessage] = useState('')
   const listRef = useRef()
+  const [visible, setVisible] = useState(false)
+  const [payUser, setPayUser] = useState({})
+  const {
+    sendRequest: milestoneRequest,
+    error: milestoneError,
+    clearError: clearMilestoneError,
+    loading: milestoneLoading,
+  } = useHttpClient()
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: {errors, isValid},
+  } = useForm()
+
+  const onSubmit = async (data) => {
+    // console.log(
+    //   JSON.stringify({
+    //     buyer_id: buyer.id,
+    //     amount: data.amount,
+    //     dscr: data.detail,
+    //   }),
+    // )
+
+    try {
+      const response = await milestoneRequest(
+        'https://deliverypay.in/api/createMilestone',
+        'POST',
+
+        JSON.stringify({
+          seller,
+          amount: data.amount,
+          dscr: data.detail,
+          // products: [],
+        }),
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      )
+
+      console.log(response)
+      setVisible(false)
+      Alert.alert('Success', 'Milestone creted')
+      reset()
+    } catch (e) {
+      console.log(e)
+    }
+    if (milestoneError) {
+      Alert.alert('Error', milestoneError, [
+        {onPress: () => clearMilestoneError()},
+      ])
+    }
+  }
 
   const filePickerHandler = async () => {
     try {
@@ -54,10 +110,13 @@ const ChatScreen = (props) => {
       // }
       console.log(response[0])
       const formData = new FormData()
-      formData.append('file')
+      formData.append('file[]', response[0].uri)
       const imageResponse = await fetch(`https://cdn.deliverypay.in/`, {
         body: formData,
         method: 'POST',
+        headers: {
+          Accept: '/',
+        },
       })
       const resData = await imageResponse.json()
       if (!response.ok) {
@@ -71,9 +130,95 @@ const ChatScreen = (props) => {
     }
   }
 
+  const milestoneModal = () => {
+    return (
+      <Portal>
+        <Modal
+          visible={visible}
+          contentContainerStyle={styles.modalContainer}
+          onDismiss={() => {
+            setVisible(false)
+            // setBuyer({})
+            reset()
+          }}>
+          <View style={styles.modalHeadingContainer}>
+            <Text style={styles.modalHeading}>Create Milestone</Text>
+          </View>
+          <View
+            style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            {payUser && <Avatar.Image source={{uri: image}} />}
+            <View style={{alignItems: 'center'}}>
+              {payUser && (
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Poppins-SemiBold',
+                  }}>
+                  {name}
+                </Text>
+              )}
+              <Text>{phone}</Text>
+              <Text>{email}</Text>
+            </View>
+          </View>
+          <Controller
+            control={control}
+            name="amount"
+            rules={{required: true}}
+            render={({field: {value, onChange}}) => (
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Amount"
+                placeholderTextColor="grey"
+                style={[styles.field, errors.amount && styles.redBorder]}
+                keyboardType={'number-pad'}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="detail"
+            rules={{required: true}}
+            render={({field: {value, onChange}}) => (
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Detail"
+                placeholderTextColor="grey"
+                style={[
+                  styles.field,
+                  errors.detail && styles.redBorder,
+                  {width: '80%'},
+                ]}
+              />
+            )}
+          />
+          <TouchableOpacity
+            style={{width: 171, marginVertical: 20}}
+            activeOpacity={0.6}
+            onPress={handleSubmit(onSubmit)}>
+            <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              colors={['#2598b6', '#1BE6D6']}
+              style={{
+                borderRadius: 20,
+                height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.callToActionText}>Create Milestone</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Modal>
+      </Portal>
+    )
+  }
+
   useEffect(() => {
     listRef.current.scrollToEnd()
-  }, [])
+  }, [listRef])
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
@@ -111,6 +256,7 @@ const ChatScreen = (props) => {
 
   return (
     <>
+      {milestoneModal()}
       <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
         <View style={styles.screen}>
           <View style={styles.headingContainer}>
@@ -148,10 +294,7 @@ const ChatScreen = (props) => {
 
           <View style={styles.innerList}>
             <View style={styles.imageView}>
-              <Image
-                style={styles.image}
-                source={require('../assets/profile.jpg')}
-              />
+              <Image style={styles.image} source={{uri: image}} />
             </View>
             <View style={styles.details}>
               <Text style={styles.name}>{`${name}`}</Text>
@@ -162,52 +305,73 @@ const ChatScreen = (props) => {
             <View style={styles.requestStatusView}>
               <Text style={styles.requestStatus}>Connected</Text>
             </View>
+            <View></View>
             <TouchableOpacity
               style={{width: '25%'}}
               activeOpacity={0.6}
               onPress={() => props.navigation.navigate('wallet')}>
               <LinearGradient
-                colors={['#336CF9', '#1BE6D6']}
+                colors={[colors.purple, colors.purple]}
+                style={styles.optionsView}
+                start={{x: 0, y: 0}}
+                end={{x: 1.2, y: 0}}>
+                <Text style={styles.optionText}>View Shop</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.payView}>
+            {/* <View style={{width: '75%'}}> */}
+            <TouchableOpacity
+              style={{width: '25%'}}
+              activeOpacity={0.6}
+              onPress={() => {
+                setVisible(true)
+              }}>
+              <LinearGradient
+                colors={[colors.purple, colors.purple]}
                 style={styles.optionsView}
                 start={{x: 0, y: 0}}
                 end={{x: 1.2, y: 0}}>
                 <Text style={styles.optionText}>Pay</Text>
               </LinearGradient>
             </TouchableOpacity>
-          </View>
-          <View style={styles.payView}>
-            {/* <View style={{width: '75%'}}> */}
             <Text style={styles.payText}>
               Click on pay if your deal is done it will be debited to Delivery
               Pay wallet with {name}
             </Text>
             {/* </View> */}
           </View>
-          <View style={styles.requestView}>
+          {/* <View style={styles.requestView}>
             <Image
               style={styles.tileImage}
               source={require('../assets/icons/arrow.png')}
             />
             <Text style={styles.requestText}>Your request is pending</Text>
-          </View>
-          <View
+          </View> */}
+          {/* <View
             style={{
               height: window.height < 700 ? 314 : 385,
               // marginVertical: 5,
-            }}>
-            <FlatList
-              // initialNumToRender={50}
-              data={messages}
-              extraData={true}
-              ref={(ref) => (listRef.current = ref)}
-              keyExtractor={(item, index) => item._id}
-              renderItem={({item}) => {
-                if (item.media) {
-                  console.log(item.media)
-                }
-                return item.from !== props.route.params.clientId ? (
-                  <>
-                    {/* {item.media ? (
+            }}> */}
+          <FlatList
+            // initialNumToRender={50}
+            data={messages}
+            style={{height: window.height < 700 ? 314 : 385}}
+            // contentContainerStyle={{
+            //   // flexGrow: 1,
+
+            //   height: window.height < 700 ? 314 : 385,
+            // }}
+            extraData={true}
+            ref={(ref) => (listRef.current = ref)}
+            keyExtractor={(item, index) => item._id}
+            renderItem={({item}) => {
+              if (item.media) {
+                console.log(item.media)
+              }
+              return item.from !== props.route.params.clientId ? (
+                <>
+                  {/* {item.media ? (
                       <Image
                         source={{
                           uri: item.media,
@@ -215,70 +379,70 @@ const ChatScreen = (props) => {
                         style={{width: 15, height: 15}}
                       />
                     ) : ( */}
-                    {item.media ? (
-                      <Image
-                        source={{uri: item.media}}
-                        resizeMethod="scale"
-                        style={{
-                          width: 200,
-                          height: 200,
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    ) : (
+                  {item.media ? (
+                    <Image
+                      source={{uri: item.media}}
+                      resizeMethod="scale"
+                      style={{
+                        width: 200,
+                        height: 200,
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  ) : (
+                    <View
+                      style={[
+                        styles.messageContainer,
+                        {alignItems: 'flex-end'},
+                      ]}>
                       <View
                         style={[
-                          styles.messageContainer,
-                          {alignItems: 'flex-end'},
+                          styles.messageView,
+                          {
+                            backgroundColor: '#F9EAF4',
+                            borderBottomLeftRadius: 0,
+                          },
                         ]}>
-                        <View
-                          style={[
-                            styles.messageView,
-                            {
-                              backgroundColor: '#F9EAF4',
-                              borderBottomLeftRadius: 0,
-                            },
-                          ]}>
-                          <Text style={styles.messageText}>{item.text}</Text>
-                        </View>
-                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                        <Text style={styles.messageText}>{item.text}</Text>
                       </View>
-                    )}
-                    {/* )} */}
-                  </>
-                ) : (
-                  <>
-                    {item.media ? (
-                      <Image
-                        source={{uri: item.media}}
-                        resizeMethod="scale"
-                        style={{
-                          width: 200,
-                          height: 200,
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    ) : (
-                      <View style={styles.messageContainer}>
-                        <View
-                          style={[
-                            styles.messageView,
-                            {
-                              // marginBottom: 0,
-                              backgroundColor: '#BCE0FD',
-                              borderBottomRightRadius: 0,
-                            },
-                          ]}>
-                          <Text style={styles.messageText}>{item.text}</Text>
-                        </View>
-                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                      {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                    </View>
+                  )}
+                  {/* )} */}
+                </>
+              ) : (
+                <>
+                  {item.media ? (
+                    <Image
+                      source={{uri: item.media}}
+                      resizeMethod="scale"
+                      style={{
+                        width: 200,
+                        height: 200,
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  ) : (
+                    <View style={styles.messageContainer}>
+                      <View
+                        style={[
+                          styles.messageView,
+                          {
+                            // marginBottom: 0,
+                            backgroundColor: '#BCE0FD',
+                            borderBottomRightRadius: 0,
+                          },
+                        ]}>
+                        <Text style={styles.messageText}>{item.text}</Text>
                       </View>
-                    )}
-                  </>
-                )
-              }}
-            />
-          </View>
+                      {/* <Text style={styles.timeText}>{item.time}</Text> */}
+                    </View>
+                  )}
+                </>
+              )
+            }}
+          />
+          {/* </View> */}
 
           <View style={styles.searchBarContainer}>
             <View style={styles.searchBarView}>
@@ -409,17 +573,19 @@ const styles = StyleSheet.create({
     // marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
+
     marginHorizontal: 5,
   },
   payText: {
     color: '#707070',
     fontFamily: 'Poppins-Regular',
-    fontSize: 12,
-    textAlign: 'center',
+    fontSize: 11,
+    width: '75%',
+    // textAlign: 'center',
   },
   requestView: {
     marginTop: 5,
-    // marginHorizontal: 20,
+
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -481,6 +647,43 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 14,
     marginRight: 10,
+  },
+  modalHeadingContainer: {
+    borderBottomColor: '#aaa',
+    borderBottomWidth: 2,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalHeading: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Regular',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    width: '80%',
+    paddingVertical: 10,
+    alignSelf: 'center',
+    borderRadius: 20,
+  },
+  field: {
+    borderBottomWidth: 2,
+    fontSize: 16,
+    width: '40%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    // alignItems: 'center',
+    borderBottomColor: '#cccc',
+    marginTop: 10,
+  },
+  redBorder: {
+    borderBottomColor: '#c12323',
+  },
+  callToActionText: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 16,
+    color: '#fff',
   },
 })
 

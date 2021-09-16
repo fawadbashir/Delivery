@@ -1,5 +1,12 @@
 import React, {useContext} from 'react'
-import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
+import {
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
 import Svg, {Path} from 'react-native-svg'

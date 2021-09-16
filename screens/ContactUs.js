@@ -14,13 +14,23 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import BottomBar from '../components/BottomBar'
 import {AppContext} from '../context/auth'
+import {useHttpClient} from '../hooks/http-hook'
 
-const ContactUs = () => {
-  const {logout} = useContext(AppContext)
+const ContactUs = (props) => {
+  const {logout, userType} = useContext(AppContext)
   const [queries, setQueries] = useState('')
   const window = useWindowDimensions()
-  const updateText = (text) => {
-    setQueries(text)
+  const {sendRequest, error} = useHttpClient()
+
+  const searchQueries = async (text) => {
+    try {
+      const response = await sendRequest(
+        `https://deliverypay.in/api/faq?audience=${userType}&q=${text}`,
+      )
+      console.log(response)
+    } catch (e) {
+      e
+    }
   }
 
   return (
@@ -160,11 +170,14 @@ const ContactUs = () => {
               placeholder={'Search Ur Queries'}
               style={styles.input}
               placeholderTextColor="#707070"
-              value={queries}
-              onChangeText={updateText}
+              // value={queries}
+              onChangeText={searchQueries}
             />
-            <TouchableOpacity style={styles.inputButton}>
-              <Text style={styles.inputButtonText}>My ticket</Text>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              style={styles.inputButton}
+              onPress={() => props.navigation.navigate('tickets')}>
+              <Text style={styles.inputButtonText}>My Tickets</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.shareContainer}>

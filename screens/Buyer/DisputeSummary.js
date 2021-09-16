@@ -1,13 +1,5 @@
 import React, {useEffect, useState, useContext} from 'react'
-import {
-  TouchableOpacity,
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Alert,
-  Image,
-} from 'react-native'
+import {View, StyleSheet, Text, ScrollView, Alert} from 'react-native'
 import {CommonActions} from '@react-navigation/native'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'

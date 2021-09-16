@@ -33,6 +33,8 @@ import {AppContext} from '../context/auth'
 import OrderHistory from '../screens/Buyer/OrderHistory'
 import OrderSummary from '../screens/Buyer/OrderSummary'
 import DisputeSummary from '../screens/Buyer/DisputeSummary'
+import Tickets from '../screens/Tickets'
+import TicketDetails from '../screens/TicketDetail'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -60,7 +62,7 @@ export const MainNavigator = () => {
       test: '1',
       cookie: user.cookie,
     },
-    transports: ['websocket'],
+    transports: ['polling'],
   })
   socket.connect()
   useEffect(() => {
@@ -132,6 +134,8 @@ export const MainNavigator = () => {
           name="orders/disputeSummary"
           component={DisputeSummary}
         />
+        <MainStack.Screen name="tickets" component={Tickets} />
+        <MainStack.Screen name="ticketDetail" component={TicketDetails} />
       </MainStack.Navigator>
     </>
   )

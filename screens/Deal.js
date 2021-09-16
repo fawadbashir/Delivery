@@ -48,25 +48,65 @@ const Deal = (props) => {
   // socket.onC
 
   const [chats, setChats] = useState([])
-  const oldChat = useRef()
+
+  const [users, setUsers] = useState([])
   const window = useWindowDimensions()
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
 
-  const searchChat = (text) => {
-    // if (text) {
-    //   setChats((oldChats) => [
-    //     ...oldChats.filter((chat) =>
-    //       chat.phone.toLowerCase().includes(text.toLowerCase()),
-    //     ),
-    //   ])
-    // } else {
-    //   setChats(oldChat.current)
-    // }
+  const getUsers = async (text) => {
+    if (text === '') {
+      setUsers([])
+    }
+    try {
+      // if (chats.length === 0) {
+      const response = await fetch(
+        `https://deliverypay.in/api/getUsers?q=${text}`,
+      )
+      const resData = await response.json()
+
+      const validArray = resData.map((user) => ({
+        clientId: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        image: user.profileImg,
+      }))
+      // console.log(resData)
+
+      setUsers(validArray)
+
+      console.log(validArray)
+      // }
+      // console.log(response)
+      // const response = await sendRequest('https://deliverypay.in/api/getChat')
+      //socket.on('connect', () => console.log(socket.id, 'socketId'))
+
+      //socket.on('test', (r) => console.log(socket.id, 'test'))
+
+      // socket.on('connectedToRoom', (r) => {
+      //   console.log(r)
+      //   setRooms(r.rooms.map((room) => room))
+      // })
+
+      // socket.emit(
+      //   'initiateChat',
+      //   {client_id: '60fee8603435a87f6a609ec6'},
+      //   (y) => console.log(y, 'initiateChat'),
+      // )
+
+      // socket.on('messageToUser', (response) =>
+      //   console.log(response, 'messageToUserfrom deal'),
+      // )
+
+      // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
+    } catch (e) {
+      Alert.alert('Error', e.message)
+    }
   }
   console.log(socket.connected)
 
   useEffect(() => {
-    const abrtCntrl = new AbortController()
     const unsubscribe = props.navigation.addListener('focus', async () => {
       try {
         // if (chats.length === 0) {
@@ -84,6 +124,7 @@ const Deal = (props) => {
           image: chat.client.profileImg,
           clientId: chat.client._id,
           messages: chat.messages,
+          client: chat.client,
         }))
         console.log(resData)
 
@@ -100,15 +141,15 @@ const Deal = (props) => {
           setRooms(r.rooms.map((room) => room))
         })
 
-        socket.emit(
-          'initiateChat',
-          {client_id: '60fee8603435a87f6a609ec6'},
-          (y) => console.log(y, 'initiateChat'),
-        )
+        // socket.emit(
+        //   'initiateChat',
+        //   {client_id: '60fee8603435a87f6a609ec6'},
+        //   (y) => console.log(y, 'initiateChat'),
+        // )
 
-        socket.on('messageToUser', (response) =>
-          console.log(response, 'messageToUserfrom deal'),
-        )
+        // socket.on('messageToUser', (response) =>
+        //   console.log(response, 'messageToUserfrom deal'),
+        // )
 
         // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
       } catch (e) {
@@ -130,27 +171,95 @@ const Deal = (props) => {
           />
         </View>
         <View style={styles.searchBarView}>
-          <CommonSearch
-            onChangeText={searchChat}
-            placeholder={'Search with Skropay ID or Phone Number'}
-          />
+          <CommonSearch onChangeText={getUsers} placeholder={'Phone Number'} />
         </View>
         <View
           style={{
             height: window.height < 700 ? 315 : 386,
-
             paddingTop: 10,
-
             paddingHorizontal: 10,
           }}>
+          {users.length === 0 && (
+            <FlatList
+              data={chats}
+              keyExtractor={(item, index) => item.clientId}
+              renderItem={({item}) => {
+                // console.log(item)
+                return (
+                  // <View style={styles.list}>
+                  <View style={[styles.innerList, {backgroundColor: 'white'}]}>
+                    <View style={styles.imageView}>
+                      <Image
+                        style={styles.image}
+                        source={{
+                          uri:
+                            item.image ||
+                            'https://www.mountsinai.on.ca/wellbeing/our-team/team-images/person-placeholder/image_view_fullscreen',
+                        }}
+                      />
+                    </View>
+                    <View style={styles.details}>
+                      <Text style={styles.name}>{item.firstName}</Text>
+                      <Text style={styles.name}>{item.lastName}</Text>
+                      <Text style={styles.phoneNumber}>{item.phone}</Text>
+                      <Text style={styles.email}>{item.email}</Text>
+                      <Text style={styles.address}>{item.address}</Text>
+                    </View>
+                    <View style={styles.requestStatusView}>
+                      <Text style={styles.requestStatus}>
+                        {item.requestStatus}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.chartStatusView}
+                      onPress={() => {
+                        console.log(rooms)
+                        // socket.emit('messageToServer', {
+                        //   rooms,
+                        //   message: {
+                        //     text: 'hello',
+                        //     to: '60fee8603435a87f6a609ec6',
+                        //   },
+                        // })
+
+                        // socket.on('messageToUser', (response) =>
+                        //   console.log(response, 'messageToUser'),
+                        // )
+
+                        props.navigation.navigate('chat', {
+                          rooms,
+                          email: item.email,
+                          name: `${item.firstName} ${item.lastName}`,
+                          clientId: item.clientId,
+                          phone: item.phone,
+                          image: item.image,
+                          seller: item.client,
+                          messages: item.messages,
+                        })
+                      }}>
+                      <Text style={styles.chartStatus}>Chat</Text>
+                    </TouchableOpacity>
+                    {/* <TouchableOpacity
+                    onPress={() =>
+                      
+                    }>
+                    <Text>hello</Text>
+                  </TouchableOpacity> */}
+                  </View>
+                  // </View>
+                )
+              }}
+            />
+          )}
+
+          {/* {Search Users List} */}
           <FlatList
-            data={chats}
-            keyExtractor={(item, index) => item.id}
+            data={users}
+            key={(item) => item.key}
             renderItem={({item}) => {
-              // console.log(item)
               return (
                 // <View style={styles.list}>
-                <View style={styles.innerList}>
+                <TouchableOpacity style={styles.innerList}>
                   <View style={styles.imageView}>
                     <Image
                       style={styles.image}
@@ -173,21 +282,9 @@ const Deal = (props) => {
                       {item.requestStatus}
                     </Text>
                   </View>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     style={styles.chartStatusView}
                     onPress={() => {
-                      // console.log('es')
-                      // socket.on('connectedToRoom', (r) => {
-                      //   console.log(r, 'rrom')
-                      //   setRooms(r)
-                      // })
-                      // socket.emit(
-                      //   'initiateChat',
-                      //   {client_id: item.clientId},
-                      //   (y) => console.log(y, 'initiateChat'),
-                      // )
-
-                      // socket.emit('joinRooms', {rooms})
                       console.log(rooms)
                       // socket.emit('messageToServer', {
                       //   rooms,
@@ -211,14 +308,14 @@ const Deal = (props) => {
                       })
                     }}>
                     <Text style={styles.chartStatus}>Chat</Text>
-                  </TouchableOpacity>
-                  {/* <TouchableOpacity
-                    onPress={() =>
-                      
-                    }>
-                    <Text>hello</Text>
                   </TouchableOpacity> */}
-                </View>
+                  {/* <TouchableOpacity
+                  onPress={() =>
+                    
+                  }>
+                  <Text>hello</Text>
+                </TouchableOpacity> */}
+                </TouchableOpacity>
                 // </View>
               )
             }}

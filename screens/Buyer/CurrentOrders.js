@@ -62,6 +62,13 @@ const CurrentOrders = ({navigation}) => {
           style={{backgroundColor: 'white'}}
           data={orders}
           keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <View style={styles.emptyListView}>
+              <Text style={styles.emptyListText}>
+                There are no orders. How about starting adding some?
+              </Text>
+            </View>
+          }
           renderItem={(itemData) => (
             <TouchableOpacity
               activeOpacity={0.6}
@@ -93,6 +100,16 @@ const styles = StyleSheet.create({
   order: {
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
+    textAlign: 'center',
+  },
+  emptyListView: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyListText: {
+    fontSize: 20,
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
   },
 })

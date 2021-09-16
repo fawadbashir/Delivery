@@ -62,6 +62,11 @@ const DisputeResolution = ({navigation}) => {
         <FlatList
           style={{backgroundColor: 'white'}}
           data={disputes}
+          ListEmptyComponent={
+            <View style={styles.emptyListView}>
+              <Text style={styles.emptyListText}>There are no disputes</Text>
+            </View>
+          }
           keyExtractor={(item) => item.id}
           renderItem={(itemData) => (
             <TouchableOpacity
@@ -94,6 +99,16 @@ const styles = StyleSheet.create({
   order: {
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
+    textAlign: 'center',
+  },
+  emptyListView: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyListText: {
+    fontSize: 20,
+    fontFamily: 'Poppins-Regular',
     textAlign: 'center',
   },
 })

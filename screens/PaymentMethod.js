@@ -20,11 +20,12 @@ import Banking from '../components/Banking'
 import {useHttpClient} from '../hooks/http-hook'
 
 const PaymentMethod = () => {
-  const [method, setMethod] = useState('upi')
+  const [method, setMethod] = useState('banking')
   const window = useWindowDimensions()
   const {sendRequest, isLoading, error, clearError} = useHttpClient()
 
   const onSubmit = (data) => {
+    console.log(data)
     if (method === 'banking') {
       console.log(data, 'paymentMethod')
       sendRequest(
@@ -37,6 +38,8 @@ const PaymentMethod = () => {
           accountNumber: data.accountNumber,
           ifsc: data.ifsc,
           bank: data.bank,
+          city: data.city,
+          accountType: data.accountType,
         }),
         {
           'Content-Type': 'application/json',
@@ -46,29 +49,31 @@ const PaymentMethod = () => {
         .catch((e) => e)
 
       if (error) {
-        Alert.alert('Error', error, [{onPress: () => clearError()}])
-      }
-    } else if (method === 'card') {
-      sendRequest(
-        'https://deliverypay.in/api/addPaymentMethod',
-        'POST',
-        JSON.stringify({
-          type: 'BankCard',
-          name: data.name,
-          accountNumber: data.accountNumber,
-          ifsc: data.ifsc,
-          bank: data.bank,
-        }),
-        {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      ).then((response) => console.log(response))
-
-      if (error) {
-        Alert.alert('Error', error, [{onPress: () => clearError()}])
+        Alert.alert('Error', error, [{onPress: () => clearError}])
       }
     }
+
+    // else if (method === 'card') {
+    //   sendRequest(
+    //     'https://deliverypay.in/api/addPaymentMethod',
+    //     'POST',
+    //     JSON.stringify({
+    //       type: 'BankCard',
+    //       name: data.name,
+    //       accountNumber: data.accountNumber,
+    //       ifsc: data.ifsc,
+    //       bank: data.bank,
+    //     }),
+    //     {
+    //       Accept: 'application/json',
+    //       'Content-Type': 'application/json',
+    //     },
+    //   ).then((response) => console.log(response))
+
+    //   if (error) {
+    //     Alert.alert('Error', error, [{onPress: () => clearError()}])
+    //   }
+    // }
     // else {
 
     // }
@@ -80,7 +85,7 @@ const PaymentMethod = () => {
         <ScrollView
           style={[styles.mainView, {height: window.height < 700 ? 342 : 504}]}>
           <Text style={styles.heading}>Add Money</Text>
-          <View style={styles.optionView}>
+          {/* <View style={styles.optionView}>
             <RadioButton
               value="upi"
               color="#2699fb"
@@ -88,10 +93,10 @@ const PaymentMethod = () => {
               onPress={() => setMethod('upi')}
             />
             <Text style={styles.methodText}>UPI</Text>
-          </View>
+          </View> */}
 
-          {method === 'upi' && <UpiCard style={{marginVertical: 20}} />}
-          <View style={styles.optionView}>
+          {/* {method === 'upi' && <UpiCard style={{marginVertical: 20}} />} */}
+          {/* <View style={styles.optionView}>
             <RadioButton
               value="card"
               color="#2699fb"
@@ -100,19 +105,21 @@ const PaymentMethod = () => {
             />
 
             <Text style={styles.methodText}>Add Debit/Credit Card</Text>
-          </View>
-          {method === 'card' && <DebitCardForm onSubmit={onSubmit} />}
+          </View> */}
+          {/* {method === 'card' && <DebitCardForm onSubmit={onSubmit} />} */}
           <View style={styles.optionView}>
-            <RadioButton
+            {/* <RadioButton
               value="banking"
               color="#2699fb"
               status={method === 'banking' ? 'checked' : 'unchecked'}
               onPress={() => setMethod('banking')}
-            />
+            /> */}
 
             <Text style={styles.methodText}>Net Banking</Text>
           </View>
-          {method === 'banking' && <Banking onSubmit={onSubmit} />}
+          {method === 'banking' && (
+            <Banking onSubmit={onSubmit} loading={isLoading} />
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
       <BottomBar />
@@ -139,6 +146,7 @@ const styles = StyleSheet.create({
   methodText: {
     fontSize: 22,
     fontFamily: 'Poppins-Regular',
+    marginLeft: 15,
   },
   upiCard: {
     backgroundColor: '#f8faff',

@@ -1,8 +1,9 @@
 import React from 'react'
 import {View, StyleSheet, Text, TextInput, TouchableOpacity} from 'react-native'
-import {Card} from 'react-native-paper'
+import {ActivityIndicator, Card} from 'react-native-paper'
 import LinearGradient from 'react-native-linear-gradient'
 import {Controller, useForm} from 'react-hook-form'
+import colors from '../constants/colors'
 
 const Banking = (props) => {
   const {
@@ -109,29 +110,33 @@ const Banking = (props) => {
         )}
       />
 
-      <TouchableOpacity activeOpacity={0.6} onPress={handleSubmit(onSubmit)}>
-        <LinearGradient
-          colors={['#336CF9', '#1BE6D6']}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 0}}
-          style={{
-            alignSelf: 'center',
-            width: '80%',
-            height: 40,
-            justifyContent: 'center',
-            borderRadius: 10,
-            marginTop: 10,
-          }}>
-          <Text
+      {props.loading ? (
+        <ActivityIndicator color={colors.primary} />
+      ) : (
+        <TouchableOpacity activeOpacity={0.6} onPress={handleSubmit(onSubmit)}>
+          <LinearGradient
+            colors={['#336CF9', '#1BE6D6']}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
             style={{
-              textAlign: 'center',
-              color: 'white',
-              fontFamily: 'Poppins-Regular',
+              alignSelf: 'center',
+              width: '80%',
+              height: 40,
+              justifyContent: 'center',
+              borderRadius: 10,
+              marginTop: 10,
             }}>
-            Save
-          </Text>
-        </LinearGradient>
-      </TouchableOpacity>
+            <Text
+              style={{
+                textAlign: 'center',
+                color: 'white',
+                fontFamily: 'Poppins-Regular',
+              }}>
+              Save
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
     </Card>
   )
 }

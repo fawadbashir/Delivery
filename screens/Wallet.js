@@ -21,6 +21,7 @@ import {useHttpClient} from '../hooks/http-hook'
 
 import Colors from '../constants/colors'
 import {AppContext} from '../context/auth'
+import Svg, {G, Path, Defs} from 'react-native-svg'
 
 const data = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr'],
@@ -41,6 +42,7 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
   const {user} = useContext(AppContext)
 
   const [money, setMoney] = useState()
+  const [currentMethod, setCurrentMethod] = useState(0)
   const [withdraw, setWithdraw] = useState()
   const {sendRequest} = useHttpClient()
   const {sendRequest: withdrawRequest} = useHttpClient()
@@ -180,24 +182,55 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
             <Icon name="person" color="#2699FB" size={30} />
           </View>
           <Text style={styles.heading}>Wallet Balance</Text>
-          <Text style={styles.balance}>₹{user.balance}</Text>
+          <Text style={styles.balance}>₹{user.balance.toFixed(0)}</Text>
         </View>
         <View style={styles.whiteBackground}>
           <View style={styles.paymentMethodContainer}>
-            <TouchableOpacity onPress={() => navigate('paymentMethod')}>
-              <Image
-                source={require('../assets/addpayment.png')}
-                style={{width: 21, height: 21}}
-              />
-            </TouchableOpacity>
+            <View style={{alignItems: 'center'}}>
+              <TouchableOpacity onPress={() => navigate('paymentMethod')}>
+                <Image
+                  source={require('../assets/addpayment.png')}
+                  style={{width: 21, height: 21}}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={currentMethod === 0}
+                onPress={() => setCurrentMethod((prev) => (prev -= 1))}>
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="31.818"
+                  height="44.147"
+                  viewBox="0 0 31.818 44.147">
+                  <G
+                    transform="matrix(1, 0, 0, 1, 0, 0)"
+                    filter="url(#Path_217)">
+                    <G
+                      id="Path_217-2"
+                      data-name="Path 217"
+                      transform="translate(27.32 4.5) rotate(90)"
+                      fill="#858585">
+                      <Path
+                        d="M 27.53220176696777 15.71776485443115 C 26.13888931274414 15.2262544631958 24.10462951660156 14.50919151306152 22.07958030700684 13.79734325408936 C 14.74783992767334 11.22007274627686 14.70039939880371 11.22007274627686 14.5736198425293 11.22007274627686 C 14.44684028625488 11.22007274627686 14.39939975738525 11.22007274627686 7.067659854888916 13.79734325408936 C 5.042610645294189 14.50919151306152 3.00835108757019 15.2262544631958 1.615038275718689 15.71776485443115 L 14.5736198425293 0.7635064125061035 L 27.53220176696777 15.71776485443115 Z"
+                        stroke="none"></Path>
+                      <Path
+                        d="M 14.5736198425293 1.526998519897461 L 3.229276657104492 14.61841773986816 C 4.349065780639648 14.22377777099609 5.627307891845703 13.77366733551025 6.901840209960938 13.32564258575439 C 14.31408023834229 10.72007274627686 14.33368015289307 10.72007274627686 14.5736198425293 10.72007274627686 C 14.81355953216553 10.72007274627686 14.83315944671631 10.72007274627686 22.24539947509766 13.32564258575439 C 23.51993179321289 13.77366733551025 24.79817390441895 14.22377777099609 25.9179630279541 14.61841773986816 L 14.5736198425293 1.526998519897461 M 14.5736198425293 1.9073486328125e-06 L 29.14723968505859 16.81802368164063 C 29.14723968505859 16.81802368164063 14.71584987640381 11.72007274627686 14.5736198425293 11.72007274627686 C 14.43138980865479 11.72007274627686 0 16.81802368164063 0 16.81802368164063 L 14.5736198425293 1.9073486328125e-06 Z"
+                        stroke="none"
+                        fill="#858585"></Path>
+                    </G>
+                  </G>
+                </Svg>
+              </TouchableOpacity>
+            </View>
             <View style={{top: -20}}>
               <CreditCard
-                bank={user.paymentMethods[0].bank}
-                name={user.paymentMethods[0].name}
-                type={user.paymentMethods[0].type}
+                bank={user.paymentMethods[currentMethod].bank}
+                name={user.paymentMethods[currentMethod].name}
+                type={user.paymentMethods[currentMethod].type}
               />
             </View>
-            <TouchableOpacity disabled={user.paymentMethods.length - 1}>
+            <TouchableOpacity
+              onPress={() => setCurrentMethod((prev) => (prev += 1))}
+              disabled={currentMethod === [user.paymentMethods.length - 1]}>
               <Image
                 source={require('../assets/nextpayment.png')}
                 style={{width: 21, height: 21}}

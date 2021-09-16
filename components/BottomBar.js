@@ -439,9 +439,9 @@ const BottomBar = () => {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            onPress={() => navigation.navigate('holeTransaction')}
+            // onPress={() => navigation.navigate('holeTransaction')}
             style={[
-              route.name === 'holeTransaction'
+              route.name.includes('shop')
                 ? {
                     ...styles.activeButton,
                     backgroundColor:
@@ -451,13 +451,13 @@ const BottomBar = () => {
               buttonOnHeight,
             ]}
             activeOpacity={0.7}>
-            {route.name === 'holeTransaction' ? (
-              // <Image source={require('../assets/transactionActive.png')} />
-              <Icon name="card-travel" size={20} color="#fff" />
-            ) : (
-              <Icon name="card-travel" size={20} color="#2699FB" />
-              // <Image source={require('../assets/transactionIcon.png')} />
-            )}
+            {/* {route.name === 'holeTransaction' ? ( */}
+            {/* // <Image source={require('../assets/transactionActive.png')} /> */}
+            {/* <Icon name="card-travel" size={20} color="#fff" /> */}
+            {/* ) : ( */}
+            <Icon name="card-travel" size={20} color="#2699FB" />
+            {/* // <Image source={require('../assets/transactionIcon.png')} /> */}
+            {/* )} */}
           </TouchableOpacity>
         )}
         <Text style={styles.iconText}>
@@ -558,7 +558,7 @@ const BottomBar = () => {
             // <Image source={require('../assets/holdIcon.png')} />
           )}
         </TouchableOpacity>
-        <Text style={styles.iconText}>Hold</Text>
+        <Text style={styles.iconText}>Milestones</Text>
       </View>
     </View>
   )
