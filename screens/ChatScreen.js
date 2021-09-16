@@ -309,7 +309,9 @@ const ChatScreen = (props) => {
             <TouchableOpacity
               style={{width: '25%'}}
               activeOpacity={0.6}
-              onPress={() => props.navigation.navigate('wallet')}>
+              onPress={() =>
+                props.navigation.navigate('products', {id: clientId})
+              }>
               <LinearGradient
                 colors={[colors.purple, colors.purple]}
                 style={styles.optionsView}

@@ -35,6 +35,8 @@ import OrderSummary from '../screens/Buyer/OrderSummary'
 import DisputeSummary from '../screens/Buyer/DisputeSummary'
 import Tickets from '../screens/Tickets'
 import TicketDetails from '../screens/TicketDetail'
+import ProductList from '../screens/Seller/ProductList'
+import SingleProduct from '../screens/Seller/SingleProduct'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -136,6 +138,8 @@ export const MainNavigator = () => {
         />
         <MainStack.Screen name="tickets" component={Tickets} />
         <MainStack.Screen name="ticketDetail" component={TicketDetails} />
+        <MainStack.Screen name="products" component={ProductList} />
+        <MainStack.Screen name="singleProduct" component={SingleProduct} />
       </MainStack.Navigator>
     </>
   )

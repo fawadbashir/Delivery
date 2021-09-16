@@ -251,11 +251,11 @@ const StartTransaction = (props) => {
                       image={itemData.item.profileImg}
                       firstName={itemData.item.firstName}
                       lastName={itemData.item.lastName}
-                      milestoneType="Create"
                       onPress={() => {
                         console.log(itemData)
-                        setSeller(itemData.item)
-                        setVisible(true)
+                        props.navigation.navigate('products', {
+                          id: itemData.item._id,
+                        })
                       }}
                     />
                   )

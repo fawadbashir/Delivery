@@ -30,8 +30,9 @@ export const useHttpClient = () => {
           console.log(responseData)
           throw new Error(responseData.message)
         }
-        console.log(response)
+        // console.log(response)
         setIsLoading(false)
+
         return responseData
       } catch (e) {
         console.log(e.message)

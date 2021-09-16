@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const CommonSearch = (props) => {
   return (
-    <View style={styles.inputContainer}>
+    <View style={{...styles.inputContainer, ...props.style}}>
       <Icon name="search" color="#707070" size={25} />
       <TextInput
         placeholder={props.placeholder}
@@ -12,6 +12,7 @@ const CommonSearch = (props) => {
         placeholderTextColor="#707070"
         multiline={true}
         onChangeText={props.onChangeText}
+        value={props.value}
       />
     </View>
   )
@@ -27,6 +28,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 10,
     marginTop: 25,
+
     // marginBottom: 20,
   },
   input: {

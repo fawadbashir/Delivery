@@ -8,6 +8,13 @@ export const AppProvider = (props) => {
   const [otp, setOtp] = useState([])
   const [userType, setUserType] = useState('')
 
+  const [cart, setCart] = useState({
+    items: [],
+    totalAmount: 0,
+  })
+
+  const addToCart = () => {}
+
   const addToOtp = (value) => {
     setOtp((prevOtp) => [...prevOtp, value.toString()])
     console.log(otp)

@@ -25,7 +25,11 @@ const UserSearchItem = (props) => {
         </Text>
       </View>
       <TouchableOpacity activeOpacity={0.6} onPress={props.onPress}>
-        <Text style={styles.milestone}>{props.milestoneType} Milestone</Text>
+        {props.milestoneType ? (
+          <Text style={styles.milestone}>{props.milestoneType} Milestone</Text>
+        ) : (
+          <Text style={styles.milestone}>{`Show Products & Services`}</Text>
+        )}
       </TouchableOpacity>
     </View>
   )
