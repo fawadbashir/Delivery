@@ -24,10 +24,10 @@ export const useHttpClient = () => {
         activeHttpRequests.current = activeHttpRequests.current.filter(
           (reqCtrl) => reqCtrl !== httpAbortCntrl,
         )
+        console.log(response)
 
         if (!response.ok) {
           // console.log(responseData.message)
-          console.log(responseData)
           throw new Error(responseData.message)
         }
         // console.log(response)
@@ -35,7 +35,7 @@ export const useHttpClient = () => {
 
         return responseData
       } catch (e) {
-        console.log(e.message)
+        console.log(e)
         setError(e.message)
         setIsLoading(false)
         throw e

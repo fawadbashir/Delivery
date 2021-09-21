@@ -35,7 +35,7 @@ const OrderSummary = ({navigation, route}) => {
         console.log(response)
         setDispute(response.dispute)
         if (error) {
-          Alert.alert('Error', error, [{onPress: clearError}])
+          Alert.alert('Error', error, [{onPress: () => clearError}])
         }
       } catch (e) {
         e

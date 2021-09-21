@@ -18,20 +18,21 @@ import moment from 'moment'
 import colors from '../../constants/colors'
 
 const OrderSummary = ({navigation, route}) => {
+  console.log(route.params)
   const {userType} = useContext(AppContext)
   const [order, setOrder] = useState()
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
 
-  useEffect(() => {
-    if (userType === 'seller') {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: 'home/chooseCategory'}],
-        }),
-      )
-    }
-  }, [navigation, userType])
+  // useEffect(() => {
+  //   if (userType === 'seller') {
+  //     navigation.dispatch(
+  //       CommonActions.reset({
+  //         index: 0,
+  //         routes: [{name: 'home/chooseCategory'}],
+  //       }),
+  //     )
+  //   }
+  // }, [navigation, userType])
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -42,14 +43,14 @@ const OrderSummary = ({navigation, route}) => {
         console.log(response)
         setOrder(response.order)
         if (error) {
-          Alert.alert('Error', error, [{onPress: clearError}])
+          Alert.alert('Error', error, [{onPress: () => clearError}])
         }
       } catch (e) {
         e
       }
     })
     return () => unsubscribe
-  }, [clearError, error, navigation, route.params.id, sendRequest])
+  }, [clearError, navigation, route.params.id, sendRequest])
 
   const cancelOrder = async () => {
     try {
@@ -88,7 +89,7 @@ const OrderSummary = ({navigation, route}) => {
           />
         ) : (
           <>
-            {route.params.cancellable && (
+            {route.params.cancellable == true && (
               <View style={{alignItems: 'flex-end', paddingRight: 10}}>
                 <TouchableOpacity
                   onPress={cancelOrder}

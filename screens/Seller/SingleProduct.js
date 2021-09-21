@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {
   View,
   Text,
@@ -7,18 +7,19 @@ import {
   Image,
   useWindowDimensions,
 } from 'react-native'
-import CommonSearch from '../../components/CommonSearch'
+
 import {useHttpClient} from '../../hooks/http-hook'
-import {ActivityIndicator} from 'react-native-paper'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
 import {SwiperFlatList} from 'react-native-swiper-flatlist'
 import colors from '../../constants/colors'
+import {AppContext} from '../../context/auth'
 
 const SingleProduct = (props) => {
-  const window = useWindowDimensions()
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
+  const window = useWindowDimensions()
   const [product, setProduct] = useState({})
+  const {addToCart} = useContext(AppContext)
 
   useEffect(() => {
     const getProduct = async () => {
@@ -62,10 +63,13 @@ const SingleProduct = (props) => {
           <Text style={styles.price}>Price: ₹{product.available}</Text>
         )}
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity disabled={props.disabled} style={styles.cartButton}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={styles.cartButton}
+            onPress={addToCart.bind(this, product, product.user)}>
             <Text style={styles.cardButtonText}>Add To Cart</Text>
           </TouchableOpacity>
-          <TouchableOpacity disabled={props.disabled} style={styles.cartButton}>
+          <TouchableOpacity style={styles.cartButton}>
             <Text style={styles.cardButtonText}>Share the Product</Text>
           </TouchableOpacity>
         </View>

@@ -16,7 +16,7 @@ import {AppContext} from '../context/auth'
 import colors from '../constants/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
-const BottomBar = () => {
+const BottomBar = (props) => {
   const {userType} = useContext(AppContext)
   const window = useWindowDimensions()
   const navigation = useNavigation()
@@ -27,7 +27,11 @@ const BottomBar = () => {
     height: window.height < 700 ? 33 : 44,
   }
   return (
-    <View style={[styles.container, {height: window.height < 700 ? 80 : 100}]}>
+    <View
+      style={[
+        {...styles.container, ...props.styles},
+        {height: window.height < 700 ? 80 : 100},
+      ]}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={() => navigation.navigate('home/chooseCategory')}
@@ -439,7 +443,7 @@ const BottomBar = () => {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            // onPress={() => navigation.navigate('holeTransaction')}
+            onPress={() => navigation.navigate('shop/myShop')}
             style={[
               route.name.includes('shop')
                 ? {
@@ -451,13 +455,13 @@ const BottomBar = () => {
               buttonOnHeight,
             ]}
             activeOpacity={0.7}>
-            {/* {route.name === 'holeTransaction' ? ( */}
-            {/* // <Image source={require('../assets/transactionActive.png')} /> */}
-            {/* <Icon name="card-travel" size={20} color="#fff" /> */}
-            {/* ) : ( */}
-            <Icon name="card-travel" size={20} color="#2699FB" />
-            {/* // <Image source={require('../assets/transactionIcon.png')} /> */}
-            {/* )} */}
+            {route.name.includes('shop') ? (
+              <>
+                <Icon name="card-travel" size={20} color="#fff" />
+              </>
+            ) : (
+              <Icon name="card-travel" size={20} color="#2699FB" />
+            )}
           </TouchableOpacity>
         )}
         <Text style={styles.iconText}>

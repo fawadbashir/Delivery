@@ -21,6 +21,8 @@ import {Avatar, Portal, Modal} from 'react-native-paper'
 import {Controller, useForm} from 'react-hook-form'
 import LinearGradient from 'react-native-linear-gradient'
 import {CommonActions} from '@react-navigation/native'
+import {ActivityIndicator} from 'react-native-paper'
+import colors from '../../constants/colors'
 
 const StartTransaction = (props) => {
   const {
@@ -57,7 +59,7 @@ const StartTransaction = (props) => {
       const response = await sendRequest(
         `https://deliverypay.in/api/getUsers?q=${query}`,
       )
-      console.log(response[0])
+      // console.log(response[0])
 
       setUsers(
         response.map((user) => ({
@@ -102,7 +104,7 @@ const StartTransaction = (props) => {
         },
       )
 
-      console.log(response)
+      // console.log(response)
       setVisible(false)
       Alert.alert('Success', 'Milestone requested')
       reset()
@@ -176,23 +178,30 @@ const StartTransaction = (props) => {
               />
             )}
           />
-          <TouchableOpacity
-            style={{width: 171, marginVertical: 20}}
-            activeOpacity={0.6}
-            onPress={handleSubmit(onSubmit)}>
-            <LinearGradient
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}
-              colors={['#2598b6', '#1BE6D6']}
-              style={{
-                borderRadius: 20,
-                height: 48,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text style={styles.callToActionText}>Request Milestone</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          {milestoneLoading ? (
+            <ActivityIndicator
+              color={colors.primary}
+              style={{marginVertical: 20}}
+            />
+          ) : (
+            <TouchableOpacity
+              style={{width: 171, marginVertical: 20}}
+              activeOpacity={0.6}
+              onPress={handleSubmit(onSubmit)}>
+              <LinearGradient
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 0}}
+                colors={['#2598b6', '#1BE6D6']}
+                style={{
+                  borderRadius: 20,
+                  height: 48,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.callToActionText}>Request Milestone</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
         </Modal>
       </Portal>
     )
@@ -208,14 +217,16 @@ const StartTransaction = (props) => {
         setPayments(response)
 
         if (recentPaymentsError) {
-          Alert.alert('Error', recentPaymentsError, [{onPress: clearError}])
+          Alert.alert('Error', recentPaymentsError, [
+            {onPress: () => clearError()},
+          ])
         }
       } catch (e) {
         e
       }
     }
     getRecentPayments()
-  }, [clearError, recentPaymentsError, recentPaymentsRequest])
+  }, [recentPaymentsRequest])
 
   useEffect(() => {
     if (userType === 'buyer') {

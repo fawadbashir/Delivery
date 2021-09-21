@@ -29,7 +29,7 @@ import {useHttpClient} from '../hooks/http-hook'
 
 const ChatScreen = (props) => {
   const window = useWindowDimensions()
-  const {user} = useContext(AppContext)
+  const {user, userType} = useContext(AppContext)
   const {clientId, name, email, phone, image, seller} = props.route.params
   const {socket, rooms} = props
   const [messages, setMessages] = useState([])
@@ -110,18 +110,47 @@ const ChatScreen = (props) => {
       // }
       console.log(response[0])
       const formData = new FormData()
-      formData.append('file[]', response[0].uri)
-      const imageResponse = await fetch(`https://cdn.deliverypay.in/`, {
-        body: formData,
-        method: 'POST',
-        headers: {
-          Accept: '/',
-        },
+      formData.append('UploadFiles', {
+        type: response[0].type,
+        name: response[0].name,
+        uri: response[0].fileCopyUri,
       })
+      const headers = new Headers()
+      headers.append('Accept', '/')
+      headers.append('Content-Type', 'multipart/form-data')
+      const imageResponse = await fetch(
+        `https://sassolution.org/Admin/API/cdn_image.php`,
+        {
+          body: formData,
+          method: 'POST',
+          headers,
+        },
+      )
       const resData = await imageResponse.json()
       if (!response.ok) {
         console.log(resData)
       }
+      socket.emit(
+        'messageToServer',
+        {
+          rooms,
+          message: {
+            media: `https://${resData.url}`,
+            to: clientId,
+          },
+        },
+        (r) => console.log(r),
+      )
+
+      setMessages((prev) =>
+        prev.concat({
+          media: `https://${resData.url}`,
+          to: clientId,
+          from: user.userId,
+          id: 'sassolution.org/Admin/API/Files/2021092001274381.png',
+        }),
+      )
+
       console.log(resData)
       console.log(resData)
     } catch (e) {
@@ -222,6 +251,7 @@ const ChatScreen = (props) => {
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', () => {
+      console.log(props.route.params.messages)
       setMessages(props.route.params.messages)
 
       socket.emit('initiateChat', {client_id: clientId}, (y) =>
@@ -310,37 +340,49 @@ const ChatScreen = (props) => {
               style={{width: '25%'}}
               activeOpacity={0.6}
               onPress={() =>
-                props.navigation.navigate('products', {id: clientId})
+                props.navigation.navigate('products', {
+                  id: userType === 'seller' ? user.userId : clientId,
+                })
               }>
               <LinearGradient
-                colors={[colors.purple, colors.purple]}
+                colors={
+                  userType === 'seller'
+                    ? [colors.blue, colors.blue]
+                    : [colors.purple, colors.purple]
+                }
                 style={styles.optionsView}
                 start={{x: 0, y: 0}}
                 end={{x: 1.2, y: 0}}>
-                <Text style={styles.optionText}>View Shop</Text>
+                <Text style={styles.optionText}>
+                  {userType === 'seller' ? 'Create Order' : 'View Shop'}
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
           <View style={styles.payView}>
             {/* <View style={{width: '75%'}}> */}
-            <TouchableOpacity
-              style={{width: '25%'}}
-              activeOpacity={0.6}
-              onPress={() => {
-                setVisible(true)
-              }}>
-              <LinearGradient
-                colors={[colors.purple, colors.purple]}
-                style={styles.optionsView}
-                start={{x: 0, y: 0}}
-                end={{x: 1.2, y: 0}}>
-                <Text style={styles.optionText}>Pay</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <Text style={styles.payText}>
-              Click on pay if your deal is done it will be debited to Delivery
-              Pay wallet with {name}
-            </Text>
+            {userType === 'buyer' && (
+              <>
+                <TouchableOpacity
+                  style={{width: '25%'}}
+                  activeOpacity={0.6}
+                  onPress={() => {
+                    setVisible(true)
+                  }}>
+                  <LinearGradient
+                    colors={[colors.purple, colors.purple]}
+                    style={styles.optionsView}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1.2, y: 0}}>
+                    <Text style={styles.optionText}>Pay</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+                <Text style={styles.payText}>
+                  Click on pay if your deal is done it will be debited to
+                  Delivery Pay wallet with {name}
+                </Text>
+              </>
+            )}
             {/* </View> */}
           </View>
           {/* <View style={styles.requestView}>
@@ -358,7 +400,10 @@ const ChatScreen = (props) => {
           <FlatList
             // initialNumToRender={50}
             data={messages}
-            style={{height: window.height < 700 ? 314 : 385}}
+            style={{
+              height:
+                window.height < 700 ? 324 : userType === 'seller' ? 435 : 390,
+            }}
             // contentContainerStyle={{
             //   // flexGrow: 1,
 

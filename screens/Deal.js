@@ -104,7 +104,6 @@ const Deal = (props) => {
       Alert.alert('Error', e.message)
     }
   }
-  console.log(socket.connected)
 
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
@@ -222,9 +221,9 @@ const Deal = (props) => {
                         //   },
                         // })
 
-                        // socket.on('messageToUser', (response) =>
-                        //   console.log(response, 'messageToUser'),
-                        // )
+                        socket.on('messageToUser', (response) =>
+                          console.log(response, 'messageToUser'),
+                        )
 
                         props.navigation.navigate('chat', {
                           rooms,

@@ -5,13 +5,13 @@ import colors from '../constants/colors'
 const ProductItem = (props) => {
   return (
     <TouchableOpacity
-      activeOpacity={0.5}
+      activeOpacity={0.8}
       onPress={props.onPress}
       style={styles.card}>
       <Image source={{uri: props.uri}} style={styles.image} />
       <Text style={styles.name}>{props.name}</Text>
       <Text style={styles.price}>₹{props.price}</Text>
-      <TouchableOpacity disabled={props.disabled} style={styles.cartButton}>
+      <TouchableOpacity style={styles.cartButton} onPress={props.onCartPress}>
         <Text style={styles.cardButtonText}>Add To Cart</Text>
       </TouchableOpacity>
     </TouchableOpacity>

@@ -1,21 +1,16 @@
 import React, {useContext} from 'react'
-import {
-  Image,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-} from 'react-native'
+import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
 import Svg, {Path} from 'react-native-svg'
 import {AppContext} from '../context/auth'
 import colors from '../constants/colors'
+import numeral from 'numeral'
 
 const Header = () => {
-  const {user, userType, changeUserType} = useContext(AppContext)
+  const {user, userType, changeUserType, cart} = useContext(AppContext)
   const navigation = useNavigation()
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -81,6 +76,27 @@ const Header = () => {
             </TouchableOpacity>
           </View>
         </View>
+        {userType === 'buyer' && (
+          <TouchableOpacity onPress={() => navigation.navigate('cart')}>
+            <Icon name="shopping-cart" color="grey" size={25} />
+            {cart.items.length > 0 && (
+              <Text
+                style={{
+                  top: -15,
+                  right: 5,
+                  left: 5,
+                  fontSize: 16,
+                  position: 'absolute',
+                  color: '#fff',
+                  backgroundColor: colors.purple,
+                  textAlign: 'center',
+                  borderRadius: 20,
+                }}>
+                {cart.items.length}
+              </Text>
+            )}
+          </TouchableOpacity>
+        )}
         {/* <View style={styles.inputContainer}>
           <TextInput
             placeholder="Search"

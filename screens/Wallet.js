@@ -222,11 +222,13 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
               </TouchableOpacity>
             </View>
             <View style={{top: -20}}>
-              <CreditCard
-                bank={user.paymentMethods[currentMethod].bank}
-                name={user.paymentMethods[currentMethod].name}
-                type={user.paymentMethods[currentMethod].type}
-              />
+              {user.paymentMethods && (
+                <CreditCard
+                  bank={user?.paymentMethods[currentMethod]?.bank}
+                  name={user?.paymentMethods[currentMethod]?.name}
+                  type={user?.paymentMethods[currentMethod]?.type}
+                />
+              )}
             </View>
             <TouchableOpacity
               onPress={() => setCurrentMethod((prev) => (prev += 1))}

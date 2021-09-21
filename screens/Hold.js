@@ -21,11 +21,10 @@ import ReleaseConfirm from '../components/ReleaseConfirm'
 import DisputeModal from '../components/DisputeModal'
 
 const Hold = (props) => {
-  const window = useWindowDimensions()
   const [milestones, setMilestones] = useState([])
   const [milestoneId, setMilestoneId] = useState()
   const [amount, setAmount] = useState()
-  const [visible, setVisible] = useState(false)
+
   const [approveVisible, setApproveVisible] = useState(false)
   const [releaseVisible, setReleaseVisible] = useState(false)
   const [transactionModal, setTransactionModal] = useState()
@@ -40,30 +39,6 @@ const Hold = (props) => {
     clearError: clearCancelError,
     isLoading: cancelLoading,
   } = useHttpClient()
-
-  const cancelRequest = async (id) => {
-    try {
-      const response = await requestCancel(
-        'https://deliverypay.in/api/cancelMilestoneReques',
-        'DELETE',
-        JSON.stringify({
-          _id: id,
-        }),
-        {
-          'Content-Type': 'application/json',
-        },
-      )
-      console.log(response)
-      if (cancellationError)
-        Alert.alert('Error', cancellationError, [
-          {
-            onPress: () => clearCancelError(),
-          },
-        ])
-    } catch (e) {
-      e
-    }
-  }
 
   const detailModal = () => {
     return (

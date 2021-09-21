@@ -69,7 +69,9 @@ const Tickets = (props) => {
       )
       console.log(JSON.stringify(body))
       if (ticketError)
-        Alert.alert('Error', response.message, [{onPress: clearTicketError}])
+        Alert.alert('Error', response.message, [
+          {onPress: () => clearTicketError},
+        ])
       console.log(response)
       Alert('success', 'Ticket Successfully filed')
     } catch (e) {

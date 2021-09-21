@@ -37,15 +37,22 @@ import Tickets from '../screens/Tickets'
 import TicketDetails from '../screens/TicketDetail'
 import ProductList from '../screens/Seller/ProductList'
 import SingleProduct from '../screens/Seller/SingleProduct'
+import Cart from '../screens/Cart'
+
+import MyShop from '../screens/Seller/MyShop'
+import ProductsServices from '../screens/Seller/ProductsServices'
+import Orders from '../screens/Seller/Orders'
+import Refunds from '../screens/Seller/Refunds'
+import Campaigns from '../screens/Seller/Campaigns'
+import FbMarketPlace from '../screens/Seller/FbMarketPlace'
+import Settings from '../screens/Seller/Settings'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
 
 export const AuthNavigator = () => {
   return (
-    <AuthStack.Navigator
-      headerMode={'none'}
-      initialRouteName="customerCategory">
+    <AuthStack.Navigator headerMode={'none'} initialRouteName="login">
       <AuthStack.Screen name="login" component={Login} />
       <AuthStack.Screen name="signup" component={SignUp} />
       <AuthStack.Screen name="otp" component={OtpScreen} />
@@ -71,9 +78,6 @@ export const MainNavigator = () => {
     if (!socket.connected) {
       socket.connect()
     }
-    socket.on('messageToUser', (response) =>
-      console.log(response, 'messageToUserfrom deal'),
-    )
 
     return () => socket.disconnect()
   }, [socket])
@@ -105,6 +109,7 @@ export const MainNavigator = () => {
             />
           )}
         </MainStack.Screen>
+
         <MainStack.Screen
           name="wallet/history"
           component={TransactionHistory}
@@ -140,6 +145,17 @@ export const MainNavigator = () => {
         <MainStack.Screen name="ticketDetail" component={TicketDetails} />
         <MainStack.Screen name="products" component={ProductList} />
         <MainStack.Screen name="singleProduct" component={SingleProduct} />
+        <MainStack.Screen name="cart" component={Cart} />
+        <MainStack.Screen name="shop/myShop" component={MyShop} />
+        <MainStack.Screen
+          name="shop/productsServices"
+          component={ProductsServices}
+        />
+        <MainStack.Screen name="shop/orders" component={Orders} />
+        <MainStack.Screen name="shop/refunds" component={Refunds} />
+        <MainStack.Screen name="shop/campaigns" component={Campaigns} />
+        <MainStack.Screen name="shop/fbMarket" component={FbMarketPlace} />
+        <MainStack.Screen name="shop/settings" component={Settings} />
       </MainStack.Navigator>
     </>
   )
