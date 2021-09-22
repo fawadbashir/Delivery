@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback, useMemo} from 'react'
 import {
   TouchableOpacity,
   View,
@@ -7,6 +7,7 @@ import {
   FlatList,
   Alert,
 } from 'react-native'
+import {URL} from 'react-native-url-polyfill'
 
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
@@ -15,36 +16,45 @@ import moment from 'moment'
 import LinearGradient from 'react-native-linear-gradient'
 import {ActivityIndicator, Portal, Modal} from 'react-native-paper'
 import colors from '../../constants/colors'
+import CommonSearch from '../../components/CommonSearch'
+import DateRangePicker from 'react-native-daterange-picker'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import {Picker} from '@react-native-picker/picker'
 
+const url = new URL('https://deliverypay.in/api/getOrders?user=seller')
 const Orders = ({navigation}) => {
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
   const [orders, setOrders] = useState([])
   const [visible, setVisible] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [date, setDate] = useState()
+  const [displayedDate] = useState(moment())
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [status, setStatus] = useState('')
+
+  const getOrders = useCallback(async () => {
+    try {
+      const response = await sendRequest(url)
+
+      const validOrders = response.orders.map((order) => ({
+        id: order._id,
+        total: order.total,
+        purchaseDate: moment(order.createdAt).format('DD MMM YYYY'),
+        status: order.status,
+      }))
+      setOrders(validOrders)
+
+      console.log(response)
+      console.log(error)
+    } catch (e) {
+      e
+    }
+  }, [error, sendRequest])
 
   useEffect(() => {
-    const getOrders = async () => {
-      try {
-        const response = await sendRequest(
-          'https://deliverypay.in/api/getOrders?user=seller',
-        )
-
-        const validOrders = response.orders.map((order) => ({
-          id: order._id,
-          total: order.total,
-          purchaseDate: moment(order.createdAt).format('DD MMM YYYY'),
-          status: order.status,
-        }))
-        setOrders(validOrders)
-
-        console.log(response)
-        console.log(error)
-      } catch (e) {
-        e
-      }
-    }
     getOrders()
-  }, [error, sendRequest])
+  }, [getOrders])
+
   const requestCancellation = async () => {
     try {
       const response = await fetch(
@@ -117,7 +127,61 @@ const Orders = ({navigation}) => {
   return (
     <>
       {detailModal()}
+
       <Header />
+      <View
+        style={{
+          flexDirection: 'row',
+          // alignItems: 'center',
+          justifyContent: 'space-around',
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+        }}>
+        <CommonSearch style={{borderRadius: 10, width: '80%', marginTop: 0}} />
+        <DateRangePicker
+          onChange={(dates) => {
+            console.log(dates)
+            setDate((prev) => ({...prev, ...dates}))
+          }}
+          backdropStyle={{
+            flexGrow: 1,
+          }}
+          displayedDate={displayedDate}
+          range={true}
+          startDate={date?.startDate}
+          endDate={date?.endDate}
+          moment={moment}>
+          <Icon name="calendar-today" color={colors.blue} size={30} />
+        </DateRangePicker>
+      </View>
+      <View
+        style={{
+          // alignItems: 'center',
+          alignSelf: 'center',
+          marginBottom: 10,
+          width: 300,
+        }}>
+        <Picker
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 30,
+          }}
+          mode="dropdown"
+          selectedValue={status}
+          onValueChange={(itemValue, itemIndex) => setStatus(itemValue)}>
+          {[
+            'pending',
+            'approved',
+            'cancelled',
+            'hold',
+            'shipped',
+            'delivered',
+            'refund',
+          ].map((status) => (
+            <Picker.Item key={status} value={status} label={status} />
+          ))}
+        </Picker>
+      </View>
       <View style={styles.orderItemContainer}>
         <Text style={styles.order}>Order</Text>
         <Text style={styles.order}>Purchase Date</Text>

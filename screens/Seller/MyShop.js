@@ -62,7 +62,7 @@ const MyOrders = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('orders/disputes')}
+          onPress={() => navigation.navigate('shop/settings')}
           activeOpacity={0.8}>
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>

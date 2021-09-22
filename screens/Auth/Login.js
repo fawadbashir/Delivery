@@ -39,11 +39,19 @@ const Login = (props) => {
     control,
     handleSubmit,
     register,
+    reset,
     formState: {errors},
   } = useForm({mode: 'onSubmit'})
 
   const email = register('email')
   const password = register('password')
+
+  useEffect(() => {
+    reset({
+      email: '+919625259527',
+      password: '1234',
+    })
+  }, [reset])
 
   const onSubmit = async (data) => {
     const {email, password} = data
@@ -85,6 +93,8 @@ const Login = (props) => {
         paymentMethods: user.paymentMethods,
         balance: user.balance,
         cookie,
+        shopInfo: user.shopInfo,
+        gst: user.gst,
       })
     } catch (e) {
       Alert.alert('Error', e.message)

@@ -7,6 +7,10 @@ import {
   FlatList,
   Alert,
 } from 'react-native'
+import {Picker} from '@react-native-picker/picker'
+import Icon from 'react-native-vector-icons/MaterialIcons'
+
+import DateRangePicker from 'react-native-daterange-picker'
 
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
@@ -15,6 +19,7 @@ import moment from 'moment'
 import {ActivityIndicator} from 'react-native-paper'
 import colors from '../../constants/colors'
 import CouponModal from '../../components/CouponModal'
+import CommonSearch from '../../components/CommonSearch'
 
 const Campaigns = ({navigation}) => {
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
@@ -22,6 +27,10 @@ const Campaigns = ({navigation}) => {
   const [coupon, setCoupon] = useState()
   const [campaigns, setCampaigns] = useState([])
   const goToOrder = (id) => navigation.navigate('orders/summary', {id})
+  const [date, setDate] = useState()
+  const [displayedDate] = useState(moment())
+  const [calendarOpen, setCalendarOpen] = useState(false)
+  const [status, setStatus] = useState('')
 
   const getCoupons = useCallback(async () => {
     setLoading(true)
@@ -134,7 +143,50 @@ const Campaigns = ({navigation}) => {
       )}
 
       <Header />
-
+      <View
+        style={{
+          flexDirection: 'row',
+          // alignItems: 'center',
+          justifyContent: 'space-around',
+          paddingHorizontal: 20,
+          paddingVertical: 10,
+        }}>
+        <CommonSearch style={{borderRadius: 10, width: '80%', marginTop: 0}} />
+        <DateRangePicker
+          onChange={(dates) => {
+            console.log(dates)
+            setDate((prev) => ({...prev, ...dates}))
+          }}
+          backdropStyle={{
+            flexGrow: 1,
+          }}
+          displayedDate={displayedDate}
+          range={true}
+          startDate={date?.startDate}
+          endDate={date?.endDate}
+          moment={moment}>
+          <Icon name="calendar-today" color={colors.blue} size={30} />
+        </DateRangePicker>
+      </View>
+      <View
+        style={{
+          width: '80%',
+          alignSelf: 'center',
+          marginBottom: 10,
+        }}>
+        <Picker
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: 30,
+          }}
+          mode="dropdown"
+          selectedValue={status}
+          onValueChange={(itemValue) => setStatus(itemValue)}>
+          {['pending', 'active', 'inactive'].map((status) => (
+            <Picker.Item key={status} value={status} label={status} />
+          ))}
+        </Picker>
+      </View>
       {isLoading ? (
         <ActivityIndicator
           color={colors.primary}
