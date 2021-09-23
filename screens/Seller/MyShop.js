@@ -1,4 +1,4 @@
-import React, {useEffect, useContext} from 'react'
+import React, {useEffect, useContext, useState} from 'react'
 import {
   TouchableOpacity,
   View,
@@ -13,7 +13,7 @@ import Header from '../../components/Header'
 import {AppContext} from '../../context/auth'
 import colors from '../../constants/colors'
 
-const MyOrders = ({navigation}) => {
+const MyShop = ({navigation}) => {
   const {userType} = useContext(AppContext)
 
   useEffect(() => {
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default MyOrders
+export default MyShop

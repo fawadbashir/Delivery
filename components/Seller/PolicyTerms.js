@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -22,7 +21,7 @@ const PolicyTerms = () => {
   const {
     control,
     handleSubmit,
-    setValue,
+
     reset,
     formState: {errors},
   } = useForm({mode: 'all'})
