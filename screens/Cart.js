@@ -75,8 +75,12 @@ const Cart = () => {
                     fontFamily: 'Poppins-SemiBold',
                   }}>{`${seller?.firstName} ${seller?.lastName}`}</Text>
               )}
-              <Text>{`${seller.phone}`}</Text>
-              <Text>{`${seller.email}`}</Text>
+              {seller && (
+                <>
+                  <Text>{`${seller.phone}`} </Text>
+                  <Text>{`${seller.email}`}</Text>
+                </>
+              )}
             </View>
           </View>
           <Controller

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, useCallback} from 'react'
 import {
   Text,
   StyleSheet,
@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
+import {useFocusEffect} from '@react-navigation/native'
 
 import {useHttpClient} from '../../hooks/http-hook'
 import UserSearchItem from '../../components/UserSearchItem'
@@ -189,21 +190,23 @@ const StartTransaction = (props) => {
     )
   }
 
-  useEffect(() => {
-    const getRecentPayments = async () => {
-      try {
-        const response = await sendRequest(
-          'https://deliverypay.in/api/recentPayments',
-        )
+  useFocusEffect(
+    useCallback(() => {
+      const getRecentPayments = async () => {
+        try {
+          const response = await sendRequest(
+            'https://deliverypay.in/api/recentPayments',
+          )
 
-        console.log(response)
-        setPayments(response)
-      } catch (e) {
-        e
+          console.log(response)
+          setPayments(response)
+        } catch (e) {
+          e
+        }
       }
-    }
-    getRecentPayments()
-  }, [sendRequest])
+      getRecentPayments()
+    }, [sendRequest]),
+  )
 
   useEffect(() => {
     if (userType === 'seller') {

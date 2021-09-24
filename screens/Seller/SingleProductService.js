@@ -7,16 +7,16 @@ import {
   Image,
   useWindowDimensions,
 } from 'react-native'
-
+import {useFocusEffect} from '@react-navigation/native'
 import {useHttpClient} from '../../hooks/http-hook'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
 import {SwiperFlatList} from 'react-native-swiper-flatlist'
 import colors from '../../constants/colors'
 import {AppContext} from '../../context/auth'
-import {useFocusEffect} from '@react-navigation/native'
+import {ActivityIndicator} from 'react-native-paper'
 
-const SingleProduct = (props) => {
+const SingleProductService = (props) => {
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const window = useWindowDimensions()
   const [product, setProduct] = useState({})
@@ -52,6 +52,7 @@ const SingleProduct = (props) => {
           )}
         />
       </View>
+      {isLoading && <ActivityIndicator color={colors.primary} />}
 
       <View style={styles.detail}>
         {product && <Text style={styles.title}>{product.name}</Text>}
@@ -67,11 +68,10 @@ const SingleProduct = (props) => {
         )}
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
-            disable={true}
             activeOpacity={0.6}
             style={styles.cartButton}
             onPress={addToCart.bind(this, product, product.user)}>
-            <Text style={styles.cardButtonText}>Add To Order</Text>
+            <Text style={styles.cardButtonText}>Add To Cart</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.cartButton}>
             <Text style={styles.cardButtonText}>Share the Product</Text>
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cartButton: {
-    backgroundColor: colors.purple,
+    backgroundColor: colors.blue,
     padding: 10,
     borderRadius: 10,
     paddingHorizontal: 20,
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default SingleProduct
+export default SingleProductService

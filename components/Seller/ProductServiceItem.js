@@ -1,9 +1,12 @@
 import React from 'react'
-import {View, Text, StyleSheet, Image} from 'react-native'
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native'
 
 const ProductServiceItem = (props) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.7}
+      onPress={props.onPress}>
       <View style={styles.subContainer}>
         <View style={styles.itemContainer}>
           <Text style={styles.itemHeading}>Image</Text>
@@ -63,7 +66,7 @@ const ProductServiceItem = (props) => {
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 

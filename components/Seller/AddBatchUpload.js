@@ -10,8 +10,7 @@ import {
 } from 'react-native'
 import {Portal, Modal} from 'react-native-paper'
 import colors from '../../constants/colors'
-import {Controller, useForm} from 'react-hook-form'
-import {Picker} from '@react-native-picker/picker'
+
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import DocumentPicker from 'react-native-document-picker'
 import LinearGradient from 'react-native-linear-gradient'
@@ -22,7 +21,7 @@ const AddProductService = (props) => {
   const filePickerHandler = async () => {
     try {
       const response = await DocumentPicker.pick({
-        type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
+        type: [DocumentPicker.types.csv, DocumentPicker.types.xlsx],
         allowMultiSelection: true,
         mode: 'import',
       })
@@ -54,7 +53,7 @@ const AddProductService = (props) => {
               onPress={filePickerHandler}>
               <Icon name="description" size={30} color="#fff" />
             </TouchableOpacity>
-            {files && <Text>File Selected</Text>}
+            {files.length > 0 && <Text>File Selected</Text>}
           </View>
 
           <TouchableOpacity
@@ -95,8 +94,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   modalHeadingContainer: {
-    elevation: 2,
-
     backgroundColor: 'white',
     width: '100%',
     padding: 5,

@@ -46,6 +46,9 @@ import Refunds from '../screens/Seller/Refunds'
 import Campaigns from '../screens/Seller/Campaigns'
 import FbMarketPlace from '../screens/Seller/FbMarketPlace'
 import Settings from '../screens/Seller/Settings'
+import BottomBar from '../components/BottomBar'
+import Header from '../components/Header'
+import SingleProductService from '../screens/Seller/SingleProductService'
 
 const AuthStack = createStackNavigator()
 const MainStack = createStackNavigator()
@@ -85,7 +88,12 @@ export const MainNavigator = () => {
   return (
     <>
       <MainStack.Navigator
-        headerMode={'none'}
+        headerMode={false}
+        // screenOptions={() => {
+        //   return {
+        //     header: () => <Header />,
+        //   }
+        // }}
         initialRouteName="chooseCategory">
         <MainStack.Screen name="home/chooseCategory" component={UserCategory} />
         <MainStack.Screen
@@ -156,6 +164,10 @@ export const MainNavigator = () => {
         <MainStack.Screen name="shop/campaigns" component={Campaigns} />
         <MainStack.Screen name="shop/fbMarket" component={FbMarketPlace} />
         <MainStack.Screen name="shop/settings" component={Settings} />
+        <MainStack.Screen
+          name="shop/singleProduct"
+          component={SingleProductService}
+        />
       </MainStack.Navigator>
     </>
   )

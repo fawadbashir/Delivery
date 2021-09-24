@@ -15,9 +15,9 @@ import AddProductService from '../../components/Seller/AddProductService'
 import moment from 'moment'
 import colors from '../../constants/colors'
 import {useHttpClient} from '../../hooks/http-hook'
-import AddBatchUpload from '../../components/Seller/AddBatchUpload'
+import {useFocusEffect} from '@react-navigation/native'
 
-const ProductsServices = () => {
+const ProductsServices = (props) => {
   const [BatchVisible, setBatchVisible] = useState(false)
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const {
@@ -53,8 +53,8 @@ const ProductsServices = () => {
       name: data.name,
       dscr: data.description,
       price: data.price,
-      images: data.images ? data.images : [],
-      gst: data.hsn,
+      images: data.files.length > 0 ? data.files : [],
+      gst: 0,
       tags: data.tags,
       discount: {
         type: data.discountType,
@@ -74,32 +74,36 @@ const ProductsServices = () => {
         },
       )
       console.log(response)
-      console.log(error)
+      if (error) {
+        console.log(error)
+      }
     } catch (e) {
       e
     }
   }
-  const uploadBatch = async (data) => {
-    try {
-      const response = await batchRequest(
-        'https://deliverypay.in/api/addProduct',
-        'POST',
-        // JSON.stringify(body),
-        {
-          'Content-Type': 'application/json',
-        },
-      )
-      console.log(response)
-      console.log(error)
-    } catch (e) {
-      e
-    }
-  }
+  // const uploadBatch = async (data) => {
+  //   try {
+  //     const response = await batchRequest(
+  //       'https://deliverypay.in/api/addProduct',
+  //       'POST',
+  //       // JSON.stringify(body),
+  //       {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     )
+  //     console.log(response)
+  //     console.log(error)
+  //   } catch (e) {
+  //     e
+  //   }
+  // }
 
-  useEffect(() => {
-    getProducts()
-    getCategories()
-  }, [getProducts, getCategories])
+  useFocusEffect(
+    useCallback(() => {
+      getProducts()
+      getCategories()
+    }, [getCategories, getProducts]),
+  )
   const getCategories = useCallback(async () => {
     try {
       const response = await fetch('https://deliverypay.in/api/categories')
@@ -117,12 +121,13 @@ const ProductsServices = () => {
 
   return (
     <>
-      <AddBatchUpload
+      {/* <AddBatchUpload
         open={BatchVisible}
         onDismiss={setBatchVisible}
         onSubmit={uploadBatch}
-      />
+      /> */}
       <AddProductService
+        isLoading={isLoading}
         open={addProductVisible}
         onDismiss={setAddProductVisble}
         categories={categories}
@@ -138,11 +143,11 @@ const ProductsServices = () => {
               onPress={setAddProductVisble.bind(this, true)}>
               <Text style={styles.buttonText}>Add Product</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.button}
               onPress={setBatchVisible.bind(this, true)}>
-              <Text style={styles.buttonText}>Batch Product Upload</Text>
-            </TouchableOpacity>
+              <Text style={styles.buttonText}>Batch Upload</Text>
+            </TouchableOpacity> */}
           </View>
         }
         data={products}
@@ -154,6 +159,9 @@ const ProductsServices = () => {
         }
         renderItem={({item}) => (
           <ProductServiceItem
+            onPress={() => {
+              props.navigation.navigate('shop/singleProduct', {id: item._id})
+            }}
             image={item.images[0]}
             date={moment(item.createAt).format('DD MM YY')}
             name={item.name}
@@ -181,17 +189,18 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: 'Poppins-Regulat',
-    fontSize: 18,
+    fontSize: 15,
     color: '#fff',
   },
   listHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    padding: 10,
+    // padding: 10,
+    paddingTop: 5,
   },
   heading: {
-    fontSize: 20,
+    fontSize: 17,
   },
 })
 

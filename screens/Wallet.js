@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect, useContext, useCallback} from 'react'
 import {
   View,
   StyleSheet,
@@ -13,6 +13,7 @@ import {BarChart} from 'react-native-chart-kit'
 import RazorpayCheckout from 'react-native-razorpay'
 import LinearGradient from 'react-native-linear-gradient'
 import Icon from 'react-native-vector-icons/MaterialIcons'
+import {useFocusEffect} from '@react-navigation/native'
 
 import CreditCard from '../components/CreditCard'
 import BottomBar from '../components/BottomBar'
@@ -21,7 +22,7 @@ import {useHttpClient} from '../hooks/http-hook'
 
 import Colors from '../constants/colors'
 import {AppContext} from '../context/auth'
-import Svg, {G, Path, Defs} from 'react-native-svg'
+import Svg, {G, Path} from 'react-native-svg'
 
 const data = {
   labels: ['Jan', 'Feb', 'Mar', 'Apr'],
@@ -72,17 +73,17 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
     console.log(response.order.id)
 
     var options = {
-      description: 'Credits towards consultation',
-      image: 'https://i.imgur.com/3g7nmJC.png',
+      description: 'Never Pay Without Using Delivery pay',
+      image: 'https://deliverypay.in/logo_sqr.jpg',
       currency: 'INR',
       key: 'rzp_live_99P71FzULLEPB7',
       amount: money,
-      name: 'Acme Corp',
+      name: 'Delivery Pay',
       order_id: response.order.id, //Replace this with an order_id created using Orders API.
       prefill: {
-        email: 'gaurav.kumar@example.com',
-        contact: '9191919191',
-        name: 'Gaurav Kumar',
+        email: user.email,
+        contact: user.userPhone,
+        name: `${user.firstName} ${user.lastName}`,
       },
       theme: {color: '#2699FB'},
     }
@@ -93,7 +94,8 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
       })
       .catch((error) => {
         // handle failure
-        alert(`Error: ${error.code} | ${error.description}`)
+        // alert(`Error: ${error.code} | ${error.description}`)
+        console.log(error)
       })
   }
   const handleWithdraw = async () => {
@@ -137,28 +139,30 @@ const Wallet = ({navigation: {navigate, addListener}}) => {
       })
   }
 
-  useEffect(() => {
-    const unsubsribe = addListener('focus', async () => {
-      try {
-        const response = await dashboardRequest(
-          'https://deliverypay.in/api/dashboardData',
-        )
+  useFocusEffect(
+    useCallback(() => {
+      const unsubsribe = addListener('focus', async () => {
+        try {
+          const response = await dashboardRequest(
+            'https://deliverypay.in/api/dashboardData',
+          )
 
-        setDashboardData(response)
-        const barData = {labels: [], datasets: [{data: []}]}
-        response.monthlyBalance.forEach((month) => {
-          barData.labels.push(month._id)
-          barData.datasets[0].data.push(month.balance)
-        })
-        console.log(barData)
-        setChartData(barData)
-      } catch (e) {
-        console.log(e)
-      }
-    })
+          setDashboardData(response)
+          const barData = {labels: [], datasets: [{data: []}]}
+          response.monthlyBalance.forEach((month) => {
+            barData.labels.push(month._id)
+            barData.datasets[0].data.push(month.balance)
+          })
+          console.log(barData)
+          setChartData(barData)
+        } catch (e) {
+          console.log(e)
+        }
+      })
 
-    return unsubsribe
-  }, [addListener, dashboardRequest])
+      return unsubsribe
+    }, [addListener, dashboardRequest]),
+  )
 
   return (
     <>

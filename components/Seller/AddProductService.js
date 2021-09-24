@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native'
-import {Portal, Modal} from 'react-native-paper'
+import {Portal, Modal, ActivityIndicator} from 'react-native-paper'
 import colors from '../../constants/colors'
 import {Controller, useForm} from 'react-hook-form'
 import {Picker} from '@react-native-picker/picker'
@@ -59,16 +59,18 @@ const AddProductService = (props) => {
         response.map((image) => image.uri),
       )
       setImages(response.map((image) => image.uri))
-      console.log(response[0])
     } catch (e) {
       console.log(e)
     }
   }
 
-  console.log(errors)
   const onSubmit = (data) => {
     props.onSubmit({...data, tags})
   }
+
+  useEffect(() => {
+    return () => reset({})
+  }, [reset])
 
   return (
     <Portal>
@@ -430,26 +432,30 @@ const AddProductService = (props) => {
             </View>
           ) : null}
 
-          <TouchableOpacity
-            activeOpacity={0.6}
-            style={{marginTop: 20}}
-            onPress={handleSubmit(onSubmit)}>
-            <LinearGradient
-              start={{x: 0, y: 1}}
-              //   end={{x: 1, y: 0}}
-              colors={['#2598b6', '#0b1a45']}
-              style={{
-                borderRadius: 30,
-                height: 48,
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 10,
-                width: 120,
-                alignSelf: 'center',
-              }}>
-              <Text style={{color: '#fff'}}>Submit</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          {props.isLoading ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : (
+            <TouchableOpacity
+              activeOpacity={0.6}
+              style={{marginTop: 20}}
+              onPress={handleSubmit(onSubmit)}>
+              <LinearGradient
+                start={{x: 0, y: 1}}
+                //   end={{x: 1, y: 0}}
+                colors={['#2598b6', '#0b1a45']}
+                style={{
+                  borderRadius: 30,
+                  height: 48,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: 10,
+                  width: 120,
+                  alignSelf: 'center',
+                }}>
+                <Text style={{color: '#fff'}}>Submit</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </Modal>
     </Portal>
@@ -465,6 +471,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 5,
     paddingBottom: 20,
+    maxHeight: '80%',
   },
   modalHeadingContainer: {
     elevation: 2,
