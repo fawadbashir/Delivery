@@ -76,7 +76,7 @@ const OrderHistory = ({navigation}) => {
           data={orders}
           ListEmptyComponent={
             <View style={styles.emptyListView}>
-              <Text style={styles.emptyListText}>No Orders were cancelled</Text>
+              <Text style={styles.emptyListText}>No Orders.</Text>
             </View>
           }
           keyExtractor={(item) => item.id}

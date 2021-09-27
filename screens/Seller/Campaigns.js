@@ -6,16 +6,16 @@ import {
   Text,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native'
 import {Picker} from '@react-native-picker/picker'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-
-import DateRangePicker from 'react-native-daterange-picker'
 
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
 import {useHttpClient} from '../../hooks/http-hook'
 import moment from 'moment'
+import {DatePickerModal} from 'react-native-paper-dates'
 import {ActivityIndicator} from 'react-native-paper'
 import colors from '../../constants/colors'
 import CouponModal from '../../components/CouponModal'
@@ -31,16 +31,26 @@ const Campaigns = ({navigation}) => {
   const [displayedDate] = useState(moment())
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [status, setStatus] = useState('')
+  const [search, setSearch] = useState('')
+  const [range, setRange] = useState()
 
   const getCoupons = useCallback(async () => {
+    const startDate = moment(range?.startDate).format('YYYY-MM-DD')
+    const endDate = moment(range?.endDate).format('YYYY-MM-DD')
     setLoading(true)
 
     try {
       const response = await fetch(
-        'https://deliverypay.in/api/getCoupons?page=1&perPage=20&sort=createdAt',
-        {
-          method: 'GET',
-        },
+        `https://deliverypay.in/api/getCoupons?${new URLSearchParams({
+          user: 'seller',
+          ...(search && {q: search}),
+
+          ...(range && {
+            dateFrom: startDate,
+            dateTo: endDate,
+          }),
+          ...(status && {status}),
+        })}`,
       )
       const resData = await response.json()
       if (!response.ok) {
@@ -68,7 +78,7 @@ const Campaigns = ({navigation}) => {
       alert('Error', e.message)
     }
     setLoading(false)
-  }, [])
+  }, [range, search, status])
 
   useEffect(() => {
     getCoupons()
@@ -129,6 +139,18 @@ const Campaigns = ({navigation}) => {
       e
     }
   }
+  const onDismiss = React.useCallback(() => {
+    setCalendarOpen(false)
+  }, [setCalendarOpen])
+
+  const onConfirm = React.useCallback(({startDate, endDate}) => {
+    setCalendarOpen(false)
+    setRange({startDate, endDate})
+
+    // params.append('dateFrom', moment(startDate).format('YYYY-DD-MM'))
+    // params.append('dateTo', moment(endDate).format('YYYY-DD-MM'))
+    // dateFrom=2021-09-02&dateTo=2021-09-26
+  }, [])
 
   return (
     <>
@@ -141,128 +163,132 @@ const Campaigns = ({navigation}) => {
           isLoading={isLoading}
         />
       )}
-
-      <Header />
-      <View
-        style={{
-          flexDirection: 'row',
-          // alignItems: 'center',
-          justifyContent: 'space-around',
-          paddingHorizontal: 20,
-          paddingVertical: 10,
-        }}>
-        <CommonSearch style={{borderRadius: 10, width: '80%', marginTop: 0}} />
-        <DateRangePicker
-          onChange={(dates) => {
-            console.log(dates)
-            setDate((prev) => ({...prev, ...dates}))
-          }}
-          backdropStyle={{
-            flexGrow: 1,
-          }}
-          displayedDate={displayedDate}
-          range={true}
-          startDate={date?.startDate}
-          endDate={date?.endDate}
-          moment={moment}>
-          <Icon name="calendar-today" color={colors.blue} size={30} />
-        </DateRangePicker>
-      </View>
-      <View
-        style={{
-          width: '80%',
-          alignSelf: 'center',
-          marginBottom: 10,
-        }}>
-        <Picker
+      <DatePickerModal
+        disablecategoryBar
+        animationType="slide"
+        locale={'en'}
+        mode="range"
+        visible={calendarOpen}
+        onDismiss={onDismiss}
+        startDate={range?.startDate}
+        endDate={range?.endDate}
+        onConfirm={onConfirm}
+      />
+      <KeyboardAvoidingView style={{flexGrow: 1}}>
+        <Header />
+        <View
           style={{
-            backgroundColor: '#fff',
-            borderRadius: 30,
-          }}
-          mode="dropdown"
-          selectedValue={status}
-          onValueChange={(itemValue) => setStatus(itemValue)}>
-          {['pending', 'active', 'inactive'].map((status) => (
-            <Picker.Item key={status} value={status} label={status} />
-          ))}
-        </Picker>
-      </View>
-      {isLoading ? (
-        <ActivityIndicator
-          color={colors.primary}
-          style={{flexGrow: 1, backgroundColor: 'white'}}
-        />
-      ) : (
-        <FlatList
-          contentContainerStyle={{flexGrow: 1}}
-          ListEmptyComponent={
-            <View style={styles.emptyListView}>
-              <Text style={styles.emptyListText}>
-                There are no campaigns available.
-              </Text>
-            </View>
-          }
-          data={campaigns}
-          keyExtractor={(item) => item.id}
-          renderItem={(itemData) => (
-            <TouchableOpacity
-              style={styles.itemContainer}
-              activeOpacity={0.6}
-              onPress={() => setCoupon(itemData.item)}>
-              <View style={styles.orderItemContainer}>
-                <View>
-                  <Text style={styles.order}>Date</Text>
-                  <Text style={styles.order}>{itemData.item.date}</Text>
-                </View>
-                <View>
-                  <Text style={styles.order}>Title</Text>
-                  <Text style={styles.order}>{itemData.item.title}</Text>
-                </View>
-                <View>
-                  <Text style={styles.order}>Status</Text>
-                  <Text style={styles.order}>{itemData.item.status}</Text>
-                </View>
+            flexDirection: 'row',
+            // alignItems: 'center',
+            justifyContent: 'space-around',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+          }}>
+          <CommonSearch
+            style={{borderRadius: 10, width: '80%', marginTop: 0}}
+          />
+          <TouchableOpacity onPress={() => setCalendarOpen(true)}>
+            <Icon name="calendar-today" color={colors.blue} size={30} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            width: '80%',
+            alignSelf: 'center',
+            marginBottom: 10,
+          }}>
+          <Picker
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 30,
+            }}
+            mode="dropdown"
+            selectedValue={status}
+            onValueChange={(itemValue) => setStatus(itemValue)}>
+            {['pending', 'active', 'inactive'].map((status) => (
+              <Picker.Item key={status} value={status} label={status} />
+            ))}
+          </Picker>
+        </View>
 
-                <View>
-                  <Text style={styles.order}>Code</Text>
-                  <Text style={styles.order}>{itemData.item.code}</Text>
-                </View>
+        {isLoading ? (
+          <ActivityIndicator
+            color={colors.primary}
+            style={{flexGrow: 1, backgroundColor: 'white'}}
+          />
+        ) : (
+          <FlatList
+            contentContainerStyle={{flexGrow: 1}}
+            ListEmptyComponent={
+              <View style={styles.emptyListView}>
+                <Text style={styles.emptyListText}>
+                  There are no campaigns available.
+                </Text>
               </View>
-              <View style={styles.orderItemContainer}>
-                <View>
-                  <Text style={styles.order}>Discount</Text>
+            }
+            data={campaigns}
+            keyExtractor={(item) => item.id}
+            renderItem={(itemData) => (
+              <TouchableOpacity
+                style={styles.itemContainer}
+                activeOpacity={0.6}
+                onPress={() => setCoupon(itemData.item)}>
+                <View style={styles.orderItemContainer}>
+                  <View>
+                    <Text style={styles.order}>Date</Text>
+                    <Text style={styles.order}>{itemData.item.date}</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.order}>Title</Text>
+                    <Text style={styles.order}>{itemData.item.title}</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.order}>Status</Text>
+                    <Text style={styles.order}>{itemData.item.status}</Text>
+                  </View>
 
-                  <Text style={styles.order}>
-                    {`${itemData.item.discount}%`}
-                  </Text>
-                  <Text style={{fontSize: 12, textAlign: 'center'}}>
-                    {`Up To ₹${itemData.item.maxDiscount}`}
-                  </Text>
+                  <View>
+                    <Text style={styles.order}>Code</Text>
+                    <Text style={styles.order}>{itemData.item.code}</Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={styles.order}>Threshold</Text>
-                  <Text style={styles.order}>{itemData.item.threshold}</Text>
-                </View>
-                <View>
-                  <Text style={styles.order}>Validity</Text>
-                  <Text style={[styles.order, {fontSize: 14}]}>
-                    {itemData.item.validity}
-                  </Text>
-                </View>
+                <View style={styles.orderItemContainer}>
+                  <View>
+                    <Text style={styles.order}>Discount</Text>
 
-                <View>
-                  <Text style={styles.order}>Accept</Text>
-                  <Text style={styles.order}>
-                    {itemData.item.accept === true ? 'Yes' : 'No'}
-                  </Text>
+                    <Text style={styles.order}>
+                      {`${itemData.item.discount}%`}
+                    </Text>
+                    <Text style={{fontSize: 12, textAlign: 'center'}}>
+                      {`Up To ₹${itemData.item.maxDiscount}`}
+                    </Text>
+                  </View>
+                  <View>
+                    <Text style={styles.order}>Threshold</Text>
+                    <Text style={styles.order}>{itemData.item.threshold}</Text>
+                  </View>
+                  <View>
+                    <Text style={styles.order}>Validity</Text>
+                    <Text style={[styles.order, {fontSize: 14}]}>
+                      {itemData.item.validity}
+                    </Text>
+                  </View>
+
+                  <View>
+                    <Text style={styles.order}>Accept</Text>
+                    <Text style={styles.order}>
+                      {itemData.item.accept === true ? 'Yes' : 'No'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      )}
-      {/* </ScrollView> */}
-      <BottomBar />
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {/* </ScrollView> */}
+        <BottomBar />
+      </KeyboardAvoidingView>
     </>
   )
 }

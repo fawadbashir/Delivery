@@ -6,9 +6,10 @@ import {
   Text,
   FlatList,
   Alert,
+  KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native'
-import {URL} from 'react-native-url-polyfill'
-
+import {URLSearchParams} from 'react-native-url-polyfill'
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
 import {useHttpClient} from '../../hooks/http-hook'
@@ -17,24 +18,42 @@ import LinearGradient from 'react-native-linear-gradient'
 import {ActivityIndicator, Portal, Modal} from 'react-native-paper'
 import colors from '../../constants/colors'
 import CommonSearch from '../../components/CommonSearch'
-import DateRangePicker from 'react-native-daterange-picker'
+
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {Picker} from '@react-native-picker/picker'
+import {DatePickerModal} from 'react-native-paper-dates'
+import {useFocusEffect} from '@react-navigation/native'
 
-const url = new URL('https://deliverypay.in/api/getOrders?user=seller')
 const Orders = ({navigation}) => {
+  const window = useWindowDimensions()
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
   const [orders, setOrders] = useState([])
   const [visible, setVisible] = useState(false)
   const [orderId, setOrderId] = useState('')
-  const [date, setDate] = useState()
-  const [displayedDate] = useState(moment())
+  const [range, setRange] = useState(null)
+  const [search, setSearch] = useState('')
+
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [status, setStatus] = useState('')
 
+  // const params = new URLSearchParams(url)
+
   const getOrders = useCallback(async () => {
+    const startDate = moment(range?.startDate).format('YYYY-MM-DD')
+    const endDate = moment(range?.endDate).format('YYYY-MM-DD')
     try {
-      const response = await sendRequest(url)
+      const response = await sendRequest(
+        `https://deliverypay.in/api/getOrders?${new URLSearchParams({
+          user: 'seller',
+          ...(search && {q: search}),
+
+          ...(range && {
+            dateFrom: startDate,
+            dateTo: endDate,
+          }),
+          ...(status && {status}),
+        })}`,
+      )
 
       const validOrders = response.orders.map((order) => ({
         id: order._id,
@@ -49,11 +68,30 @@ const Orders = ({navigation}) => {
     } catch (e) {
       e
     }
-  }, [error, sendRequest])
+  }, [error, range, search, sendRequest, status])
 
-  useEffect(() => {
-    getOrders()
-  }, [getOrders])
+  const searchOrders = (text) => {
+    setSearch(text)
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      getOrders()
+    }, [getOrders]),
+  )
+
+  const onDismiss = React.useCallback(() => {
+    setCalendarOpen(false)
+  }, [setCalendarOpen])
+
+  const onConfirm = React.useCallback(({startDate, endDate}) => {
+    setCalendarOpen(false)
+    setRange({startDate, endDate})
+
+    // params.append('dateFrom', moment(startDate).format('YYYY-DD-MM'))
+    // params.append('dateTo', moment(endDate).format('YYYY-DD-MM'))
+    // dateFrom=2021-09-02&dateTo=2021-09-26
+  }, [])
 
   const requestCancellation = async () => {
     try {
@@ -127,104 +165,114 @@ const Orders = ({navigation}) => {
   return (
     <>
       {detailModal()}
-
-      <Header />
-      <View
-        style={{
-          flexDirection: 'row',
-          // alignItems: 'center',
-          justifyContent: 'space-around',
-          paddingHorizontal: 20,
-          paddingVertical: 10,
-        }}>
-        <CommonSearch style={{borderRadius: 10, width: '80%', marginTop: 0}} />
-        <DateRangePicker
-          onChange={(dates) => {
-            console.log(dates)
-            setDate((prev) => ({...prev, ...dates}))
-          }}
-          backdropStyle={{
-            flexGrow: 1,
-          }}
-          displayedDate={displayedDate}
-          range={true}
-          startDate={date?.startDate}
-          endDate={date?.endDate}
-          moment={moment}>
-          <Icon name="calendar-today" color={colors.blue} size={30} />
-        </DateRangePicker>
-      </View>
-      <View
-        style={{
-          // alignItems: 'center',
-          alignSelf: 'center',
-          marginBottom: 10,
-          width: 300,
-        }}>
-        <Picker
+      <DatePickerModal
+        disableStatusBar
+        animationType="slide"
+        locale={'en'}
+        mode="range"
+        visible={calendarOpen}
+        onDismiss={onDismiss}
+        startDate={range?.startDate}
+        endDate={range?.endDate}
+        onConfirm={onConfirm}
+      />
+      <KeyboardAvoidingView style={{flexGrow: 1}}>
+        <Header />
+        <View
           style={{
-            backgroundColor: '#fff',
-            borderRadius: 30,
-          }}
-          mode="dropdown"
-          selectedValue={status}
-          onValueChange={(itemValue, itemIndex) => setStatus(itemValue)}>
-          {[
-            'pending',
-            'approved',
-            'cancelled',
-            'hold',
-            'shipped',
-            'delivered',
-            'refund',
-          ].map((status) => (
-            <Picker.Item key={status} value={status} label={status} />
-          ))}
-        </Picker>
-      </View>
-      <View style={styles.orderItemContainer}>
-        <Text style={styles.order}>Order</Text>
-        <Text style={styles.order}>Purchase Date</Text>
-        <Text style={styles.order}>Total</Text>
-        <Text style={styles.order}>Status</Text>
-      </View>
-      {isLoading ? (
-        <ActivityIndicator
-          color={colors.primary}
-          style={{flexGrow: 1, backgroundColor: 'white'}}
-        />
-      ) : (
-        <FlatList
-          contentContainerStyle={{flexGrow: 1}}
-          ListEmptyComponent={
-            <View style={styles.emptyListView}>
-              <Text style={styles.emptyListText}>
-                There are no orders. How about starting adding some?
-              </Text>
-            </View>
-          }
-          style={{backgroundColor: 'white'}}
-          data={orders}
-          keyExtractor={(item) => item.id}
-          renderItem={(itemData) => (
-            <TouchableOpacity
-              activeOpacity={0.6}
-              style={styles.orderItemContainer}
-              onPress={() => {
-                setVisible(true)
-                setOrderId(itemData.item.id)
-              }}>
-              <Text style={styles.order}>
-                {itemData.item?.id.substring(0, 10)}
-              </Text>
-              <Text style={styles.order}>{itemData.item.purchaseDate}</Text>
-              <Text style={styles.order}>₹{itemData.item.total}</Text>
-              <Text style={styles.order}>{itemData.item.status}</Text>
-            </TouchableOpacity>
+            flexDirection: 'row',
+            // alignItems: 'center',
+            justifyContent: 'space-around',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+          }}>
+          <CommonSearch
+            style={{borderRadius: 10, width: '80%', marginTop: 0}}
+            onChangeText={searchOrders}
+            value={search}
+          />
+          <TouchableOpacity onPress={() => setCalendarOpen(true)}>
+            <Icon name="calendar-today" color={colors.blue} size={30} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            // alignItems: 'center',
+            alignSelf: 'center',
+            marginBottom: 10,
+            width: 300,
+          }}>
+          <Picker
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 30,
+            }}
+            mode="dropdown"
+            selectedValue={status}
+            onValueChange={(itemValue) => {
+              setStatus(itemValue)
+              getOrders()
+            }}>
+            {[
+              'pending',
+              'approved',
+              'cancelled',
+              'hold',
+              'shipped',
+              'delivered',
+              'refund',
+            ].map((item) => (
+              <Picker.Item key={item} value={item} label={item} />
+            ))}
+          </Picker>
+        </View>
+        <View style={styles.orderItemContainer}>
+          <Text style={styles.order}>Order</Text>
+          <Text style={styles.order}>Purchase Date</Text>
+          <Text style={styles.order}>Total</Text>
+          <Text style={styles.order}>Status</Text>
+        </View>
+        <View style={{height: window.height < 700 ? 235 : 306}}>
+          {isLoading ? (
+            <ActivityIndicator
+              color={colors.primary}
+              style={{flexGrow: 1, backgroundColor: 'white'}}
+            />
+          ) : (
+            <FlatList
+              contentContainerStyle={{flexGrow: 1}}
+              ListEmptyComponent={
+                <View style={styles.emptyListView}>
+                  <Text style={styles.emptyListText}>
+                    There are no orders. How about starting adding some?
+                  </Text>
+                </View>
+              }
+              style={{backgroundColor: 'white'}}
+              data={orders}
+              keyExtractor={(item) => item.id}
+              renderItem={(itemData) => (
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={styles.orderItemContainer}
+                  onPress={() => {
+                    setVisible(true)
+                    setOrderId(itemData.item.id)
+                  }}>
+                  <Text style={styles.order}>
+                    {itemData.item?.id.substring(0, 10)}
+                  </Text>
+                  <Text style={styles.order}>{itemData.item.purchaseDate}</Text>
+                  <Text style={styles.order}>₹{itemData.item.total}</Text>
+                  <Text style={styles.order}>{itemData.item.status}</Text>
+                </TouchableOpacity>
+              )}
+            />
           )}
-        />
-      )}
-      <BottomBar />
+        </View>
+
+        <BottomBar />
+      </KeyboardAvoidingView>
     </>
   )
 }

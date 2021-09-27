@@ -9,7 +9,6 @@ import {
 import {CommonActions} from '@react-navigation/native'
 import BottomBar from '../../components/BottomBar'
 import Header from '../../components/Header'
-import colors from '../../constants/colors'
 
 import {AppContext} from '../../context/auth'
 
