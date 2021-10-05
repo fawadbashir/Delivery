@@ -297,6 +297,7 @@ export const AppProvider = (props) => {
         cart,
         addToCart,
         removeFromCart,
+        setCart,
       }}>
       {props.children}
     </AppContext.Provider>

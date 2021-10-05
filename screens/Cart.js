@@ -23,13 +23,15 @@ import {Avatar} from 'react-native-paper'
 
 const Cart = () => {
   const [grandTotal, setGrandTotal] = useState(0)
-  const {cart, addToCart, removeFromCart, user} = useContext(AppContext)
+  const {cart, addToCart, removeFromCart, user, setCart} =
+    useContext(AppContext)
   const [terms, setTerms] = useState([])
   const [seller, setSeller] = useState(null)
   const [termsOpen, setTermsOpen] = useState(false)
   const [addressOpen, setAddressOpen] = useState(false)
   const [note, setNote] = useState('')
   const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const {
     control: milestoneControl,
@@ -55,7 +57,7 @@ const Cart = () => {
     return (
       <Portal>
         <Modal
-          visible={seller}
+          visible={!!seller}
           dismissable={isLoading === false}
           contentContainerStyle={styles.modalContainer}
           onDismiss={() => {
@@ -121,7 +123,7 @@ const Cart = () => {
               />
             )}
           />
-          {isLoading ? (
+          {loading ? (
             <ActivityIndicator
               color={colors.primary}
               style={{marginVertical: 20}}
@@ -170,7 +172,8 @@ const Cart = () => {
   const placeOrder = async (data) => {
     const {altPhone, phone, name, zip, locality, street, city, landmark} =
       getValues()
-    console.log({
+
+    const body = {
       amount: data.amount,
       seller,
       dscr: data.detail,
@@ -186,47 +189,63 @@ const Cart = () => {
           // city,
           // landmark,
         },
-        products,
+        products: products.map((product) => ({
+          product,
+          qty: product.quantity,
+        })),
         // note,
       },
-    })
+    }
+    if (altPhone) {
+      body.order.deliveryDetail.altPhone = altPhone
+    }
+    if (zip) {
+      body.order.deliveryDetail.zip = zip
+    }
+    if (locality) {
+      body.order.deliveryDetail.locality = locality
+    }
+    if (street) {
+      body.order.deliveryDetail.street = street
+    }
+    if (city) {
+      body.order.deliveryDetail.city = city
+    }
+    if (landmark) {
+      body.order.deliveryDetail.landmark = landmark
+    }
+    setLoading(true)
     try {
-      const response = await sendRequest(
+      const response = await fetch(
         'https://deliverypay.in/api/createMilestone',
-        'POST',
-        JSON.stringify({
-          amount: data.amount,
-          seller,
-          dscr: data.detail,
-          order: {
-            deliveryDetail: {
-              // altPhone,
-              deliveryWithin: 7,
-              phone,
-              name,
-              // zip,
-              // locality,
-              // street,
-              // city,
-              // landmark,
-            },
-            products,
-            // note,
-          },
-        }),
         {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
+          method: 'POST',
+          body: JSON.stringify(body),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
         },
       )
-      if (error) {
-        Alert.alert('Error', error, [{onPress: () => clearError()}])
+      const resData = await response.json()
+
+      if (!response.ok) {
+        throw new Error(resData.message)
       }
+      Alert.alert('Success', resData.message)
+      console.log(cart)
+      console.log(resData)
+      setCart((prev) => ({
+        ...prev,
+        items: prev.items.filter(
+          (item) => item.seller._id !== resData.milestone.seller._id,
+        ),
+      }))
       setSeller(null)
-      console.log(response)
     } catch (e) {
-      e
+      Alert.alert('Error', e.message)
     }
+    setLoading(false)
   }
 
   const addressModal = () => {
