@@ -14,9 +14,6 @@ import {
 import CommonSearch from '../components/CommonSearch'
 import BottomBar from '../components/BottomBar'
 
-import {useHttpClient} from '../hooks/http-hook'
-import {AuthContext} from '../context/auth'
-
 const Deal = (props) => {
   const {socket, rooms, setRooms} = props
 
@@ -51,7 +48,6 @@ const Deal = (props) => {
 
   const [users, setUsers] = useState([])
   const window = useWindowDimensions()
-  const {sendRequest, error, isLoading, clearError} = useHttpClient()
 
   const getUsers = async (text) => {
     if (text === '') {
@@ -105,15 +101,16 @@ const Deal = (props) => {
     }
   }
 
+  socket.on('disconnect', () => console.log('disconnected'))
   useEffect(() => {
     const unsubscribe = props.navigation.addListener('focus', async () => {
       try {
-        // if (chats.length === 0) {
         const response = await fetch('https://deliverypay.in/api/getChat', {})
         const resData = await response.json()
         socket.emit('joinRooms', {
           rooms: resData.map((contact) => contact._id),
         })
+        // console.log(`rooms:[${resData.map((contact) => contact._id)}]`, 'rooms')
         const validArray = resData.map((chat) => ({
           id: chat._id,
           firstName: chat.client.firstName,
@@ -128,29 +125,11 @@ const Deal = (props) => {
         console.log(resData)
 
         setChats(validArray)
-        // }
-        // console.log(response)
-        // const response = await sendRequest('https://deliverypay.in/api/getChat')
-        //socket.on('connect', () => console.log(socket.id, 'socketId'))
-
-        //socket.on('test', (r) => console.log(socket.id, 'test'))
 
         socket.on('connectedToRoom', (r) => {
           console.log(r)
           setRooms(r.rooms.map((room) => room))
         })
-
-        // socket.emit(
-        //   'initiateChat',
-        //   {client_id: '60fee8603435a87f6a609ec6'},
-        //   (y) => console.log(y, 'initiateChat'),
-        // )
-
-        // socket.on('messageToUser', (response) =>
-        //   console.log(response, 'messageToUserfrom deal'),
-        // )
-
-        // socket.on('newChat', (payload) => console.log(payload, 'newChat'))
       } catch (e) {
         Alert.alert('Error', e.message)
       }
@@ -174,7 +153,14 @@ const Deal = (props) => {
         </View>
         <View
           style={{
-            height: window.height < 700 ? 315 : 386,
+            height:
+              window.height < 700
+                ? window.width < 400
+                  ? '48%'
+                  : '56%'
+                : window.width < 400
+                ? 355
+                : 385,
             paddingTop: 10,
             paddingHorizontal: 10,
           }}>
@@ -212,7 +198,7 @@ const Deal = (props) => {
                     <TouchableOpacity
                       style={styles.chartStatusView}
                       onPress={() => {
-                        console.log(rooms)
+                        // console.log(rooms)
                         // socket.emit('messageToServer', {
                         //   rooms,
                         //   message: {
@@ -221,9 +207,9 @@ const Deal = (props) => {
                         //   },
                         // })
 
-                        socket.on('messageToUser', (response) =>
-                          console.log(response, 'messageToUser'),
-                        )
+                        // socket.on('messageToUser', (response) =>
+                        //   console.log(response, 'messageToUser'),
+                        // )
 
                         props.navigation.navigate('chat', {
                           rooms,
@@ -320,8 +306,10 @@ const Deal = (props) => {
             }}
           />
         </View>
+        <BottomBar />
       </View>
-      <BottomBar />
+      {/* <View style={{bottom: 0}}> */}
+      {/* </View> */}
     </>
   )
 }

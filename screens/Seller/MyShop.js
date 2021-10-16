@@ -56,7 +56,7 @@ const MyShop = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('orders/disputes')}
+          onPress={() => navigation.navigate('shop/fbMarket')}
           activeOpacity={0.8}>
           <Text style={styles.buttonText}>FB MarketPlace</Text>
         </TouchableOpacity>
@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     backgroundColor: '#fff',
     paddingVertical: 15,
+    marginBottom: 100,
   },
   button: {
     backgroundColor: colors.blue,

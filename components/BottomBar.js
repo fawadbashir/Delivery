@@ -29,8 +29,12 @@ const BottomBar = (props) => {
   return (
     <View
       style={[
-        {...styles.container, ...props.styles},
-        {height: window.height < 700 ? 80 : 100},
+        {...styles.container, ...props.style},
+        {
+          height: window.height < 700 ? 80 : 100,
+          // top: window.height < 700 ? window.height - 100 : window.height - 120,
+          // bottom: 0,
+        },
       ]}>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -580,6 +584,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 100,
     backgroundColor: '#F8FAFF',
+    // position: 'absolute',
 
     // bottom: 0,
     // zIndex: -1,

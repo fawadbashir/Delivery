@@ -70,6 +70,7 @@ const ProductsServices = (props) => {
   }, [range, search, category])
 
   const onSubmit = async (data) => {
+    console.log(data, 'data')
     const body = {
       available: data.available,
       type: data.productType,
@@ -77,7 +78,7 @@ const ProductsServices = (props) => {
       name: data.name,
       dscr: data.description,
       price: data.price,
-      images: data.files.length > 0 ? data.files : [],
+      images: data?.files ? data.files : [],
       gst: 0,
       tags: data.tags,
       discount: {
@@ -103,7 +104,7 @@ const ProductsServices = (props) => {
         console.log(error)
       }
     } catch (e) {
-      e
+      console.log(e)
     }
   }
   // const uploadBatch = async (data) => {
@@ -157,7 +158,7 @@ const ProductsServices = (props) => {
   }, [])
 
   return (
-    <>
+    <View style={{flex: 1}}>
       {/* <AddBatchUpload
         open={BatchVisible}
         onDismiss={setBatchVisible}
@@ -182,17 +183,21 @@ const ProductsServices = (props) => {
         endDate={range?.endDate}
         onConfirm={onConfirm}
       />
-      <KeyboardAvoidingView behavior="padding">
-        <Header />
-        {/* <View style={styles.listHeader}>
+      {/* <KeyboardAvoidingView
+        keyboardVerticalOffset={10}
+        style={{flex: 1}}
+        behavior="height"> */}
+      <Header />
+      {/* <View style={styles.listHeader}>
         <Text style={styles.heading}>Product Management</Text> */}
 
-        {/* <TouchableOpacity
+      {/* <TouchableOpacity
               style={styles.button}
               onPress={setBatchVisible.bind(this, true)}>
               <Text style={styles.buttonText}>Batch Upload</Text>
             </TouchableOpacity> */}
-        {/* </View> */}
+      {/* </View> */}
+      <View style={{flex: 1}}>
         <View
           style={{
             flexDirection: 'row',
@@ -246,38 +251,51 @@ const ProductsServices = (props) => {
             <Text style={styles.buttonText}>Add Product</Text>
           </TouchableOpacity>
         </View>
-        <View style={{height: window.height < 700 ? 295 : 365}}>
-          <FlatList
-            data={products}
-            keyExtractor={(item) => item._id}
-            ListEmptyComponent={
-              <View>
-                <Text>No Products or Services Available</Text>
-              </View>
-            }
-            renderItem={({item}) => (
-              <ProductServiceItem
-                onPress={() => {
-                  props.navigation.navigate('shop/singleProduct', {
-                    id: item._id,
-                  })
-                }}
-                image={item.images[0]}
-                date={moment(item.createAt).format('DD MM YY')}
-                name={item.name}
-                type={item.type}
-                fbMarketId={item.fbMarketId}
-                available={item.available}
-                price={item.price}
-                gst={item.gst}
-                discount={item.discount}
-              />
-            )}
-          />
-        </View>
+        {/* <View
+          style={{
+            height:
+              window.height < 700 ? '36%' : window.width < 400 ? 336 : 365,
+          }}
+          > */}
+
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item._id}
+          ListEmptyComponent={
+            <View>
+              <Text>No Products or Services Available</Text>
+            </View>
+          }
+          renderItem={({item}) => (
+            <ProductServiceItem
+              onPress={() => {
+                props.navigation.navigate('shop/singleProduct', {
+                  id: item._id,
+                  categories,
+                })
+              }}
+              image={item.images[0]}
+              date={moment(item.createAt).format('DD MM YY')}
+              name={item.name}
+              type={item.type}
+              fbMarketId={item.fbMarketId}
+              available={item.available}
+              price={item.price}
+              gst={item.gst}
+              discount={item.discount}
+            />
+          )}
+        />
         <BottomBar />
-      </KeyboardAvoidingView>
-    </>
+      </View>
+      {/* </View> */}
+      {/* <View
+          style={{
+           
+          }}> */}
+      {/* </View> */}
+      {/* </KeyboardAvoidingView> */}
+    </View>
   )
 }
 
@@ -291,7 +309,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   buttonText: {
-    fontFamily: 'Poppins-Regulat',
+    fontFamily: 'Poppins-Regular',
     fontSize: 15,
     color: '#fff',
   },

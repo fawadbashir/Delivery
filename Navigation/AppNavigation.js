@@ -80,8 +80,6 @@ export const MainNavigator = () => {
     if (!socket.connected) {
       socket.connect()
     }
-
-    return () => socket.disconnect()
   }, [socket])
 
   return (

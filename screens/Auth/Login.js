@@ -46,13 +46,6 @@ const Login = (props) => {
   const email = register('email')
   const password = register('password')
 
-  useEffect(() => {
-    reset({
-      email: '+919625259527',
-      password: '1234',
-    })
-  }, [reset])
-
   const onSubmit = async (data) => {
     const {email, password} = data
 
@@ -81,6 +74,7 @@ const Login = (props) => {
       const cookie = regEx[0].replace('access_token=', '').replace(';', '')
 
       const {user} = responseData
+      console.log(user)
 
       login({
         userId: user._id,
@@ -95,6 +89,7 @@ const Login = (props) => {
         cookie,
         shopInfo: user.shopInfo,
         gst: user.gst,
+        fbMarket: user.fbMarket,
       })
     } catch (e) {
       Alert.alert('Error', e.message)

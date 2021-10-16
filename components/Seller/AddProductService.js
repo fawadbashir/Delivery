@@ -17,6 +17,7 @@ import DocumentPicker from 'react-native-document-picker'
 import LinearGradient from 'react-native-linear-gradient'
 
 const AddProductService = (props) => {
+  // console.log(props, 'sdads')
   const [tags, setTags] = useState([])
   const [tag, setTag] = useState('')
   const [images, setImages] = useState([])
@@ -69,8 +70,25 @@ const AddProductService = (props) => {
   }
 
   useEffect(() => {
+    props.product && console.log(props, 'sdads')
+    props.product != null ? setTags(props.product.tags) : setTags([])
+    props.product != null ? setImages(props.product.images) : setImages([])
+    props.product != null &&
+      reset({
+        productType: props?.product?.type,
+        category: props?.product?.category,
+        name: props?.product?.name,
+        price: props?.product?.price?.toString(),
+        available: props?.product?.available,
+        description: props?.product?.dscr,
+        discountType: props?.product?.discount?.type,
+        discountAmount: props?.product?.discount?.amount.toString(),
+        discountDescription: props?.product?.discount?.dscr,
+      })
+
     return () => reset({})
-  }, [reset])
+  }, [props, reset])
+  console.log(errors)
 
   return (
     <Portal>
@@ -102,13 +120,13 @@ const AddProductService = (props) => {
             <Text style={styles.fieldHeading}>Type</Text>
             <View
               style={{
-                borderColor: 'grey',
+                borderColor: errors.productType ? colors.errorColor : 'grey',
 
                 borderRadius: 10,
                 width: '100%',
                 alignSelf: 'center',
                 marginBottom: 10,
-                borderBottomWidth: 0.5,
+                borderBottomWidth: 1,
               }}>
               <Controller
                 name="productType"
@@ -133,13 +151,13 @@ const AddProductService = (props) => {
             <Text style={styles.fieldHeading}>Category</Text>
             <View
               style={{
-                borderColor: 'grey',
+                borderColor: errors.category ? colors.errorColor : 'grey',
 
                 borderRadius: 10,
                 width: '100%',
                 alignSelf: 'center',
                 marginBottom: 10,
-                borderBottomWidth: 0.5,
+                borderBottomWidth: 1,
               }}>
               <Controller
                 name="category"
@@ -176,8 +194,10 @@ const AddProductService = (props) => {
                 <TextInput
                   value={value}
                   onChangeText={onChange}
-                  style={styles.field}
-                  placeholder="grey"
+                  style={{
+                    ...styles.field,
+                    borderBottomColor: errors.name && colors.errorColor,
+                  }}
                 />
               )}
             />
@@ -196,16 +216,16 @@ const AddProductService = (props) => {
                 <TextInput
                   value={value}
                   onChangeText={onChange}
-                  style={[styles.field, errors.pirce && styles.redBorder]}
+                  style={(styles.field, [errors.price && styles.redBorder])}
                   keyboardType={'numeric'}
                   placeholderTextColor="grey"
                 />
               )}
             />
           </View>
-          {watch('prouctType') === 'product' ? (
+          {watch('productType') === 'product' ? (
             <View style={[styles.fieldArea]}>
-              <Text style={styles.fieldHeading}>Price</Text>
+              <Text style={styles.fieldHeading}>Available in stock</Text>
 
               <Controller
                 name="available"
@@ -230,13 +250,13 @@ const AddProductService = (props) => {
               <Text style={styles.fieldHeading}>Availability</Text>
               <View
                 style={{
-                  borderColor: 'grey',
+                  borderColor: errors.available ? colors.errorColor : 'grey',
 
                   borderRadius: 10,
                   width: '100%',
                   alignSelf: 'center',
                   marginBottom: 10,
-                  borderBottomWidth: 0.5,
+                  borderBottomWidth: 1,
                 }}>
                 <Controller
                   name="available"
@@ -286,8 +306,8 @@ const AddProductService = (props) => {
             <Text style={styles.fieldHeading}>Tags</Text>
             <View style={styles.tagsView}>
               <View style={styles.tagsContainer}>
-                {tags.length > 0
-                  ? tags.map((tag) => (
+                {tags?.length > 0
+                  ? tags?.map((tag) => (
                       <View key={tag} style={styles.tag}>
                         <Text style={styles.tagText}>{tag}</Text>
                         <TouchableOpacity
@@ -321,13 +341,15 @@ const AddProductService = (props) => {
               activeOpacity={0.6}
               style={styles.imagePickerContainer}
               onPress={filePickerHandler}>
-              {images.length > 0 ? (
+              {props.product?.images && images?.length > 0 ? (
                 <Image source={{uri: images[0]}} style={styles.image} />
               ) : (
                 <Icon name="photo-camera" size={30} color="#fff" />
               )}
             </TouchableOpacity>
-            <Text>{`${images.length} Selected`}</Text>
+            {props.product?.images && (
+              <Text>{`${images?.length} Selected`}</Text>
+            )}
           </View>
           <View style={styles.fieldArea}>
             <Text style={styles.fieldHeading}>HSN Code</Text>
@@ -335,13 +357,13 @@ const AddProductService = (props) => {
             <Controller
               name="hsn"
               control={control}
-              rules={{required: true}}
+              // rules={{required: true}}
               render={({field: {value, onChange}}) => (
                 <TextInput
                   placeholderTextColor="gray"
                   value={value}
                   onChangeText={onChange}
-                  style={styles.field}
+                  style={[styles.field, errors.hsn && styles.redBorder]}
                 />
               )}
             />
@@ -350,13 +372,13 @@ const AddProductService = (props) => {
             <Text style={styles.fieldHeading}>Discount Type</Text>
             <View
               style={{
-                borderColor: 'grey',
+                borderColor: errors.discountType ? colors.errorColor : 'grey',
 
                 borderRadius: 10,
                 width: '100%',
                 alignSelf: 'center',
                 marginBottom: 10,
-                borderBottomWidth: 0.5,
+                borderBottomWidth: 1,
               }}>
               <Controller
                 name="discountType"
@@ -398,7 +420,10 @@ const AddProductService = (props) => {
                     placeholderTextColor="gray"
                     value={value}
                     onChangeText={onChange}
-                    style={[styles.field, errors.pirce && styles.redBorder]}
+                    style={[
+                      styles.field,
+                      errors.discountAmount && styles.redBorder,
+                    ]}
                     keyboardType={'numeric'}
                   />
                 )}
@@ -424,7 +449,10 @@ const AddProductService = (props) => {
                     placeholderTextColor="gray"
                     value={value}
                     onChangeText={onChange}
-                    style={[styles.field, errors.pirce && styles.redBorder]}
+                    style={[
+                      styles.field,
+                      errors.discountDescription && styles.redBorder,
+                    ]}
                     multiline={true}
                   />
                 )}
@@ -498,9 +526,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   field: {
-    width: '90%',
+    width: '100%',
     alignSelf: 'center',
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     fontSize: 16,
     borderBottomColor: '#cccc',
     color: '#000',
@@ -579,6 +607,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  redBorder: {
+    borderBottomColor: colors.errorColor,
+    borderBottomWidth: 1,
   },
 })
 

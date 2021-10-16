@@ -142,17 +142,17 @@ const ChatScreen = (props) => {
         (r) => console.log(r),
       )
 
-      setMessages((prev) =>
-        prev.concat({
-          media: `https://${resData.url}`,
-          to: clientId,
-          from: user.userId,
-          id: 'sassolution.org/Admin/API/Files/2021092001274381.png',
-        }),
-      )
+      // setMessages((prev) =>
+      //   prev.concat({
+      //     media: `https://${resData.url}`,
+      //     to: clientId,
+      //     from: user.userId,
+      //     id: 'sassolution.org/Admin/API/Files/2021092001274381.png',
+      //   }),
+      // )
 
-      console.log(resData)
-      console.log(resData)
+      // console.log(resData)
+      console.log(resData, 'image')
     } catch (e) {
       // setVisible(false)
       console.log(e)
@@ -261,7 +261,7 @@ const ChatScreen = (props) => {
         console.log(response, 'messageToUserfromChatSceen')
 
         setMessages((prev) => prev.concat(response))
-        listRef.current.scrollToEnd()
+        listRef?.current?.scrollToEnd()
       })
     })
 
@@ -397,28 +397,36 @@ const ChatScreen = (props) => {
               height: window.height < 700 ? 314 : 385,
               // marginVertical: 5,
             }}> */}
-          <FlatList
-            // initialNumToRender={50}
-            data={messages}
+          <View
             style={{
-              height:
-                window.height < 700 ? 324 : userType === 'seller' ? 435 : 390,
-            }}
-            // contentContainerStyle={{
-            //   // flexGrow: 1,
+              flex: 1,
+            }}>
+            <FlatList
+              // window.height < 700
+              //   ? window.width < 400
+              //     ? '46%'
+              //     : '55%'
+              //   : window.width < 400
+              //   ? 360
+              //   : 400,
+              //  userType === 'seller' ?  : 390,
+              // initialNumToRender={50}
+              data={messages}
+              contentContainerStyle={{
+                flex: 1,
 
-            //   height: window.height < 700 ? 314 : 385,
-            // }}
-            extraData={true}
-            ref={(ref) => (listRef.current = ref)}
-            keyExtractor={(item, index) => item._id}
-            renderItem={({item}) => {
-              if (item.media) {
-                console.log(item.media)
-              }
-              return item.from !== props.route.params.clientId ? (
-                <>
-                  {/* {item.media ? (
+                // height: window.height < 700 ? 314 : 385,
+              }}
+              extraData={true}
+              ref={(ref) => (listRef.current = ref)}
+              keyExtractor={(item, index) => item._id}
+              renderItem={({item}) => {
+                // if (item.media) {
+                //   console.log(item.media)
+                // }
+                return item.from !== props.route.params.clientId ? (
+                  <>
+                    {/* {item.media ? (
                       <Image
                         source={{
                           uri: item.media,
@@ -426,69 +434,71 @@ const ChatScreen = (props) => {
                         style={{width: 15, height: 15}}
                       />
                     ) : ( */}
-                  {item.media ? (
-                    <Image
-                      source={{uri: item.media}}
-                      resizeMethod="scale"
-                      style={{
-                        width: 200,
-                        height: 200,
-                        resizeMode: 'contain',
-                      }}
-                    />
-                  ) : (
-                    <View
-                      style={[
-                        styles.messageContainer,
-                        {alignItems: 'flex-end'},
-                      ]}>
+                    {item.media ? (
+                      <Image
+                        source={{uri: item.media}}
+                        resizeMethod="scale"
+                        style={{
+                          width: 200,
+                          height: 200,
+                          resizeMode: 'contain',
+                          alignSelf: 'flex-end',
+                        }}
+                      />
+                    ) : (
                       <View
                         style={[
-                          styles.messageView,
-                          {
-                            backgroundColor: '#F9EAF4',
-                            borderBottomLeftRadius: 0,
-                          },
+                          styles.messageContainer,
+                          {alignItems: 'flex-end'},
                         ]}>
-                        <Text style={styles.messageText}>{item.text}</Text>
+                        <View
+                          style={[
+                            styles.messageView,
+                            {
+                              backgroundColor: '#F9EAF4',
+                              borderBottomLeftRadius: 0,
+                            },
+                          ]}>
+                          <Text style={styles.messageText}>{item.text}</Text>
+                        </View>
+                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
                       </View>
-                      {/* <Text style={styles.timeText}>{item.time}</Text> */}
-                    </View>
-                  )}
-                  {/* )} */}
-                </>
-              ) : (
-                <>
-                  {item.media ? (
-                    <Image
-                      source={{uri: item.media}}
-                      resizeMethod="scale"
-                      style={{
-                        width: 200,
-                        height: 200,
-                        resizeMode: 'contain',
-                      }}
-                    />
-                  ) : (
-                    <View style={styles.messageContainer}>
-                      <View
-                        style={[
-                          styles.messageView,
-                          {
-                            // marginBottom: 0,
-                            backgroundColor: '#BCE0FD',
-                            borderBottomRightRadius: 0,
-                          },
-                        ]}>
-                        <Text style={styles.messageText}>{item.text}</Text>
+                    )}
+                    {/* )} */}
+                  </>
+                ) : (
+                  <>
+                    {item.media ? (
+                      <Image
+                        source={{uri: item.media}}
+                        resizeMethod="scale"
+                        style={{
+                          width: 200,
+                          height: 200,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <View style={styles.messageContainer}>
+                        <View
+                          style={[
+                            styles.messageView,
+                            {
+                              // marginBottom: 0,
+                              backgroundColor: '#BCE0FD',
+                              borderBottomRightRadius: 0,
+                            },
+                          ]}>
+                          <Text style={styles.messageText}>{item.text}</Text>
+                        </View>
+                        {/* <Text style={styles.timeText}>{item.time}</Text> */}
                       </View>
-                      {/* <Text style={styles.timeText}>{item.time}</Text> */}
-                    </View>
-                  )}
-                </>
-              )
-            }}
-          />
+                    )}
+                  </>
+                )
+              }}
+            />
+          </View>
           {/* </View> */}
 
           <View style={styles.searchBarContainer}>
@@ -517,7 +527,15 @@ const ChatScreen = (props) => {
           </View>
         </View>
       </KeyboardAvoidingView>
-      <BottomBar />
+      <BottomBar
+        style={{
+          // width: '97.2%',
+          marginTop: 300,
+          // position: 'absolute',
+          // top: window.height < 700 ? window.height - 100 : window.height - 120,
+          // bottom: 0,
+        }}
+      />
 
       {/* </TouchableWithoutFeedback> */}
     </>
@@ -527,6 +545,7 @@ const ChatScreen = (props) => {
 const styles = StyleSheet.create({
   screen: {
     // flex: 1,
+    flexGrow: 1,
   },
   headingContainer: {
     marginTop: 5,

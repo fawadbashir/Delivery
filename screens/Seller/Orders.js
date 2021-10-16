@@ -232,47 +232,52 @@ const Orders = ({navigation}) => {
           <Text style={styles.order}>Total</Text>
           <Text style={styles.order}>Status</Text>
         </View>
-        <View style={{height: window.height < 700 ? 235 : 306}}>
-          {isLoading ? (
-            <ActivityIndicator
-              color={colors.primary}
-              style={{flexGrow: 1, backgroundColor: 'white'}}
-            />
-          ) : (
-            <FlatList
-              contentContainerStyle={{flexGrow: 1}}
-              ListEmptyComponent={
-                <View style={styles.emptyListView}>
-                  <Text style={styles.emptyListText}>
-                    There are no orders. How about starting adding some?
-                  </Text>
-                </View>
-              }
-              style={{backgroundColor: 'white'}}
-              data={orders}
-              keyExtractor={(item) => item.id}
-              renderItem={(itemData) => (
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  style={styles.orderItemContainer}
-                  onPress={() => {
-                    setVisible(true)
-                    setOrderId(itemData.item.id)
-                  }}>
-                  <Text style={styles.order}>
-                    {itemData.item?.id.substring(0, 10)}
-                  </Text>
-                  <Text style={styles.order}>{itemData.item.purchaseDate}</Text>
-                  <Text style={styles.order}>₹{itemData.item.total}</Text>
-                  <Text style={styles.order}>{itemData.item.status}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          )}
-        </View>
-
-        <BottomBar />
+        {/* <View style={{height: window.height < 700 ? 235 : 306}}> */}
+        {isLoading ? (
+          <ActivityIndicator
+            color={colors.primary}
+            style={{flexGrow: 1, backgroundColor: 'white'}}
+          />
+        ) : (
+          <FlatList
+            contentContainerStyle={{flexGrow: 1, marginBottom: -40}}
+            ListEmptyComponent={
+              <View style={styles.emptyListView}>
+                <Text style={styles.emptyListText}>
+                  There are no orders. How about starting adding some?
+                </Text>
+              </View>
+            }
+            style={{backgroundColor: 'white'}}
+            data={orders}
+            keyExtractor={(item) => item.id}
+            renderItem={(itemData) => (
+              <TouchableOpacity
+                activeOpacity={0.6}
+                style={styles.orderItemContainer}
+                onPress={() => {
+                  setVisible(true)
+                  setOrderId(itemData.item.id)
+                }}>
+                <Text style={styles.order}>
+                  {itemData.item?.id.substring(0, 10)}
+                </Text>
+                <Text style={styles.order}>{itemData.item.purchaseDate}</Text>
+                <Text style={styles.order}>₹{itemData.item.total}</Text>
+                <Text style={styles.order}>{itemData.item.status}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+        {/* </View> */}
       </KeyboardAvoidingView>
+      <BottomBar
+        style={{
+          // width: '97.2%',
+          position: 'absolute',
+          top: window.height < 700 ? window.height - 100 : window.height - 120,
+        }}
+      />
     </>
   )
 }

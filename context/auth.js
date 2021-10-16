@@ -278,11 +278,20 @@ export const AppProvider = (props) => {
     setUserType(user)
   }
 
+  const updateUserProfile = async (newData) => {
+    return fetch('https://deliverypay.in/api/editUserProfile', {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json', Accept: 'application/json'},
+      body: JSON.stringify({...newData}),
+    }).then((res) => res.json())
+  }
+
   const userForgotPassword = () => setIsForgotPassword(true)
 
   return (
     <AppContext.Provider
       value={{
+        updateUserProfile,
         login,
         user,
         userForgotPassword,
