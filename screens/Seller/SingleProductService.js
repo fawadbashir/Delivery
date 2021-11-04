@@ -11,11 +11,7 @@ import {
 } from 'react-native'
 import {useFocusEffect} from '@react-navigation/native'
 import {useHttpClient} from '../../hooks/http-hook'
-import {
-  ShareDialog,
-  ShareOpenGraphAction,
-  ShareOpenGraphObject,
-} from 'react-native-fbsdk-next'
+import {ShareDialog} from 'react-native-fbsdk-next'
 import {SwiperFlatList} from 'react-native-swiper-flatlist'
 import {ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -139,6 +135,7 @@ const SingleProductService = (props) => {
       <GroupsPages
         visible={pagesVisible}
         onDismiss={() => setPagesVisible(false)}
+        id={props.route.params.id}
       />
       {product != null ? (
         <AddProductService
@@ -227,14 +224,8 @@ const SingleProductService = (props) => {
               onPress={() => {
                 const shareLinkContent = {
                   contentType: 'link',
-                  photos: [
-                    {
-                      imageUrl:
-                        'https://cdn.deliverypay.in/file_1635856974451.png',
-                    },
-                  ],
+
                   contentUrl: `https://deliverypay.in/marketplace/${props.route.params.id}`,
-                  contentDescription: 'Wow, check out this great site!',
                 }
 
                 ShareDialog.canShow(shareLinkContent)
