@@ -34,7 +34,7 @@ const MyShop = ({navigation}) => {
           style={styles.button}
           onPress={() => navigation.navigate('shop/productsServices')}
           activeOpacity={0.8}>
-          <Text style={styles.buttonText}>{`Prdoucts & Services`}</Text>
+          <Text style={styles.buttonText}>{`Products & Services`}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     backgroundColor: '#fff',
     paddingVertical: 15,
-    marginBottom: 100,
+    // marginBottom: 100,
   },
   button: {
     backgroundColor: colors.blue,

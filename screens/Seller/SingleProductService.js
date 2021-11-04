@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useState} from 'react'
 import {
   View,
   Text,
@@ -11,7 +11,11 @@ import {
 } from 'react-native'
 import {useFocusEffect} from '@react-navigation/native'
 import {useHttpClient} from '../../hooks/http-hook'
-import {ShareDialog} from 'react-native-fbsdk-next'
+import {
+  ShareDialog,
+  ShareOpenGraphAction,
+  ShareOpenGraphObject,
+} from 'react-native-fbsdk-next'
 import {SwiperFlatList} from 'react-native-swiper-flatlist'
 import {ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -21,10 +25,13 @@ import BottomBar from '../../components/BottomBar'
 import colors from '../../constants/colors'
 import GroupsPages from '../../components/Seller/GroupsPages'
 import AddProductService from '../../components/Seller/AddProductService'
+import {AppContext} from '../../context/auth'
 
 const SingleProductService = (props) => {
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const [pagesVisible, setPagesVisible] = useState(false)
+  const [fbLoading, setFbLoading] = useState(false)
+  const {user} = useContext(AppContext)
   const {
     sendRequest: editRequest,
     error: editError,
@@ -34,11 +41,6 @@ const SingleProductService = (props) => {
   const window = useWindowDimensions()
   const [editProductVisible, setEditProductVisible] = useState(false)
   const [product, setProduct] = useState({})
-  const shareLinkContent = {
-    contentType: 'link',
-    contentUrl: `https://deliverypay.in/marketplace/${props.route.params.id}`,
-    contentDescription: 'Wow, check out this great site!',
-  }
 
   const onSubmit = async (data) => {
     console.log(data, 'data')
@@ -62,7 +64,7 @@ const SingleProductService = (props) => {
 
     try {
       const response = await editRequest(
-        `https://deliverypay.in/api/addProduct`,
+        `https://deliverypay.in/api/editProduct`,
         'PATCH',
         JSON.stringify(body),
         {
@@ -83,6 +85,42 @@ const SingleProductService = (props) => {
     }
   }
 
+  const addToFacebook = () => {
+    setFbLoading(true)
+    fetch('https://deliverypay.in/api/addToFbMarket', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({_ids: [product._id]}),
+    })
+      .then((res) => {
+        setFbLoading(false)
+        return res.json()
+      })
+      .then((res) => {
+        setProduct((prev) => ({
+          ...prev,
+          fbMarketId: res.fb_products[0].fbMarketId,
+        }))
+        Alert.alert('Success', 'Product Added on Facebook')
+      })
+      .catch((e) => Alert.alert(e.message))
+  }
+  const removeFromFacebook = () => {
+    setFbLoading(true)
+    fetch('https://deliverypay.in/api/removeFromFbMarket', {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({_ids: [product._id]}),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        Alert.alert('Success', 'Product Removed From Facebook')
+        setProduct((prev) => ({...prev, fbMarketId: null}))
+      })
+      .catch((e) => Alert.alert(e.message))
+    setFbLoading(false)
+  }
+
   useFocusEffect(
     useCallback(() => {
       const getProduct = async () => {
@@ -90,7 +128,7 @@ const SingleProductService = (props) => {
           `https://deliverypay.in/api/singleProduct?_id=${props.route.params.id}`,
         )
         setProduct(response.product)
-        console.log(response)
+        // console.log(response)
       }
       getProduct()
     }, [props.route.params.id, sendRequest]),
@@ -115,20 +153,19 @@ const SingleProductService = (props) => {
       ) : null}
       <Header />
       <ScrollView contentContainerStyle={{flex: 1}}>
-        <View style={styles.screen}>
-          <SwiperFlatList
-            style={{flex: 1}}
-            autoplay
-            autoplayDelay={2}
-            autoplayLoop
-            index={0}
-            showPagination
-            data={product.images}
-            renderItem={({item}) => (
-              <Image source={{uri: item}} style={{width: window.width}} />
-            )}
-          />
-        </View>
+        {/* <View style={styles.screen}> */}
+        <SwiperFlatList
+          autoplay
+          autoplayDelay={2}
+          autoplayLoop
+          index={0}
+          showPagination
+          data={product.images}
+          renderItem={({item}) => (
+            <Image source={{uri: item}} style={{width: window.width}} />
+          )}
+        />
+        {/* </View> */}
         {isLoading && <ActivityIndicator color={colors.primary} />}
 
         <View style={styles.detail}>
@@ -156,11 +193,50 @@ const SingleProductService = (props) => {
               <Icon color={'white'} name="share" size={30} />
             </TouchableOpacity>
           </View>
+          {fbLoading ? (
+            <ActivityIndicator color={colors.primary} />
+          ) : (
+            <>
+              {user?.fbMarket?.userAgreement === true ? (
+                <TouchableOpacity
+                  style={[styles.cartButton, {marginTop: 5}]}
+                  onPress={() =>
+                    product.fbMarketId ? removeFromFacebook() : addToFacebook()
+                  }>
+                  <Text style={styles.cardButtonText}>
+                    {product.fbMarketId
+                      ? 'Remove from Facebook'
+                      : 'Add To Facebook'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.cartButton, {marginTop: 5}]}
+                  onPress={() => props.navigation.navigate('shop/fbMarket')}>
+                  <Text style={styles.cardButtonText}>
+                    Setup Fb MarketPlace
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               activeOpacity={0.6}
               style={styles.cartButton}
               onPress={() => {
+                const shareLinkContent = {
+                  contentType: 'link',
+                  photos: [
+                    {
+                      imageUrl:
+                        'https://cdn.deliverypay.in/file_1635856974451.png',
+                    },
+                  ],
+                  contentUrl: `https://deliverypay.in/marketplace/${props.route.params.id}`,
+                  contentDescription: 'Wow, check out this great site!',
+                }
+
                 ShareDialog.canShow(shareLinkContent)
                   .then(function (canShow) {
                     if (canShow) {
@@ -181,6 +257,7 @@ const SingleProductService = (props) => {
                       console.log('Share fail with error: ' + error)
                     },
                   )
+                  .catch((e) => console.log(e))
               }}>
               <Text style={styles.cardButtonText}>Post on Facebook</Text>
             </TouchableOpacity>
@@ -203,10 +280,12 @@ const SingleProductService = (props) => {
               {product && (
                 <Text style={styles.shopDetail}> Being Sold By: </Text>
               )}
-              <Image
-                source={{uri: product.user.shopInfo.logo}}
-                style={{width: 40, height: 40}}
-              />
+              {/* {product.user.shopInfo?.logo != null && (
+                <Image
+                  source={{uri: product.user.shopInfo.logo}}
+                  style={{width: 40, height: 40}}
+                />
+              )} */}
               {product && (
                 <Text style={styles.shopDetail}>
                   {product?.user.shopInfo.name}

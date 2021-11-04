@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native'
 import {Portal, Modal, ActivityIndicator} from 'react-native-paper'
 import colors from '../../constants/colors'
@@ -55,11 +56,64 @@ const AddProductService = (props) => {
       //   type: response.type,
       //   fileName: response.name,
       // }
-      setValue(
-        'files',
-        response.map((image) => image.uri),
-      )
-      setImages(response.map((image) => image.uri))
+
+      // const formData = new FormData()
+      // formData.append('UploadFiles', {
+      //   type: response[0].type,
+      //   name: response[0].name,
+      //   uri: response[0].fileCopyUri,
+      // })
+      // const headers = new Headers()
+      // headers.append('Accept', '/')
+      // headers.append('Content-Type', 'multipart/form-data')
+      // try {
+      //   const imageResponse = await fetch(
+      //     `https://sassolution.org/Admin/API/cdn_image.php`,
+      //     {
+      //       body: formData,
+      //       method: 'POST',
+      //       headers,
+      //     },
+      //   )
+
+      //   const resData = await imageResponse.json()
+      //   console.log(resData)
+      // } catch (e) {
+      //   console.log(e)
+      // }
+      const uploadImages = async () => {
+        // console.log(data.files, 'files')
+        const formData = new FormData()
+        // if (data.files) {
+        // response.forEach((file) => formData.append('file', file.uri))
+        response.forEach((file) =>
+          formData.append('file', {
+            type: file.type,
+            name: file.name,
+            uri: file.fileCopyUri,
+          }),
+        )
+
+        console.log(formData)
+        return fetch(`https://cdn.deliverypay.in/upload`, {
+          method: 'POST',
+          body: formData,
+        })
+      }
+
+      uploadImages()
+        .then((res) => res.json())
+        .then(({files}) => {
+          setValue(
+            'files',
+            files.map((image) => `https://cdn.deliverypay.in/${image}`),
+          )
+          setImages(files.map((image) => `https://cdn.deliverypay.in/${image}`))
+
+          console.log(files)
+        })
+
+        .catch((e) => Alert.alert('', e.message))
     } catch (e) {
       console.log(e)
     }
@@ -169,6 +223,7 @@ const AddProductService = (props) => {
                     mode="dropdown"
                     selectedValue={value}
                     onValueChange={onChange}>
+                    <Picker.Item value={''} label="Category" />
                     {props.categories.length > 0 &&
                       props.categories.map((category) => (
                         <Picker.Item
@@ -268,6 +323,7 @@ const AddProductService = (props) => {
                       mode="dropdown"
                       selectedValue={value}
                       onValueChange={onChange}>
+                      <Picker.Item value={''} label="Availability" />
                       <Picker.Item value="true" label="Available" />
                       <Picker.Item value="false" label="Not available" />
                     </Picker>
@@ -341,8 +397,13 @@ const AddProductService = (props) => {
               activeOpacity={0.6}
               style={styles.imagePickerContainer}
               onPress={filePickerHandler}>
-              {props.product?.images && images?.length > 0 ? (
-                <Image source={{uri: images[0]}} style={styles.image} />
+              {images?.length > 0 ? (
+                <Image
+                  source={{
+                    uri: images[0],
+                  }}
+                  style={styles.image}
+                />
               ) : (
                 <Icon name="photo-camera" size={30} color="#fff" />
               )}

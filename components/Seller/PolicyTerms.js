@@ -139,7 +139,7 @@ const PolicyTerms = () => {
         </>
       )}
       {/* </View> */}
-      {setShowTermsEdit ? (
+      {showTermsEdit ? (
         <View style={styles.buttonContainer}>
           {isLoading ? (
             <ActivityIndicator color={colors.primary} />

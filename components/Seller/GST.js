@@ -110,7 +110,7 @@ const GST = () => {
       <View>
         <View>
           <Text style={styles.fieldHeading}>
-            Status: {`${user.gst.verified ? 'Verified' : 'Unverified'}`}
+            Status: {`${user?.gst?.verified ? 'Verified' : 'Unverified'}`}
           </Text>
         </View>
         {showGST ? (
@@ -156,7 +156,7 @@ const GST = () => {
                 rules={{required: true}}
                 render={({field: {value, onChange}}) => (
                   <TextInput
-                    value={value.toString()}
+                    value={value ? value.toString() : ''}
                     onChangeText={onChange}
                     style={[styles.field, errors.amount && styles.redBorder]}
                     placeholder="GST Amount"

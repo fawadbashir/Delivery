@@ -67,10 +67,26 @@ const ProductsServices = (props) => {
     } catch (e) {
       alert('Error', e)
     }
-  }, [range, search, category])
+  }, [category, range, search])
 
   const onSubmit = async (data) => {
-    console.log(data, 'data')
+    // const uploadImages = async () => {
+    //   console.log(data.files, 'files')
+    //   const formData = new FormData()
+    //   if (data.files) {
+    //     data.files.forEach((file) => formData.append('file[]', file))
+    //   }
+    //   return fetch(`https://cdn.deliverypay.in/upload`, {
+    //     method: 'POST',
+    //     body: formData,
+    //   })
+    // }
+
+    // uploadImages()
+    //   .then((res) => res.json())
+    //   .then((res) => console.log(res, 'asd'))
+    //   .catch((e) => console.log(e))
+    // console.log(data, 'data')
     const body = {
       available: data.available,
       type: data.productType,
@@ -106,6 +122,7 @@ const ProductsServices = (props) => {
     } catch (e) {
       console.log(e)
     }
+    setAddProductVisble(false)
   }
   // const uploadBatch = async (data) => {
   //   try {
@@ -158,7 +175,7 @@ const ProductsServices = (props) => {
   }, [])
 
   return (
-    <View style={{flex: 1}}>
+    <>
       {/* <AddBatchUpload
         open={BatchVisible}
         onDismiss={setBatchVisible}
@@ -183,119 +200,120 @@ const ProductsServices = (props) => {
         endDate={range?.endDate}
         onConfirm={onConfirm}
       />
-      {/* <KeyboardAvoidingView
+      <KeyboardAvoidingView
+        behavior="padding"
         keyboardVerticalOffset={10}
-        style={{flex: 1}}
-        behavior="height"> */}
-      <Header />
-      {/* <View style={styles.listHeader}>
+        style={{height: window.height < 700 ? 314 : window.height - 125}}>
+        <Header />
+        {/* <View style={styles.listHeader}>
         <Text style={styles.heading}>Product Management</Text> */}
 
-      {/* <TouchableOpacity
+        {/* <TouchableOpacity
               style={styles.button}
               onPress={setBatchVisible.bind(this, true)}>
               <Text style={styles.buttonText}>Batch Upload</Text>
             </TouchableOpacity> */}
-      {/* </View> */}
-      <View style={{flex: 1}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-around',
-            paddingHorizontal: 20,
-            paddingVertical: 10,
-          }}>
-          <CommonSearch
-            style={{borderRadius: 10, width: '80%', marginTop: 0}}
-            onChangeText={(text) => setSearch(text)}
-            value={search}
-          />
-          <TouchableOpacity onPress={() => setCalendarOpen(true)}>
-            <Icon name="calendar-today" color={colors.blue} size={30} />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            paddingHorizontal: 20,
-            alignItems: 'center',
-          }}>
+        {/* </View> */}
+        <View style={{flex: 1}}>
           <View
             style={{
-              // alignItems: 'center',
-              alignSelf: 'center',
-              marginBottom: 10,
-              width: '60%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              paddingHorizontal: 20,
+              paddingVertical: 10,
             }}>
-            <Picker
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: 30,
-              }}
-              mode="dropdown"
-              selectedValue={category}
-              onValueChange={(itemValue) => {
-                setCategory(itemValue)
-              }}>
-              {categories &&
-                categories.map((item) => (
-                  <Picker.Item key={item} value={item} label={item} />
-                ))}
-            </Picker>
+            <CommonSearch
+              style={{borderRadius: 10, width: '80%', marginTop: 0}}
+              onChangeText={(text) => setSearch(text)}
+              value={search}
+            />
+            <TouchableOpacity onPress={() => setCalendarOpen(true)}>
+              <Icon name="calendar-today" color={colors.blue} size={30} />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={setAddProductVisble.bind(this, true)}>
-            <Text style={styles.buttonText}>Add Product</Text>
-          </TouchableOpacity>
-        </View>
-        {/* <View
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              paddingHorizontal: 20,
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                // alignItems: 'center',
+                alignSelf: 'center',
+                marginBottom: 10,
+                width: '60%',
+              }}>
+              <Picker
+                style={{
+                  backgroundColor: '#fff',
+                  borderRadius: 30,
+                }}
+                mode="dropdown"
+                selectedValue={category}
+                onValueChange={(itemValue) => {
+                  setCategory(itemValue)
+                }}>
+                <Picker.Item value="" label="Category" />
+                {categories &&
+                  categories.map((item) => (
+                    <Picker.Item key={item} value={item} label={item} />
+                  ))}
+              </Picker>
+            </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={setAddProductVisble.bind(this, true)}>
+              <Text style={styles.buttonText}>Add Product</Text>
+            </TouchableOpacity>
+          </View>
+          {/* <View
           style={{
             height:
               window.height < 700 ? '36%' : window.width < 400 ? 336 : 365,
           }}
           > */}
 
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item._id}
-          ListEmptyComponent={
-            <View>
-              <Text>No Products or Services Available</Text>
-            </View>
-          }
-          renderItem={({item}) => (
-            <ProductServiceItem
-              onPress={() => {
-                props.navigation.navigate('shop/singleProduct', {
-                  id: item._id,
-                  categories,
-                })
-              }}
-              image={item.images[0]}
-              date={moment(item.createAt).format('DD MM YY')}
-              name={item.name}
-              type={item.type}
-              fbMarketId={item.fbMarketId}
-              available={item.available}
-              price={item.price}
-              gst={item.gst}
-              discount={item.discount}
-            />
-          )}
-        />
-        <BottomBar />
-      </View>
+          <FlatList
+            data={products}
+            keyExtractor={(item) => item._id}
+            ListEmptyComponent={
+              <View>
+                <Text>No Products or Services Available</Text>
+              </View>
+            }
+            renderItem={({item}) => (
+              <ProductServiceItem
+                onPress={() => {
+                  props.navigation.navigate('shop/singleProduct', {
+                    id: item._id,
+                    categories,
+                  })
+                }}
+                image={item.images[0]}
+                date={moment(item.createAt).format('DD MM YY')}
+                name={item.name}
+                type={item.type}
+                fbMarketId={item.fbMarketId}
+                available={item.available}
+                price={item.price}
+                gst={item.gst}
+                discount={item.discount}
+              />
+            )}
+          />
+        </View>
+      </KeyboardAvoidingView>
+      <BottomBar />
       {/* </View> */}
       {/* <View
           style={{
            
           }}> */}
       {/* </View> */}
-      {/* </KeyboardAvoidingView> */}
-    </View>
+    </>
   )
 }
 

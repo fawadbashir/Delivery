@@ -154,16 +154,23 @@ const Deal = (props) => {
         <View
           style={{
             height:
-              window.height < 700
-                ? window.width < 400
-                  ? '48%'
-                  : '56%'
-                : window.width < 400
-                ? 355
-                : 385,
+              window.height < 700 ? window.height - 373 : window.height - 393.5,
             paddingTop: 10,
             paddingHorizontal: 10,
-          }}>
+          }}
+          // style={{
+          //   height:
+          //     window.height < 700
+          //       ? window.width < 400
+          //         ? '48%'
+          //         : '56%'
+          //       : window.width < 400
+          //       ? 355
+          //       : 385,
+          //   paddingTop: 10,
+          //   paddingHorizontal: 10,
+          // }}
+        >
           {users.length === 0 && (
             <FlatList
               data={chats}

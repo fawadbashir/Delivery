@@ -7,6 +7,7 @@ import {
   FlatList,
   Alert,
   KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native'
 import {Picker} from '@react-native-picker/picker'
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -22,6 +23,7 @@ import CouponModal from '../../components/CouponModal'
 import CommonSearch from '../../components/CommonSearch'
 
 const Campaigns = ({navigation}) => {
+  const window = useWindowDimensions()
   const {sendRequest, error, isLoading, clearError} = useHttpClient()
   const [loading, setLoading] = useState(false)
   const [coupon, setCoupon] = useState()
@@ -218,7 +220,10 @@ const Campaigns = ({navigation}) => {
           />
         ) : (
           <FlatList
-            contentContainerStyle={{flexGrow: 1}}
+            contentContainerStyle={{
+              flexGrow: 1,
+              height: window.height < 700 ? 314 : 320,
+            }}
             ListEmptyComponent={
               <View style={styles.emptyListView}>
                 <Text style={styles.emptyListText}>

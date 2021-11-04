@@ -97,7 +97,7 @@ const BottomBar = (props) => {
         <TouchableOpacity
           onPress={() => navigation.navigate('deal')}
           style={[
-            route.name === 'deal'
+            route.name === 'deal' || route.name === 'chat'
               ? {
                   ...styles.activeButton,
                   backgroundColor:
@@ -107,7 +107,7 @@ const BottomBar = (props) => {
             buttonOnHeight,
           ]}
           activeOpacity={0.7}>
-          {route.name === 'deal' ? (
+          {route.name === 'deal' || route.name === 'chat' ? (
             <Svg
               xmlns="http://www.w3.org/2000/svg"
               width="17.426"
@@ -583,7 +583,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 100,
-    backgroundColor: '#F8FAFF',
+    backgroundColor: 'white',
+    overflow: 'hidden',
     // position: 'absolute',
 
     // bottom: 0,

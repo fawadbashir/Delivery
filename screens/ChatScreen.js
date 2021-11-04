@@ -399,41 +399,24 @@ const ChatScreen = (props) => {
             }}> */}
           <View
             style={{
-              flex: 1,
+              // flex: 1,
+              height:
+                window.height < 700
+                  ? userType === 'buyer'
+                    ? window.height - 365
+                    : window.height - 320
+                  : userType === 'buyer'
+                  ? window.height - 385
+                  : window.height - 340,
             }}>
             <FlatList
-              // window.height < 700
-              //   ? window.width < 400
-              //     ? '46%'
-              //     : '55%'
-              //   : window.width < 400
-              //   ? 360
-              //   : 400,
-              //  userType === 'seller' ?  : 390,
-              // initialNumToRender={50}
               data={messages}
-              contentContainerStyle={{
-                flex: 1,
-
-                // height: window.height < 700 ? 314 : 385,
-              }}
               extraData={true}
               ref={(ref) => (listRef.current = ref)}
               keyExtractor={(item, index) => item._id}
               renderItem={({item}) => {
-                // if (item.media) {
-                //   console.log(item.media)
-                // }
                 return item.from !== props.route.params.clientId ? (
                   <>
-                    {/* {item.media ? (
-                      <Image
-                        source={{
-                          uri: item.media,
-                        }}
-                        style={{width: 15, height: 15}}
-                      />
-                    ) : ( */}
                     {item.media ? (
                       <Image
                         source={{uri: item.media}}
@@ -527,15 +510,7 @@ const ChatScreen = (props) => {
           </View>
         </View>
       </KeyboardAvoidingView>
-      <BottomBar
-        style={{
-          // width: '97.2%',
-          marginTop: 300,
-          // position: 'absolute',
-          // top: window.height < 700 ? window.height - 100 : window.height - 120,
-          // bottom: 0,
-        }}
-      />
+      <BottomBar />
 
       {/* </TouchableWithoutFeedback> */}
     </>

@@ -40,23 +40,27 @@ const AccountSettings = () => {
   const onSubmit = async (data) => {
     console.log('hello')
     console.log(data)
+    const body = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phoneNo,
+    }
+    if (data.email) {
+      body.email = data.email
+    }
     try {
       const response = await sendRequest(
         'https://deliverypay.in/api/editUserProfile',
         'PATCH',
-        JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phoneNo,
-          email: data.email,
-        }),
+        JSON.stringify(body),
         {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
       )
       console.log(response)
-      login({
+      login((prev) => ({
+        ...prev,
         userId: response.user._id,
         deliverypayId: response.user.userId,
         userPhone: response.user.phone,
@@ -66,7 +70,7 @@ const AccountSettings = () => {
         image: response.user.profileImg,
         paymentMethods: response.user.paymentMethods,
         balance: response.user.balance,
-      })
+      }))
 
       if (error) {
         Alert.alert('Error', error, [
@@ -85,7 +89,7 @@ const AccountSettings = () => {
     reset({
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email,
+      email: user?.email,
       phoneNo: user.userPhone,
 
       deliverypayId: user.deliverypayId,
@@ -238,7 +242,7 @@ const AccountSettings = () => {
                         control={control}
                         name="email"
                         rules={{
-                          required: true,
+                          // required: true,
                           pattern:
                             /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                         }}

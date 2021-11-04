@@ -259,15 +259,20 @@ const StartTransaction = (props) => {
           />
 
           <View
+            // style={{
+            //   height:
+            //     window.height < 700
+            //       ? window.width < 400
+            //         ? '20%'
+            //         : '27%'
+            //       : window.width < 400
+            //       ? 192
+            //       : 255,
+            // }}
             style={{
               height:
-                window.height < 700
-                  ? window.width < 400
-                    ? '20%'
-                    : '27%'
-                  : window.width < 400
-                  ? 192
-                  : 255,
+                window.height < 700 ? window.height - 506 : window.height - 527,
+              // paddingBottom: 15,
             }}>
             {users.length > 1 ? (
               <FlatList

@@ -96,6 +96,12 @@ const Login = (props) => {
     }
     setIsLoading(false)
   }
+  useEffect(() => {
+    reset({
+      email: `+913422396644`,
+      password: '12345',
+    })
+  }, [reset])
 
   // useEffect(() => {
   //   if (error) {
