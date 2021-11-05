@@ -240,7 +240,11 @@ const Orders = ({navigation}) => {
           />
         ) : (
           <FlatList
-            contentContainerStyle={{flexGrow: 1, marginBottom: -40}}
+            contentContainerStyle={{
+              flexGrow: 1,
+              height:
+                window.height < 700 ? window.height - 100 : window.height - 150,
+            }}
             ListEmptyComponent={
               <View style={styles.emptyListView}>
                 <Text style={styles.emptyListText}>
@@ -274,7 +278,7 @@ const Orders = ({navigation}) => {
       <BottomBar
         style={{
           // width: '97.2%',
-          position: 'absolute',
+          // position: 'absolute',
           top: window.height < 700 ? window.height - 100 : window.height - 120,
         }}
       />

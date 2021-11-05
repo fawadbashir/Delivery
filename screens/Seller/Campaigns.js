@@ -222,7 +222,8 @@ const Campaigns = ({navigation}) => {
           <FlatList
             contentContainerStyle={{
               flexGrow: 1,
-              height: window.height < 700 ? 314 : 320,
+              height:
+                window.height < 700 ? window.height - 500 : window.height - 500,
             }}
             ListEmptyComponent={
               <View style={styles.emptyListView}>

@@ -8,6 +8,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Header from '../../components/Header'
@@ -32,6 +33,7 @@ const ProductsServices = (props) => {
   //   clearError: clearBatchError,
   //   isLoading: batchUploading,
   // } = useHttpClient()
+  const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [range, setRange] = useState()
   const [addProductVisible, setAddProductVisble] = useState(false)
@@ -43,6 +45,7 @@ const ProductsServices = (props) => {
   const getProducts = useCallback(async () => {
     const startDate = moment(range?.startDate).format('YYYY-MM-DD')
     const endDate = moment(range?.endDate).format('YYYY-MM-DD')
+    setLoading(true)
     try {
       const response = await fetch(
         `https://deliverypay.in/api/products?${new URLSearchParams({
@@ -67,6 +70,7 @@ const ProductsServices = (props) => {
     } catch (e) {
       alert('Error', e)
     }
+    setLoading(false)
   }, [category, range, search])
 
   const onSubmit = async (data) => {
@@ -200,10 +204,7 @@ const ProductsServices = (props) => {
         endDate={range?.endDate}
         onConfirm={onConfirm}
       />
-      <KeyboardAvoidingView
-        behavior="padding"
-        keyboardVerticalOffset={10}
-        style={{height: window.height < 700 ? 314 : window.height - 125}}>
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={10}>
         <Header />
         {/* <View style={styles.listHeader}>
         <Text style={styles.heading}>Product Management</Text> */}
@@ -214,105 +215,116 @@ const ProductsServices = (props) => {
               <Text style={styles.buttonText}>Batch Upload</Text>
             </TouchableOpacity> */}
         {/* </View> */}
-        <View style={{flex: 1}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-around',
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-            }}>
-            <CommonSearch
-              style={{borderRadius: 10, width: '80%', marginTop: 0}}
-              onChangeText={(text) => setSearch(text)}
-              value={search}
-            />
-            <TouchableOpacity onPress={() => setCalendarOpen(true)}>
-              <Icon name="calendar-today" color={colors.blue} size={30} />
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              paddingHorizontal: 20,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                // alignItems: 'center',
-                alignSelf: 'center',
-                marginBottom: 10,
-                width: '60%',
-              }}>
-              <Picker
-                style={{
-                  backgroundColor: '#fff',
-                  borderRadius: 30,
-                }}
-                mode="dropdown"
-                selectedValue={category}
-                onValueChange={(itemValue) => {
-                  setCategory(itemValue)
-                }}>
-                <Picker.Item value="" label="Category" />
-                {categories &&
-                  categories.map((item) => (
-                    <Picker.Item key={item} value={item} label={item} />
-                  ))}
-              </Picker>
-            </View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={setAddProductVisble.bind(this, true)}>
-              <Text style={styles.buttonText}>Add Product</Text>
-            </TouchableOpacity>
-          </View>
-          {/* <View
-          style={{
-            height:
-              window.height < 700 ? '36%' : window.width < 400 ? 336 : 365,
-          }}
-          > */}
 
-          <FlatList
-            data={products}
-            keyExtractor={(item) => item._id}
-            ListEmptyComponent={
-              <View>
-                <Text>No Products or Services Available</Text>
-              </View>
-            }
-            renderItem={({item}) => (
-              <ProductServiceItem
-                onPress={() => {
-                  props.navigation.navigate('shop/singleProduct', {
-                    id: item._id,
-                    categories,
-                  })
-                }}
-                image={item.images[0]}
-                date={moment(item.createAt).format('DD MM YY')}
-                name={item.name}
-                type={item.type}
-                fbMarketId={item.fbMarketId}
-                available={item.available}
-                price={item.price}
-                gst={item.gst}
-                discount={item.discount}
-              />
-            )}
-          />
-        </View>
-      </KeyboardAvoidingView>
-      <BottomBar />
-      {/* </View> */}
-      {/* <View
+        <View
           style={{
-           
-          }}> */}
-      {/* </View> */}
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-around',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+          }}>
+          <CommonSearch
+            style={{borderRadius: 10, width: '80%', marginTop: 0}}
+            onChangeText={(text) => setSearch(text)}
+            value={search}
+          />
+          <TouchableOpacity onPress={() => setCalendarOpen(true)}>
+            <Icon name="calendar-today" color={colors.blue} size={30} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            paddingHorizontal: 20,
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              // alignItems: 'center',
+              alignSelf: 'center',
+              marginBottom: 10,
+              width: '60%',
+            }}>
+            <Picker
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: 30,
+              }}
+              mode="dropdown"
+              selectedValue={category}
+              onValueChange={(itemValue) => {
+                setCategory(itemValue)
+              }}>
+              <Picker.Item value="" label="Category" />
+              {categories &&
+                categories.map((item) => (
+                  <Picker.Item key={item} value={item} label={item} />
+                ))}
+            </Picker>
+          </View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={setAddProductVisble.bind(this, true)}>
+            <Text style={styles.buttonText}>Add Product</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading ? (
+          <View
+            style={{
+              flexGrow: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              height:
+                window.height < 700 ? window.height - 392 : window.height - 412,
+            }}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
+        ) : (
+          <View
+            style={{
+              // flex: 1,
+              // flexGrow: 1,
+              height:
+                window.height < 700 ? window.height - 392 : window.height - 412,
+            }}>
+            <FlatList
+              data={products}
+              contentContainerStyle={{}}
+              keyExtractor={(item) => item._id}
+              ListEmptyComponent={
+                <View style={styles.emptyListView}>
+                  <Text style={styles.emptyListText}>
+                    No Products or Services Available
+                  </Text>
+                </View>
+              }
+              renderItem={({item}) => (
+                <ProductServiceItem
+                  onPress={() => {
+                    props.navigation.navigate('shop/singleProduct', {
+                      id: item._id,
+                      categories,
+                    })
+                  }}
+                  image={item.images[0]}
+                  date={moment(item.createAt).format('DD MM YY')}
+                  name={item.name}
+                  type={item.type}
+                  fbMarketId={item.fbMarketId}
+                  available={item.available}
+                  price={item.price}
+                  gst={item.gst}
+                  discount={item.discount}
+                />
+              )}
+            />
+          </View>
+        )}
+        <BottomBar />
+      </KeyboardAvoidingView>
     </>
   )
 }
@@ -340,6 +352,16 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 17,
+  },
+  emptyListView: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyListText: {
+    fontSize: 20,
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
   },
 })
 

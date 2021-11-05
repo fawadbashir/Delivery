@@ -6,14 +6,14 @@ import {
   StyleSheet,
   Image,
   FlatList,
-  useWindowDimensions,
   TouchableOpacity,
   Alert,
 } from 'react-native'
 
-import {Modal, Portal} from 'react-native-paper'
+import {ActivityIndicator, Modal, Portal} from 'react-native-paper'
 import BottomBar from '../components/BottomBar'
 import LinearGradient from 'react-native-linear-gradient'
+import colors from '../constants/colors'
 
 import {useHttpClient} from '../hooks/http-hook'
 import ApproveDecline from '../components/ApproveDecline'
@@ -33,12 +33,6 @@ const Hold = (props) => {
   const [role, setRole] = useState()
 
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
-  const {
-    sendRequest: requestCancel,
-    error: cancellationError,
-    clearError: clearCancelError,
-    isLoading: cancelLoading,
-  } = useHttpClient()
 
   const detailModal = () => {
     return (
@@ -180,161 +174,167 @@ const Hold = (props) => {
           <Text style={styles.headingText}>Status</Text>
         </View>
         <View>
-          <FlatList
-            style={{marginBottom: 40}}
-            initialNumToRender={7}
-            data={milestones}
-            keyExtractor={(item) => item.id}
-            renderItem={({item}) => {
-              return (
-                <>
-                  <TouchableOpacity
-                    style={styles.innerList}
-                    activeOpacity={0.7}
-                    onPress={() =>
-                      setTransactionModal({
-                        name: `${item.firstName} ${item.lastName}`,
-                        role: `${item.role}`,
-                        transactionId: item.id,
-                        status: item.status,
-                        product: item.description,
-                        amount: item.amount,
-                      })
-                    }>
-                    <View style={styles.nameView}>
-                      <Image style={styles.image} source={{uri: item.image}} />
-                      <Text style={styles.name}>
-                        {`${item.firstName}
+          {isLoading ? (
+            <View
+              style={{
+                flexGrow: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator color={colors.primary} />
+            </View>
+          ) : (
+            <FlatList
+              style={{marginBottom: 40}}
+              initialNumToRender={7}
+              data={milestones}
+              keyExtractor={(item) => item.id}
+              renderItem={({item}) => {
+                return (
+                  <>
+                    <TouchableOpacity
+                      style={styles.innerList}
+                      activeOpacity={0.7}
+                      onPress={() =>
+                        setTransactionModal({
+                          name: `${item.firstName} ${item.lastName}`,
+                          role: `${item.role}`,
+                          transactionId: item.id,
+                          status: item.status,
+                          product: item.description,
+                          amount: item.amount,
+                        })
+                      }>
+                      <View style={styles.nameView}>
+                        <Image
+                          style={styles.image}
+                          source={{uri: item.image}}
+                        />
+                        <Text style={styles.name}>
+                          {`${item.firstName}
                         `}
-                        {/* ${item.lastName}  */}
-                      </Text>
-                    </View>
-                    <View style={styles.roleView}>
-                      <Text style={styles.role}>{item.role}</Text>
-                    </View>
-                    <View style={styles.transactionIdView}>
-                      <Text style={styles.transactionId}>
-                        {item.id.substring(0, 9)}
-                      </Text>
-                    </View>
-                    <View style={styles.productView}>
-                      <Text style={styles.product}>
-                        {item.description.substring(0, 5)}
-                      </Text>
-                    </View>
-                    {item.status === 'pendingRelease' && (
-                      <TouchableOpacity
-                        activeOpacity={0.6}
-                        onPress={() => {
-                          setDisputeVisible(true)
-                          setClientId(item.clientId)
-                          setMilestoneId(item.id)
-                          setRole(item.role)
-                        }}>
-                        {/* <View style={styles.statusView}> */}
-                        <LinearGradient
-                          colors={
-                            item.status == 'Hold'
-                              ? ['#336CF9', '#1BE6D6']
-                              : ['#1BE6D6', '#013B67']
-                          }
-                          // start={{x: 0, y: 0}}
-                          // end={{x: 1, y: 0}}
-                          style={styles.statusView}>
-                          <Text style={styles.status}>Release Requested</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
+                          {/* ${item.lastName}  */}
+                        </Text>
+                      </View>
+                      <View style={styles.roleView}>
+                        <Text style={styles.role}>{item.role}</Text>
+                      </View>
+                      <View style={styles.transactionIdView}>
+                        <Text style={styles.transactionId}>
+                          {item.id.substring(0, 9)}
+                        </Text>
+                      </View>
+                      <View style={styles.productView}>
+                        <Text style={styles.product}>
+                          {item.description.substring(0, 5)}
+                        </Text>
+                      </View>
+                      {item.status === 'pendingRelease' && (
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          onPress={() => {
+                            setDisputeVisible(true)
+                            setClientId(item.clientId)
+                            setMilestoneId(item.id)
+                            setRole(item.role)
+                          }}>
+                          {/* <View style={styles.statusView}> */}
+                          <LinearGradient
+                            colors={
+                              item.status == 'Hold'
+                                ? ['#336CF9', '#1BE6D6']
+                                : ['#1BE6D6', '#013B67']
+                            }
+                            // start={{x: 0, y: 0}}
+                            // end={{x: 1, y: 0}}
+                            style={styles.statusView}>
+                            <Text style={styles.status}>Release Requested</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
 
-                    {item.status === 'pending' && (
-                      <TouchableOpacity
-                        activeOpacity={0.6}
-                        onPress={() => {
-                          setApproveVisible(true)
-                          setMilestoneId(item.id)
-                          setAmount(item.amount)
-                        }}>
-                        {/* <View style={styles.statusView}> */}
-                        <LinearGradient
-                          colors={
-                            item.status == 'Hold'
-                              ? ['#336CF9', '#1BE6D6']
-                              : ['#1BE6D6', '#013B67']
-                          }
-                          // start={{x: 0, y: 0}}
-                          // end={{x: 1, y: 0}}
-                          style={styles.statusView}>
-                          <Text style={styles.status}>Pending</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
+                      {item.status === 'pending' && (
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          onPress={() => {
+                            setApproveVisible(true)
+                            setMilestoneId(item.id)
+                            setAmount(item.amount)
+                          }}>
+                          {/* <View style={styles.statusView}> */}
+                          <LinearGradient
+                            colors={
+                              item.status == 'Hold'
+                                ? ['#336CF9', '#1BE6D6']
+                                : ['#1BE6D6', '#013B67']
+                            }
+                            // start={{x: 0, y: 0}}
+                            // end={{x: 1, y: 0}}
+                            style={styles.statusView}>
+                            <Text style={styles.status}>Pending</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
 
-                    {item.status === 'declined' && (
-                      <TouchableOpacity
-                        disabled={true}
-                        activeOpacity={0.6}
-                        style={styles.declinedButton}>
-                        {/* <View style={styles.statusView}> */}
+                      {item.status === 'declined' && (
+                        <TouchableOpacity
+                          disabled={true}
+                          activeOpacity={0.6}
+                          style={styles.declinedButton}>
+                          {/* <View style={styles.statusView}> */}
 
-                        <Text style={styles.declinedText}>Declined</Text>
-                      </TouchableOpacity>
-                    )}
-                    {item.status === 'inProgress' && (
-                      <TouchableOpacity
-                        activeOpacity={0.6}
-                        onPress={() => {
-                          setReleaseVisible(true)
-                          setMilestoneId(item.id)
-                          setAmount(item.amount)
-                        }}>
-                        <LinearGradient
-                          colors={['#1BE6D6', '#013B67']}
-                          style={styles.statusView}>
-                          <Text style={styles.status}>Release</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-                    {item.status === 'released' && (
-                      <TouchableOpacity
-                        disabled={true}
-                        activeOpacity={0.6}
-                        // onPress={() => {
-                        //   setReleaseVisible(true)
-                        //   setMilestoneId(item.id)
-                        //   setAmount(item.amount)
-                        // }}
-                      >
-                        <LinearGradient
-                          colors={['#1BE6D6', '#013B67']}
-                          style={styles.statusView}>
-                          <Text style={styles.status}>Released</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-                    {item.status === 'dispute' && (
-                      <TouchableOpacity
-                        activeOpacity={0.6}
-                        onPress={() => {
-                          setDisputeVisible(true)
-                          setMilestoneId(item.id)
-                          setAmount(item.amount)
-                          setRole(item.role)
-                          setClientId(item.clientId)
-                        }}>
-                        <LinearGradient
-                          start={{x: 0, y: 0}}
-                          end={{x: 1, y: 1}}
-                          colors={['#f64bbd', '#ff5757']}
-                          style={styles.statusView}>
-                          <Text style={styles.status}>Approve Dispute</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-                  </TouchableOpacity>
-                </>
-              )
-            }}
-          />
+                          <Text style={styles.declinedText}>Declined</Text>
+                        </TouchableOpacity>
+                      )}
+                      {item.status === 'inProgress' && (
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          onPress={() => {
+                            setReleaseVisible(true)
+                            setMilestoneId(item.id)
+                            setAmount(item.amount)
+                          }}>
+                          <LinearGradient
+                            colors={['#1BE6D6', '#013B67']}
+                            style={styles.statusView}>
+                            <Text style={styles.status}>Release</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
+                      {item.status === 'released' && (
+                        <TouchableOpacity disabled={true} activeOpacity={0.6}>
+                          <LinearGradient
+                            colors={['#1BE6D6', '#013B67']}
+                            style={styles.statusView}>
+                            <Text style={styles.status}>Released</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
+                      {item.status === 'dispute' && (
+                        <TouchableOpacity
+                          activeOpacity={0.6}
+                          onPress={() => {
+                            setDisputeVisible(true)
+                            setMilestoneId(item.id)
+                            setAmount(item.amount)
+                            setRole(item.role)
+                            setClientId(item.clientId)
+                          }}>
+                          <LinearGradient
+                            start={{x: 0, y: 0}}
+                            end={{x: 1, y: 1}}
+                            colors={['#f64bbd', '#ff5757']}
+                            style={styles.statusView}>
+                            <Text style={styles.status}>Approve Dispute</Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
+                    </TouchableOpacity>
+                  </>
+                )
+              }}
+            />
+          )}
         </View>
       </View>
       <BottomBar />

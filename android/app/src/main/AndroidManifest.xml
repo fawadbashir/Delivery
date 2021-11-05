@@ -39,6 +39,10 @@
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="@string/fb_login_protocol_scheme" />
         </intent-filter>
+
     </activity>
+        <provider android:authorities="com.facebook.app.FacebookContentProvider582042272810863"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
     </application>
 </manifest>

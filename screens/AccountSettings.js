@@ -104,7 +104,7 @@ const AccountSettings = () => {
             <ActivityIndicator color={Colors.primary} size="large" />
           </View>
         ) : (
-          <View style={styles.screen}>
+          <ScrollView style={styles.screen}>
             <KeyboardAvoidingView
               keyboardVerticalOffset={1}
               behavior={'position'}>
@@ -415,7 +415,7 @@ const AccountSettings = () => {
                 </View>
               </ScrollView>
             </KeyboardAvoidingView>
-          </View>
+          </ScrollView>
         )}
         <BottomBar />
       </>

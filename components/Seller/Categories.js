@@ -1,15 +1,8 @@
-import React, {
-  useRef,
-  useState,
-  useContext,
-  useEffect,
-  useCallback,
-} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -18,8 +11,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {useForm, Controller} from 'react-hook-form'
 import colors from '../../constants/colors'
-
-import {AppContext} from '../../context/auth'
 
 const Categories = () => {
   const [loading, setLoading] = useState(false)

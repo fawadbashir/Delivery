@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react'
 import {FlatList, View, Text, StyleSheet, Alert} from 'react-native'
-import {Modal, Portal, Checkbox} from 'react-native-paper'
+import {Modal, Portal, ActivityIndicator} from 'react-native-paper'
 import {AppContext} from '../../context/auth'
 import colors from '../../constants/colors'
 import PageItem from './PageItem'
@@ -12,6 +12,7 @@ const GroupsPages = (props) => {
   const [groups, setGroups] = useState([])
   const [groupsToSend, setGroupsToSend] = useState([])
   const [instaAccounts, setInstaAccounts] = useState([])
+  const [loading, setLoading] = useState(false)
   const [instaToSend, setInstaToSend] = useState([])
   const {user} = useContext(AppContext)
   const addPage = (item) => {
@@ -49,8 +50,9 @@ const GroupsPages = (props) => {
       pagesToSend.length === 0 &&
       instaToSend.length === 0
     ) {
-      Alert.alert('', 'Please select any of the followings first')
+      Alert.alert('', 'Please select any of the following first')
     } else {
+      setLoading(true)
       try {
         const response = await fetch(
           `https://deliverypay.in/api/shareProducts`,
@@ -72,12 +74,14 @@ const GroupsPages = (props) => {
         if (!response.ok) {
           throw new Error(resData.message)
         }
-        Alert.alert('Success', resData.message)
+        Alert.alert('Success', 'Posted Successfully')
+        props.onDismiss(false)
 
         console.log(response)
       } catch (e) {
         Alert.alert('Err', e.message)
       }
+      setLoading(false)
     }
   }
 
@@ -123,33 +127,35 @@ const GroupsPages = (props) => {
           <Text style={styles.modalHeading}>Share on Social media</Text>
         </View>
 
-        {
-          <FlatList
-            style={{borderBottomWidth: 0.5, height: '50%'}}
-            // contentContainerStyle={{flexGrow: 0.5}}
-            renderItem={({item}) => (
-              <PageItem
-                key={item.id}
-                image={item.picture.data.url}
-                name={item.name}
-                category={item.category}
-                onPress={addPage.bind(this, item)}
-                selected={pagesToSend.includes(item) ? 'checked' : 'unchecked'}
-              />
-            )}
-            data={pages}
-            ListHeaderComponent={
-              <View style={{width: '100%', paddingHorizontal: 10}}>
-                <Text style={{fontSize: 20, fontFamily: 'Poppins-SemiBold'}}>
-                  Pages
-                </Text>
-              </View>
-            }
-          />
-        }
+        <FlatList
+          style={{
+            borderBottomWidth: 0.5,
+            height: instaAccounts.length > 0 ? '60%' : '33%',
+          }}
+          // contentContainerStyle={{flexGrow: 0.5}}
+          renderItem={({item}) => (
+            <PageItem
+              key={item.id}
+              image={item.picture.data.url}
+              name={item.name}
+              category={item.category}
+              onPress={addPage.bind(this, item)}
+              selected={pagesToSend.includes(item) ? 'checked' : 'unchecked'}
+            />
+          )}
+          data={pages}
+          ListHeaderComponent={
+            <View style={{width: '100%', paddingHorizontal: 10}}>
+              <Text style={{fontSize: 20, fontFamily: 'Poppins-SemiBold'}}>
+                Pages
+              </Text>
+            </View>
+          }
+        />
+
         {instaAccounts.length > 0 && (
           <FlatList
-            style={{borderBottomWidth: 0.5}}
+            style={{borderBottomWidth: 0.5, height: '33%'}}
             // contentContainerStyle={{flexGrow: 0.5}}
             renderItem={({item}) => (
               <PageItem
@@ -172,7 +178,11 @@ const GroupsPages = (props) => {
           />
         )}
         <FlatList
-          style={{marginBottom: 10, borderBottomWidth: 0.5, maxHeight: '60%'}}
+          style={{
+            marginBottom: 10,
+            borderBottomWidth: 0.5,
+            maxHeight: instaAccounts.length > 0 ? '50%' : '33%',
+          }}
           renderItem={({item}) => (
             <PageItem
               key={item.id}
@@ -192,7 +202,14 @@ const GroupsPages = (props) => {
             </View>
           }
         />
-        <BlueButton onPress={sendToSocialMedia}>Post</BlueButton>
+        {loading ? (
+          <ActivityIndicator
+            color={colors.primary}
+            style={{marginVertical: 10}}
+          />
+        ) : (
+          <BlueButton onPress={sendToSocialMedia}>Post</BlueButton>
+        )}
       </Modal>
     </Portal>
   )

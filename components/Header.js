@@ -5,7 +5,6 @@ import {useNavigation} from '@react-navigation/native'
 import Svg, {Path} from 'react-native-svg'
 import {AppContext} from '../context/auth'
 import colors from '../constants/colors'
-import numeral from 'numeral'
 
 const Header = () => {
   const {user, userType, changeUserType, cart} = useContext(AppContext)
@@ -30,7 +29,10 @@ const Header = () => {
             <Text style={styles.name}>{user.firstName}</Text>
             <Text style={[styles.name, {marginTop: -5}]}>{user.lastName}</Text>
           </View>
-          <TouchableOpacity style={styles.personButton} activeOpacity={0.6}>
+          <TouchableOpacity
+            style={styles.personButton}
+            activeOpacity={0.6}
+            disabled={true}>
             <Icon name="person" color="#2699FB" size={30} />
           </TouchableOpacity>
         </View>

@@ -15,7 +15,7 @@ import {ShareDialog} from 'react-native-fbsdk-next'
 import {SwiperFlatList} from 'react-native-swiper-flatlist'
 import {ActivityIndicator} from 'react-native-paper'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-
+import Share from 'react-native-share'
 import Header from '../../components/Header'
 import BottomBar from '../../components/BottomBar'
 import colors from '../../constants/colors'
@@ -27,6 +27,7 @@ const SingleProductService = (props) => {
   const {sendRequest, error, clearError, isLoading} = useHttpClient()
   const [pagesVisible, setPagesVisible] = useState(false)
   const [fbLoading, setFbLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const {user} = useContext(AppContext)
   const {
     sendRequest: editRequest,
@@ -37,6 +38,24 @@ const SingleProductService = (props) => {
   const window = useWindowDimensions()
   const [editProductVisible, setEditProductVisible] = useState(false)
   const [product, setProduct] = useState({})
+  const shareLinkContent = {
+    contentType: 'link',
+    contentUrl: `https://deliverypay.in/marketplace/${props.route.params.id}`,
+
+    previewPhoto: product?.images
+      ? product.images[0]
+      : 'https://images.unsplash.com/photo-1635990573258-d0620cec3da0?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
+  }
+  const shareOptions = {
+    title: product?.name ? product.name : '',
+    message: 'Hey, Check out this Product!                            ',
+    url: `https://deliverypay.in/marketplace/${props.route.params.id}`,
+    social: Share.Social.WHATSAPP,
+
+    // social: Share.Social.WHATSAPP,
+    whatsAppNumber: '9199999999', // country code + phone number
+    // filename: 'test', // only for base64 file in Android
+  }
 
   const onSubmit = async (data) => {
     console.log(data, 'data')
@@ -117,12 +136,39 @@ const SingleProductService = (props) => {
     setFbLoading(false)
   }
 
+  const deleteProduct = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('https://deliverypay.in/api/removeProduct', {
+        method: 'DELETE',
+        // headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({_id: props.route.params.id}),
+      })
+      const resData = await response.json()
+      console.log(resData)
+      if (!response.ok) {
+        throw new Error(resData.message)
+      }
+      Alert.alert('Success', resData.message, [
+        {
+          onPress: () => props.navigation.navigate('shop/productsServices'),
+        },
+      ])
+    } catch (e) {
+      console.log(e)
+    }
+    setLoading(false)
+  }
+
   useFocusEffect(
     useCallback(() => {
       const getProduct = async () => {
         const response = await sendRequest(
           `https://deliverypay.in/api/singleProduct?_id=${props.route.params.id}`,
         )
+        if (error) {
+          Alert.alert('', error, [{onPress: () => clearError()}])
+        }
         setProduct(response.product)
         // console.log(response)
       }
@@ -149,19 +195,22 @@ const SingleProductService = (props) => {
         />
       ) : null}
       <Header />
-      <ScrollView contentContainerStyle={{flex: 1}}>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
         {/* <View style={styles.screen}> */}
-        <SwiperFlatList
-          autoplay
-          autoplayDelay={2}
-          autoplayLoop
-          index={0}
-          showPagination
-          data={product.images}
-          renderItem={({item}) => (
-            <Image source={{uri: item}} style={{width: window.width}} />
-          )}
-        />
+        <View style={{height: 250}}>
+          <SwiperFlatList
+            autoplay
+            autoplayDelay={2}
+            autoplayLoop
+            index={0}
+            showPagination
+            contentContainerStyle={{width: window.width}}
+            data={product.images}
+            renderItem={({item}) => (
+              <Image source={{uri: item}} style={{width: window.width}} />
+            )}
+          />
+        </View>
         {/* </View> */}
         {isLoading && <ActivityIndicator color={colors.primary} />}
 
@@ -183,10 +232,26 @@ const SingleProductService = (props) => {
               onPress={() => setEditProductVisible(true)}>
               <Icon color={'white'} name="edit" size={30} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Icon color={'white'} name="delete" size={30} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            {loading ? (
+              <ActivityIndicator color={colors.primary} />
+            ) : (
+              <TouchableOpacity
+                style={styles.iconButton}
+                onPress={deleteProduct}>
+                <Icon color={'white'} name="delete" size={30} />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                Share.open(shareOptions)
+                  .then((res) => {
+                    console.log(res)
+                  })
+                  .catch((err) => {
+                    err && console.log(err)
+                  })
+              }>
               <Icon color={'white'} name="share" size={30} />
             </TouchableOpacity>
           </View>
@@ -222,12 +287,6 @@ const SingleProductService = (props) => {
               activeOpacity={0.6}
               style={styles.cartButton}
               onPress={() => {
-                const shareLinkContent = {
-                  contentType: 'link',
-
-                  contentUrl: `https://deliverypay.in/marketplace/${props.route.params.id}`,
-                }
-
                 ShareDialog.canShow(shareLinkContent)
                   .then(function (canShow) {
                     if (canShow) {
